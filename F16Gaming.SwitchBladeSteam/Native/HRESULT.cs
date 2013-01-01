@@ -5,28 +5,17 @@
  *   Added Razer error codes
  */
 
+using System.Globalization;
+
 namespace F16Gaming.SwitchBladeSteam.Native
 {
-	//#define DOTNET20 //uncomment for .NET 2.0
 	#region HRESULT
+// ReSharper disable InconsistentNaming
 	[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential, Pack = 4)]
-	public struct HRESULT :
-		System.IComparable
-#if DOTNET20
-		,System.IEquatable<HRESULT>
-		,System.IEquatable<int>
-		,System.IComparable<HRESULT>
-		,System.IComparable<int>
-#endif
+	public struct HRESULT : System.IComparable
 	{
-		private int m_value;
+		private readonly int m_value;
 
-#if DOTNET20
-		public static System.Exception GetExceptionForHR(int hr)
-		{
-			return System.Runtime.InteropServices.Marshal.GetExceptionForHR(hr);
-		}
-#else
 		public class HResultException : System.SystemException
 		{
 			new public HRESULT HResult
@@ -46,7 +35,6 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		{
 			return new HResultException(hr);
 		}
-#endif
 
 		public HRESULT(int value)
 		{
@@ -76,23 +64,23 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 		public static bool operator true(HRESULT This)
 		{
-			return (bool)This == true;
+			return This;
 		}
 
 		public static bool operator false(HRESULT This)
 		{
-			return (bool)This == false;
+			return This == false;
 		}
 
 		#region IEquatable<> Members
 		public bool Equals(HRESULT that)
 		{
-			return (this.m_value == that.m_value);
+			return m_value == that.m_value;
 		}
 
 		public bool Equals(int that)
 		{
-			return (this.m_value == that);
+			return m_value == that;
 		}
 		#endregion
 
@@ -136,14 +124,16 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		{
 			System.Reflection.FieldInfo fi;
 			if (!dirCodes.TryGetValue(m_value, out fi))
-				return m_value.ToString();
+				return m_value.ToString(CultureInfo.InvariantCulture);
 
-			object[] o = fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+			var o = fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
 			DescriptionAttribute descr = null;
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
 			if (o != null && o.Length > 0)
 				descr = (DescriptionAttribute)o[0];
+// ReSharper restore ConditionIsAlwaysTrueOrFalse
 
-			string s = (descr != null && !nameOnly) ? fi.Name + ": " + descr.description : fi.Name;
+			var s = (descr != null && !nameOnly) ? fi.Name + ": " + descr.description : fi.Name;
 			return s;
 		}
 		#endregion
@@ -157,12 +147,12 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region IComparable<> Members
 		public int CompareTo(HRESULT that)
 		{
-			return (this.m_value < that.m_value) ? -1 : (this.m_value > that.m_value) ? +1 : 0;
+			return m_value < that.m_value ? -1 : m_value > that.m_value ? +1 : 0;
 		}
 
 		public int CompareTo(int that)
 		{
-			return (this.m_value < that) ? -1 : (this.m_value > that) ? +1 : 0;
+			return m_value < that ? -1 : m_value > that ? +1 : 0;
 		}
 		#endregion
 
@@ -200,36 +190,36 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		[System.AttributeUsage(System.AttributeTargets.All)]
 		class DescriptionAttribute : System.Attribute
 		{
-			protected string m_description;
 			public DescriptionAttribute(string description)
 			{
-				m_description = description;
+				this.description = description;
 			}
 
-			public string description { get { return m_description; } }
+			public string description { get; private set; }
 		}
 
 		///<summary>
 		///Success code
 		///</summary>
 		[Description("Success code")]
-		public const int S_OK = unchecked((int)0x00000000);
+		public const int S_OK = unchecked(0x00000000);
+
 		///<summary>
 		///Success code
 		///</summary>
 		[Description("Success code")]
-		public const int NO_ERROR = unchecked((int)0x00000000);
+		public const int NO_ERROR = unchecked(0x00000000);
 		///<summary>
 		///Success code
 		///</summary>
 		[Description("Success code")]
-		public const int NOERROR = unchecked((int)0x00000000);
+		public const int NOERROR = unchecked(0x00000000);
 
 		///<summary>
 		///Success code false
 		///</summary>
 		[Description("Success code false")]
-		public const int S_FALSE = unchecked((int)0x00000001);
+		public const int S_FALSE = unchecked(0x00000001);
 
 		///<summary>
 		///Catastrophic failure
@@ -1585,43 +1575,43 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///The underlying file was converted to compound file format.
 		///</summary>
 		[Description("The underlying file was converted to compound file format.")]
-		public const int STG_S_CONVERTED = unchecked((int)0x00030200);
+		public const int STG_S_CONVERTED = unchecked(0x00030200);
 
 		///<summary>
 		///The storage operation should block until more data is available.
 		///</summary>
 		[Description("The storage operation should block until more data is available.")]
-		public const int STG_S_BLOCK = unchecked((int)0x00030201);
+		public const int STG_S_BLOCK = unchecked(0x00030201);
 
 		///<summary>
 		///The storage operation should retry immediately.
 		///</summary>
 		[Description("The storage operation should retry immediately.")]
-		public const int STG_S_RETRYNOW = unchecked((int)0x00030202);
+		public const int STG_S_RETRYNOW = unchecked(0x00030202);
 
 		///<summary>
 		///The notified event sink will not influence the storage operation.
 		///</summary>
 		[Description("The notified event sink will not influence the storage operation.")]
-		public const int STG_S_MONITORING = unchecked((int)0x00030203);
+		public const int STG_S_MONITORING = unchecked(0x00030203);
 
 		///<summary>
 		///Multiple opens prevent consolidated. (commit succeeded).
 		///</summary>
 		[Description("Multiple opens prevent consolidated. (commit succeeded).")]
-		public const int STG_S_MULTIPLEOPENS = unchecked((int)0x00030204);
+		public const int STG_S_MULTIPLEOPENS = unchecked(0x00030204);
 
 		///<summary>
 		///Consolidation of the storage file failed. (commit succeeded).
 		///</summary>
 		[Description("Consolidation of the storage file failed. (commit succeeded).")]
-		public const int STG_S_CONSOLIDATIONFAILED = unchecked((int)0x00030205);
+		public const int STG_S_CONSOLIDATIONFAILED = unchecked(0x00030205);
 
 		///<summary>
 		///Consolidation of the storage file is inappropriate. (commit succeeded).
 		///</summary>
 		[Description("Consolidation of the storage file is inappropriate. (commit succeeded).")]
-		public const int STG_S_CANNOTCONSOLIDATE = unchecked((int)0x00030206);
+		public const int STG_S_CANNOTCONSOLIDATE = unchecked(0x00030206);
 
 		/*++
 	
@@ -1690,8 +1680,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		[Description("Generic OLE errors that may be returned by many inerfaces")]
 		public const int OLE_E_FIRST = unchecked((int)0x80040000);
 		public const int OLE_E_LAST = unchecked((int)0x800400FF);
-		public const int OLE_S_FIRST = unchecked((int)0x00040000);
-		public const int OLE_S_LAST = unchecked((int)0x000400FF);
+		public const int OLE_S_FIRST = unchecked(0x00040000);
+		public const int OLE_S_LAST = unchecked(0x000400FF);
 
 		///<summary>
 		///Invalid OLEVERB structure
@@ -1871,8 +1861,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040100 - 0x04010F) DRAGDROP errors
 		public const int DRAGDROP_E_FIRST = unchecked((int)0x80040100);
 		public const int DRAGDROP_E_LAST = unchecked((int)0x8004010F);
-		public const int DRAGDROP_S_FIRST = unchecked((int)0x00040100);
-		public const int DRAGDROP_S_LAST = unchecked((int)0x0004010F);
+		public const int DRAGDROP_S_FIRST = unchecked(0x00040100);
+		public const int DRAGDROP_S_LAST = unchecked(0x0004010F);
 
 		///<summary>
 		///Trying to revoke a drop target that has not been registered
@@ -1896,8 +1886,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040110 - 0x04011F) CLASS errors
 		public const int CLASSFACTORY_E_FIRST = unchecked((int)0x80040110);
 		public const int CLASSFACTORY_E_LAST = unchecked((int)0x8004011F);
-		public const int CLASSFACTORY_S_FIRST = unchecked((int)0x00040110);
-		public const int CLASSFACTORY_S_LAST = unchecked((int)0x0004011F);
+		public const int CLASSFACTORY_S_FIRST = unchecked(0x00040110);
+		public const int CLASSFACTORY_S_LAST = unchecked(0x0004011F);
 
 		///<summary>
 		///Class does not support aggregation (or class object is remote)
@@ -1921,22 +1911,22 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040120 - 0x04012F) MARSHAL errors
 		public const int MARSHAL_E_FIRST = unchecked((int)0x80040120);
 		public const int MARSHAL_E_LAST = unchecked((int)0x8004012F);
-		public const int MARSHAL_S_FIRST = unchecked((int)0x00040120);
-		public const int MARSHAL_S_LAST = unchecked((int)0x0004012F);
+		public const int MARSHAL_S_FIRST = unchecked(0x00040120);
+		public const int MARSHAL_S_LAST = unchecked(0x0004012F);
 		#endregion
 
 		#region (0x040130 - 0x04013F) DATA errors
 		public const int DATA_E_FIRST = unchecked((int)0x80040130);
 		public const int DATA_E_LAST = unchecked((int)0x8004013F);
-		public const int DATA_S_FIRST = unchecked((int)0x00040130);
-		public const int DATA_S_LAST = unchecked((int)0x0004013F);
+		public const int DATA_S_FIRST = unchecked(0x00040130);
+		public const int DATA_S_LAST = unchecked(0x0004013F);
 		#endregion
 
 		#region (0x040140 - 0x04014F) VIEW errors
 		public const int VIEW_E_FIRST = unchecked((int)0x80040140);
 		public const int VIEW_E_LAST = unchecked((int)0x8004014F);
-		public const int VIEW_S_FIRST = unchecked((int)0x00040140);
-		public const int VIEW_S_LAST = unchecked((int)0x0004014F);
+		public const int VIEW_S_FIRST = unchecked(0x00040140);
+		public const int VIEW_S_LAST = unchecked(0x0004014F);
 
 		///<summary>
 		///Error drawing view
@@ -1948,8 +1938,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040150 - 0x04015F) REGDB errors
 		public const int REGDB_E_FIRST = unchecked((int)0x80040150);
 		public const int REGDB_E_LAST = unchecked((int)0x8004015F);
-		public const int REGDB_S_FIRST = unchecked((int)0x00040150);
-		public const int REGDB_S_LAST = unchecked((int)0x0004015F);
+		public const int REGDB_S_FIRST = unchecked(0x00040150);
+		public const int REGDB_S_LAST = unchecked(0x0004015F);
 
 		///<summary>
 		///Could not read key from registry
@@ -2091,8 +2081,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040170 - 0x04017F) CACHE errors
 		public const int CACHE_E_FIRST = unchecked((int)0x80040170);
 		public const int CACHE_E_LAST = unchecked((int)0x8004017F);
-		public const int CACHE_S_FIRST = unchecked((int)0x00040170);
-		public const int CACHE_S_LAST = unchecked((int)0x0004017F);
+		public const int CACHE_S_FIRST = unchecked(0x00040170);
+		public const int CACHE_S_LAST = unchecked(0x0004017F);
 		///<summary>
 		///Cache not updated
 		///</summary>
@@ -2103,8 +2093,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040180 - 0x04018F) OLEOBJ errors
 		public const int OLEOBJ_E_FIRST = unchecked((int)0x80040180);
 		public const int OLEOBJ_E_LAST = unchecked((int)0x8004018F);
-		public const int OLEOBJ_S_FIRST = unchecked((int)0x00040180);
-		public const int OLEOBJ_S_LAST = unchecked((int)0x0004018F);
+		public const int OLEOBJ_S_FIRST = unchecked(0x00040180);
+		public const int OLEOBJ_S_LAST = unchecked(0x0004018F);
 		///<summary>
 		///No verbs for OLE object
 		///</summary>
@@ -2121,15 +2111,15 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040190 - 0x04019F) CLIENTSITE errors
 		public const int CLIENTSITE_E_FIRST = unchecked((int)0x80040190);
 		public const int CLIENTSITE_E_LAST = unchecked((int)0x8004019F);
-		public const int CLIENTSITE_S_FIRST = unchecked((int)0x00040190);
-		public const int CLIENTSITE_S_LAST = unchecked((int)0x0004019F);
+		public const int CLIENTSITE_S_FIRST = unchecked(0x00040190);
+		public const int CLIENTSITE_S_LAST = unchecked(0x0004019F);
 		#endregion
 
 		#region (0x0401A0 - 0x0401AF) INPLACE errors
 		public const int INPLACE_E_FIRST = unchecked((int)0x800401A0);
 		public const int INPLACE_E_LAST = unchecked((int)0x800401AF);
-		public const int INPLACE_S_FIRST = unchecked((int)0x000401A0);
-		public const int INPLACE_S_LAST = unchecked((int)0x000401AF);
+		public const int INPLACE_S_FIRST = unchecked(0x000401A0);
+		public const int INPLACE_S_LAST = unchecked(0x000401AF);
 
 		///<summary>
 		///Undo is not available
@@ -2147,15 +2137,15 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x0401B0 - 0x0401BF) ENUM errors
 		public const int ENUM_E_FIRST = unchecked((int)0x800401B0);
 		public const int ENUM_E_LAST = unchecked((int)0x800401BF);
-		public const int ENUM_S_FIRST = unchecked((int)0x000401B0);
-		public const int ENUM_S_LAST = unchecked((int)0x000401BF);
+		public const int ENUM_S_FIRST = unchecked(0x000401B0);
+		public const int ENUM_S_LAST = unchecked(0x000401BF);
 		#endregion
 
 		#region (0x0401C0 - 0x0401CF) CONVERT10 errors
 		public const int CONVERT10_E_FIRST = unchecked((int)0x800401C0);
 		public const int CONVERT10_E_LAST = unchecked((int)0x800401CF);
-		public const int CONVERT10_S_FIRST = unchecked((int)0x000401C0);
-		public const int CONVERT10_S_LAST = unchecked((int)0x000401CF);
+		public const int CONVERT10_S_FIRST = unchecked(0x000401C0);
+		public const int CONVERT10_S_LAST = unchecked(0x000401CF);
 
 		///<summary>
 		///OLESTREAM Get method failed
@@ -2203,8 +2193,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x0401D0 - 0x0401DF) CLIPBRD errors
 		public const int CLIPBRD_E_FIRST = unchecked((int)0x800401D0);
 		public const int CLIPBRD_E_LAST = unchecked((int)0x800401DF);
-		public const int CLIPBRD_S_FIRST = unchecked((int)0x000401D0);
-		public const int CLIPBRD_S_LAST = unchecked((int)0x000401DF);
+		public const int CLIPBRD_S_FIRST = unchecked(0x000401D0);
+		public const int CLIPBRD_S_LAST = unchecked(0x000401DF);
 		///<summary>
 		///OpenClipboard Failed
 		///</summary>
@@ -2239,8 +2229,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x0401E0 - 0x0401EF) MK (moniker) errors
 		public const int MK_E_FIRST = unchecked((int)0x800401E0);
 		public const int MK_E_LAST = unchecked((int)0x800401EF);
-		public const int MK_S_FIRST = unchecked((int)0x000401E0);
-		public const int MK_S_LAST = unchecked((int)0x000401EF);
+		public const int MK_S_FIRST = unchecked(0x000401E0);
+		public const int MK_S_LAST = unchecked(0x000401EF);
 
 		///<summary>
 		///Moniker needs to be connected manually
@@ -2342,8 +2332,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x0401F0 - 0x0401FF) CO errors
 		public const int CO_E_FIRST = unchecked((int)0x800401F0);
 		public const int CO_E_LAST = unchecked((int)0x800401FF);
-		public const int CO_S_FIRST = unchecked((int)0x000401F0);
-		public const int CO_S_LAST = unchecked((int)0x000401FF);
+		public const int CO_S_FIRST = unchecked(0x000401F0);
+		public const int CO_S_LAST = unchecked(0x000401FF);
 		///<summary>
 		///CoInitialize has not been called.
 		///</summary>
@@ -2444,13 +2434,13 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x040200 - 0x04020F) EVENT errors
 		public const int EVENT_E_FIRST = unchecked((int)0x80040200);
 		public const int EVENT_E_LAST = unchecked((int)0x8004021F);
-		public const int EVENT_S_FIRST = unchecked((int)0x00040200);
-		public const int EVENT_S_LAST = unchecked((int)0x0004021F);
+		public const int EVENT_S_FIRST = unchecked(0x00040200);
+		public const int EVENT_S_LAST = unchecked(0x0004021F);
 		///<summary>
 		///An event was able to invoke some but not all of the subscribers
 		///</summary>
 		[Description("An event was able to invoke some but not all of the subscribers")]
-		public const int EVENT_S_SOME_SUBSCRIBERS_FAILED = unchecked((int)0x00040200);
+		public const int EVENT_S_SOME_SUBSCRIBERS_FAILED = unchecked(0x00040200);
 
 		///<summary>
 		///An event was unable to invoke any of the subscribers
@@ -2462,7 +2452,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///An event was delivered but there were no subscribers
 		///</summary>
 		[Description("An event was delivered but there were no subscribers")]
-		public const int EVENT_S_NOSUBSCRIBERS = unchecked((int)0x00040202);
+		public const int EVENT_S_NOSUBSCRIBERS = unchecked(0x00040202);
 
 		///<summary>
 		///A syntax error occurred trying to evaluate a query string
@@ -2552,8 +2542,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#region (0x04D000 - 0x04D029) XACT errors
 		public const int XACT_E_FIRST = unchecked((int)0x8004D000);
 		public const int XACT_E_LAST = unchecked((int)0x8004D029);
-		public const int XACT_S_FIRST = unchecked((int)0x0004D000);
-		public const int XACT_S_LAST = unchecked((int)0x0004D010);
+		public const int XACT_S_FIRST = unchecked(0x0004D000);
+		public const int XACT_S_LAST = unchecked(0x0004D010);
 
 		///<summary>
 		///Another single phase resource manager has already been enlisted in this transaction.
@@ -2852,80 +2842,80 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///An asynchronous operation was specified. The operation has begun, but its outcome is not known yet.
 		///</summary>
 		[Description("An asynchronous operation was specified. The operation has begun, but its outcome is not known yet.")]
-		public const int XACT_S_ASYNC = unchecked((int)0x0004D000);
+		public const int XACT_S_ASYNC = unchecked(0x0004D000);
 
 		///<summary>
 		///XACT_S_DEFECT
 		///</summary>
 		[Description("XACT_S_DEFECT")]
-		public const int XACT_S_DEFECT = unchecked((int)0x0004D001);
+		public const int XACT_S_DEFECT = unchecked(0x0004D001);
 
 		///<summary>
 		///The method call succeeded because the transaction was read-only.
 		///</summary>
 		[Description("The method call succeeded because the transaction was read-only.")]
-		public const int XACT_S_READONLY = unchecked((int)0x0004D002);
+		public const int XACT_S_READONLY = unchecked(0x0004D002);
 
 		///<summary>
 		///The transaction was successfully aborted. However, this is a coordinated transaction, and some number of enlisted resources were aborted outright because they could not support abort-retaining semantics
 		///</summary>
 		[Description("The transaction was successfully aborted. However, this is a coordinated transaction, and some number of enlisted resources were aborted outright because they could not support abort-retaining semantics")]
-		public const int XACT_S_SOMENORETAIN = unchecked((int)0x0004D003);
+		public const int XACT_S_SOMENORETAIN = unchecked(0x0004D003);
 
 		///<summary>
 		///No changes were made during this call, but the sink wants another chance to look if any other sinks make further changes.
 		///</summary>
 		[Description("No changes were made during this call, but the sink wants another chance to look if any other sinks make further changes.")]
-		public const int XACT_S_OKINFORM = unchecked((int)0x0004D004);
+		public const int XACT_S_OKINFORM = unchecked(0x0004D004);
 
 		///<summary>
 		///The sink is content and wishes the transaction to proceed. Changes were made to one or more resources during this call.
 		///</summary>
 		[Description("The sink is content and wishes the transaction to proceed. Changes were made to one or more resources during this call.")]
-		public const int XACT_S_MADECHANGESCONTENT = unchecked((int)0x0004D005);
+		public const int XACT_S_MADECHANGESCONTENT = unchecked(0x0004D005);
 
 		///<summary>
 		///The sink is for the moment and wishes the transaction to proceed, but if other changes are made following this return by other event sinks then this sink wants another chance to look
 		///</summary>
 		[Description("The sink is for the moment and wishes the transaction to proceed, but if other changes are made following this return by other event sinks then this sink wants another chance to look")]
-		public const int XACT_S_MADECHANGESINFORM = unchecked((int)0x0004D006);
+		public const int XACT_S_MADECHANGESINFORM = unchecked(0x0004D006);
 
 		///<summary>
 		///The transaction was successfully aborted. However, the abort was non-retaining.
 		///</summary>
 		[Description("The transaction was successfully aborted. However, the abort was non-retaining.")]
-		public const int XACT_S_ALLNORETAIN = unchecked((int)0x0004D007);
+		public const int XACT_S_ALLNORETAIN = unchecked(0x0004D007);
 
 		///<summary>
 		///An abort operation was already in progress.
 		///</summary>
 		[Description("An abort operation was already in progress.")]
-		public const int XACT_S_ABORTING = unchecked((int)0x0004D008);
+		public const int XACT_S_ABORTING = unchecked(0x0004D008);
 
 		///<summary>
 		///The resource manager has performed a single-phase commit of the transaction.
 		///</summary>
 		[Description("The resource manager has performed a single-phase commit of the transaction.")]
-		public const int XACT_S_SINGLEPHASE = unchecked((int)0x0004D009);
+		public const int XACT_S_SINGLEPHASE = unchecked(0x0004D009);
 
 		///<summary>
 		///The local transaction has not aborted.
 		///</summary>
 		[Description("The local transaction has not aborted.")]
-		public const int XACT_S_LOCALLY_OK = unchecked((int)0x0004D00A);
+		public const int XACT_S_LOCALLY_OK = unchecked(0x0004D00A);
 
 		///<summary>
 		///The resource manager has requested to be the coordinator (last resource manager) for the transaction.
 		///</summary>
 		[Description("The resource manager has requested to be the coordinator (last resource manager) for the transaction.")]
-		public const int XACT_S_LASTRESOURCEMANAGER = unchecked((int)0x0004D010);
+		public const int XACT_S_LASTRESOURCEMANAGER = unchecked(0x0004D010);
 		#endregion
 
 		#region (0x04E000 - 0x04E02F) CONTEXT errors
 		public const int CONTEXT_E_FIRST = unchecked((int)0x8004E000);
 		public const int CONTEXT_E_LAST = unchecked((int)0x8004E02F);
-		public const int CONTEXT_S_FIRST = unchecked((int)0x0004E000);
-		public const int CONTEXT_S_LAST = unchecked((int)0x0004E02F);
+		public const int CONTEXT_S_FIRST = unchecked(0x0004E000);
+		public const int CONTEXT_S_LAST = unchecked(0x0004E02F);
 		///<summary>
 		///The root transaction wanted to commit, but transaction aborted
 		///</summary>
@@ -3073,127 +3063,127 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///Use the registry database to provide the requested information
 		///</summary>
 		[Description("Use the registry database to provide the requested information")]
-		public const int OLE_S_USEREG = unchecked((int)0x00040000);
+		public const int OLE_S_USEREG = unchecked(0x00040000);
 
 		///<summary>
 		///Success, but static
 		///</summary>
 		[Description("Success, but static")]
-		public const int OLE_S_STATIC = unchecked((int)0x00040001);
+		public const int OLE_S_STATIC = unchecked(0x00040001);
 
 		///<summary>
 		///Macintosh clipboard format
 		///</summary>
 		[Description("Macintosh clipboard format")]
-		public const int OLE_S_MAC_CLIPFORMAT = unchecked((int)0x00040002);
+		public const int OLE_S_MAC_CLIPFORMAT = unchecked(0x00040002);
 
 		///<summary>
 		///Successful drop took place
 		///</summary>
 		[Description("Successful drop took place")]
-		public const int DRAGDROP_S_DROP = unchecked((int)0x00040100);
+		public const int DRAGDROP_S_DROP = unchecked(0x00040100);
 
 		///<summary>
 		///Drag-drop operation canceled
 		///</summary>
 		[Description("Drag-drop operation canceled")]
-		public const int DRAGDROP_S_CANCEL = unchecked((int)0x00040101);
+		public const int DRAGDROP_S_CANCEL = unchecked(0x00040101);
 
 		///<summary>
 		///Use the default cursor
 		///</summary>
 		[Description("Use the default cursor")]
-		public const int DRAGDROP_S_USEDEFAULTCURSORS = unchecked((int)0x00040102);
+		public const int DRAGDROP_S_USEDEFAULTCURSORS = unchecked(0x00040102);
 
 		///<summary>
 		///Data has same FORMATETC
 		///</summary>
 		[Description("Data has same FORMATETC")]
-		public const int DATA_S_SAMEFORMATETC = unchecked((int)0x00040130);
+		public const int DATA_S_SAMEFORMATETC = unchecked(0x00040130);
 
 		///<summary>
 		///View is already frozen
 		///</summary>
 		[Description("View is already frozen")]
-		public const int VIEW_S_ALREADY_FROZEN = unchecked((int)0x00040140);
+		public const int VIEW_S_ALREADY_FROZEN = unchecked(0x00040140);
 
 		///<summary>
 		///FORMATETC not supported
 		///</summary>
 		[Description("FORMATETC not supported")]
-		public const int CACHE_S_FORMATETC_NOTSUPPORTED = unchecked((int)0x00040170);
+		public const int CACHE_S_FORMATETC_NOTSUPPORTED = unchecked(0x00040170);
 
 		///<summary>
 		///Same cache
 		///</summary>
 		[Description("Same cache")]
-		public const int CACHE_S_SAMECACHE = unchecked((int)0x00040171);
+		public const int CACHE_S_SAMECACHE = unchecked(0x00040171);
 
 		///<summary>
 		///Some cache(s) not updated
 		///</summary>
 		[Description("Some cache(s) not updated")]
-		public const int CACHE_S_SOMECACHES_NOTUPDATED = unchecked((int)0x00040172);
+		public const int CACHE_S_SOMECACHES_NOTUPDATED = unchecked(0x00040172);
 
 		///<summary>
 		///Invalid verb for OLE object
 		///</summary>
 		[Description("Invalid verb for OLE object")]
-		public const int OLEOBJ_S_INVALIDVERB = unchecked((int)0x00040180);
+		public const int OLEOBJ_S_INVALIDVERB = unchecked(0x00040180);
 
 		///<summary>
 		///Verb number is valid but verb cannot be done now
 		///</summary>
 		[Description("Verb number is valid but verb cannot be done now")]
-		public const int OLEOBJ_S_CANNOT_DOVERB_NOW = unchecked((int)0x00040181);
+		public const int OLEOBJ_S_CANNOT_DOVERB_NOW = unchecked(0x00040181);
 
 		///<summary>
 		///Invalid window handle passed
 		///</summary>
 		[Description("Invalid window handle passed")]
-		public const int OLEOBJ_S_INVALIDHWND = unchecked((int)0x00040182);
+		public const int OLEOBJ_S_INVALIDHWND = unchecked(0x00040182);
 
 		///<summary>
 		///Message is too long; some of it had to be truncated before displaying
 		///</summary>
 		[Description("Message is too long; some of it had to be truncated before displaying")]
-		public const int INPLACE_S_TRUNCATED = unchecked((int)0x000401A0);
+		public const int INPLACE_S_TRUNCATED = unchecked(0x000401A0);
 
 		///<summary>
 		///Unable to convert OLESTREAM to IStorage
 		///</summary>
 		[Description("Unable to convert OLESTREAM to IStorage")]
-		public const int CONVERT10_S_NO_PRESENTATION = unchecked((int)0x000401C0);
+		public const int CONVERT10_S_NO_PRESENTATION = unchecked(0x000401C0);
 
 		///<summary>
 		///Moniker reduced to itself
 		///</summary>
 		[Description("Moniker reduced to itself")]
-		public const int MK_S_REDUCED_TO_SELF = unchecked((int)0x000401E2);
+		public const int MK_S_REDUCED_TO_SELF = unchecked(0x000401E2);
 
 		///<summary>
 		///Common prefix is this moniker
 		///</summary>
 		[Description("Common prefix is this moniker")]
-		public const int MK_S_ME = unchecked((int)0x000401E4);
+		public const int MK_S_ME = unchecked(0x000401E4);
 
 		///<summary>
 		///Common prefix is input moniker
 		///</summary>
 		[Description("Common prefix is input moniker")]
-		public const int MK_S_HIM = unchecked((int)0x000401E5);
+		public const int MK_S_HIM = unchecked(0x000401E5);
 
 		///<summary>
 		///Common prefix is both monikers
 		///</summary>
 		[Description("Common prefix is both monikers")]
-		public const int MK_S_US = unchecked((int)0x000401E6);
+		public const int MK_S_US = unchecked(0x000401E6);
 
 		///<summary>
 		///Moniker is already registered in running object table
 		///</summary>
 		[Description("Moniker is already registered in running object table")]
-		public const int MK_S_MONIKERALREADYREGISTERED = unchecked((int)0x000401E7);
+		public const int MK_S_MONIKERALREADYREGISTERED = unchecked(0x000401E7);
 		#endregion
 
 		#region (0x041300 - 0x041315) SCHED (Task Scheduler) errors
@@ -3204,55 +3194,55 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///The task is ready to run at its next scheduled time.
 		///</summary>
 		[Description("The task is ready to run at its next scheduled time.")]
-		public const int SCHED_S_TASK_READY = unchecked((int)0x00041300);
+		public const int SCHED_S_TASK_READY = unchecked(0x00041300);
 
 		///<summary>
 		///The task is currently running.
 		///</summary>
 		[Description("The task is currently running.")]
-		public const int SCHED_S_TASK_RUNNING = unchecked((int)0x00041301);
+		public const int SCHED_S_TASK_RUNNING = unchecked(0x00041301);
 
 		///<summary>
 		///The task will not run at the scheduled times because it has been disabled.
 		///</summary>
 		[Description("The task will not run at the scheduled times because it has been disabled.")]
-		public const int SCHED_S_TASK_DISABLED = unchecked((int)0x00041302);
+		public const int SCHED_S_TASK_DISABLED = unchecked(0x00041302);
 
 		///<summary>
 		///The task has not yet run.
 		///</summary>
 		[Description("The task has not yet run.")]
-		public const int SCHED_S_TASK_HAS_NOT_RUN = unchecked((int)0x00041303);
+		public const int SCHED_S_TASK_HAS_NOT_RUN = unchecked(0x00041303);
 
 		///<summary>
 		///There are no more runs scheduled for this task.
 		///</summary>
 		[Description("There are no more runs scheduled for this task.")]
-		public const int SCHED_S_TASK_NO_MORE_RUNS = unchecked((int)0x00041304);
+		public const int SCHED_S_TASK_NO_MORE_RUNS = unchecked(0x00041304);
 
 		///<summary>
 		///One or more of the properties that are needed to run this task on a schedule have not been set.
 		///</summary>
 		[Description("One or more of the properties that are needed to run this task on a schedule have not been set.")]
-		public const int SCHED_S_TASK_NOT_SCHEDULED = unchecked((int)0x00041305);
+		public const int SCHED_S_TASK_NOT_SCHEDULED = unchecked(0x00041305);
 
 		///<summary>
 		///The last run of the task was terminated by the user.
 		///</summary>
 		[Description("The last run of the task was terminated by the user.")]
-		public const int SCHED_S_TASK_TERMINATED = unchecked((int)0x00041306);
+		public const int SCHED_S_TASK_TERMINATED = unchecked(0x00041306);
 
 		///<summary>
 		///Either the task has no triggers or the existing triggers are disabled or not set.
 		///</summary>
 		[Description("Either the task has no triggers or the existing triggers are disabled or not set.")]
-		public const int SCHED_S_TASK_NO_VALID_TRIGGERS = unchecked((int)0x00041307);
+		public const int SCHED_S_TASK_NO_VALID_TRIGGERS = unchecked(0x00041307);
 
 		///<summary>
 		///Event triggers don't have set run times.
 		///</summary>
 		[Description("Event triggers don't have set run times.")]
-		public const int SCHED_S_EVENT_TRIGGER = unchecked((int)0x00041308);
+		public const int SCHED_S_EVENT_TRIGGER = unchecked(0x00041308);
 
 		///<summary>
 		///Trigger not found.
@@ -3418,13 +3408,13 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///Not all the requested interfaces were available
 		///</summary>
 		[Description("Not all the requested interfaces were available")]
-		public const int CO_S_NOTALLINTERFACES = unchecked((int)0x00080012);
+		public const int CO_S_NOTALLINTERFACES = unchecked(0x00080012);
 
 		///<summary>
 		///The specified machine name was not found in the cache.
 		///</summary>
 		[Description("The specified machine name was not found in the cache.")]
-		public const int CO_S_MACHINENAMENOTFOUND = unchecked((int)0x00080013);
+		public const int CO_S_MACHINENAMENOTFOUND = unchecked(0x00080013);
 		#endregion
 
 		// ******************
@@ -3800,25 +3790,25 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///The function completed successfully, but must be called again to complete the context
 		///</summary>
 		[Description("The function completed successfully, but must be called again to complete the context")]
-		public const int SEC_I_CONTINUE_NEEDED = unchecked((int)0x00090312);
+		public const int SEC_I_CONTINUE_NEEDED = unchecked(0x00090312);
 
 		///<summary>
 		///The function completed successfully, but CompleteToken must be called
 		///</summary>
 		[Description("The function completed successfully, but CompleteToken must be called")]
-		public const int SEC_I_COMPLETE_NEEDED = unchecked((int)0x00090313);
+		public const int SEC_I_COMPLETE_NEEDED = unchecked(0x00090313);
 
 		///<summary>
 		///The function completed successfully, but both CompleteToken and this function must be called to complete the context
 		///</summary>
 		[Description("The function completed successfully, but both CompleteToken and this function must be called to complete the context")]
-		public const int SEC_I_COMPLETE_AND_CONTINUE = unchecked((int)0x00090314);
+		public const int SEC_I_COMPLETE_AND_CONTINUE = unchecked(0x00090314);
 
 		///<summary>
 		///The logon was completed, but no network authority was available. The logon was made using locally known information
 		///</summary>
 		[Description("The logon was completed, but no network authority was available. The logon was made using locally known information")]
-		public const int SEC_I_LOCAL_LOGON = unchecked((int)0x00090315);
+		public const int SEC_I_LOCAL_LOGON = unchecked(0x00090315);
 
 		///<summary>
 		///The requested security package does not exist
@@ -3836,7 +3826,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///The context has expired and can no longer be used.
 		///</summary>
 		[Description("The context has expired and can no longer be used.")]
-		public const int SEC_I_CONTEXT_EXPIRED = unchecked((int)0x00090317);
+		public const int SEC_I_CONTEXT_EXPIRED = unchecked(0x00090317);
 
 		///<summary>
 		///The supplied message is incomplete.  The signature was not verified.
@@ -3860,13 +3850,13 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///The credentials supplied were not complete, and could not be verified. Additional information can be returned from the context.
 		///</summary>
 		[Description("The credentials supplied were not complete, and could not be verified. Additional information can be returned from the context.")]
-		public const int SEC_I_INCOMPLETE_CREDENTIALS = unchecked((int)0x00090320);
+		public const int SEC_I_INCOMPLETE_CREDENTIALS = unchecked(0x00090320);
 
 		///<summary>
 		///The context data must be renegotiated with the peer.
 		///</summary>
 		[Description("The context data must be renegotiated with the peer.")]
-		public const int SEC_I_RENEGOTIATE = unchecked((int)0x00090321);
+		public const int SEC_I_RENEGOTIATE = unchecked(0x00090321);
 
 		///<summary>
 		///The target principal name is incorrect.
@@ -3878,7 +3868,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///There is no LSA mode context associated with this context.
 		///</summary>
 		[Description("There is no LSA mode context associated with this context.")]
-		public const int SEC_I_NO_LSA_CONTEXT = unchecked((int)0x00090323);
+		public const int SEC_I_NO_LSA_CONTEXT = unchecked(0x00090323);
 
 		///<summary>
 		///The clocks on the client and server machines are skewed.
@@ -4227,7 +4217,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		///The protected data needs to be re-protected.
 		///</summary>
 		[Description("The protected data needs to be re-protected.")]
-		public const int CRYPT_I_NEW_PROTECTION_REQUIRED = unchecked((int)0x00091012);
+		public const int CRYPT_I_NEW_PROTECTION_REQUIRED = unchecked(0x00091012);
 
 		///<summary>
 		///The length specified for the output data was insufficient.
@@ -7310,41 +7300,30 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		#endregion Razer SDK Error Codes
 		#endregion Error Codes
 
-#if DOTNET20
-		class DirCodes : System.Collections.Generic.Dictionary<int,System.Reflection.FieldInfo>
-		{
-			public DirCodes() : base(System.Collections.Generic.EqualityComparer<int>.Default)
-			{
-				
-			}
-			
-			public DirCodes(int capacity) : base(capacity,System.Collections.Generic.EqualityComparer<int>.Default)
-			{
-				
-			}
-		}
-#else
 		class DirCodes : System.Collections.DictionaryBase
 		{
+// ReSharper disable UnusedMember.Local
 			public DirCodes()
 			{
 
 			}
 
+// ReSharper disable UnusedParameter.Local
 			public DirCodes(int capacity)
 			{
 
 			}
+// ReSharper restore UnusedParameter.Local
 
 			public void Add(int key, System.Reflection.FieldInfo value)
 			{
-				base.Dictionary.Add(key, value);
+				Dictionary.Add(key, value);
 			}
 
 			public System.Reflection.FieldInfo this[int key]
 			{
-				get { return (System.Reflection.FieldInfo)base.Dictionary[key]; }
-				set { base.Dictionary[key] = value; }
+				private get { return (System.Reflection.FieldInfo)Dictionary[key]; }
+				set { Dictionary[key] = value; }
 			}
 
 			public bool TryGetValue(int key, out System.Reflection.FieldInfo value)
@@ -7355,31 +7334,32 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 			public bool Contains(int key)
 			{
-				return base.Dictionary.Contains(key);
+				return Dictionary.Contains(key);
 			}
 
 			public bool ContainsKey(int key)
 			{
-				return base.InnerHashtable.ContainsKey(key);
+				return InnerHashtable.ContainsKey(key);
 			}
 
 			public void CopyTo(System.Reflection.FieldInfo[] values, int index)
 			{
-				base.Dictionary.Values.CopyTo(values, index);
+				Dictionary.Values.CopyTo(values, index);
 			}
 
 			public System.Collections.ICollection Keys
 			{
-				get { return base.Dictionary.Keys; }
+				get { return Dictionary.Keys; }
 			}
 
 			public System.Collections.ICollection Values
 			{
-				get { return base.Dictionary.Values; }
+				get { return Dictionary.Values; }
 			}
+// ReSharper restore UnusedMember.Local
 		}
-#endif
-		static DirCodes dirCodes;
+
+		static readonly DirCodes dirCodes;
 
 		static HRESULT()
 		{
@@ -7387,14 +7367,15 @@ namespace F16Gaming.SwitchBladeSteam.Native
 			System.Reflection.FieldInfo[] fieldsInfo = typeof(HRESULT).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
 			foreach (System.Reflection.FieldInfo fi in fieldsInfo)
 			{
-				if (fi.GetValue(null).GetType() == typeof(int))
+				if (fi.GetValue(null) is int)
 				{
-					int hr = (int)fi.GetValue(null);
+					var hr = (int)fi.GetValue(null);
 					if (!dirCodes.ContainsKey(hr))
 						dirCodes[hr] = fi;
 				}
 			}
 		}
 	}
+// ReSharper restore InconsistentNaming
 	#endregion HRESULT
 }
