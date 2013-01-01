@@ -1,0 +1,23 @@
+This file contains a list of people involved in the development
+of F16Gaming.SwitchBladeSteam.
+
+PRIMARY AUTHORS:
+
+ * Adam Hellberg (F16Gaming) <adam.hellberg95@gmail.com>
+   - Main Developer / Coder
+
+ * Graham Hough
+   - UI and Image Artist (res/images)
+
+THANKS TO:
+
+ * Bjørn Tore Håvie (itsbth)
+   - Helping with P/Invoke signatures (F16Gaming.SwitchBladeSteam/Native/RazerAPI.cs)
+
+Note: F16Gaming.SwitchBladeSteam is distributed with the source files for Steam4NET2
+from OpenSteamWorks (http://www.opensteamworks.org), Steam4NET is considered a
+separate package and is not part of F16Gaming.SwitchBladeSteam proper.
+
+Note: F16Gaming.SwitchBladeSteam is distributed with binaries for log4net
+(http://logging.apache.org/log4net/), log4net is considered a separate
+package and is not part of F16Gaming.SwitchBladeSteam proper.
