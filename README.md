@@ -30,7 +30,7 @@ Razer is a trademark and/or a registered trademark of Razer USA Ltd.
 Steam and the Steam logo are trademarks and/or registered trademarks of Valve Corporation.  
 All other trademarks are property of their respective owners.
 
-This project is in no way endorsed, sponsored or approved by Valve or Razer.
+This project is in no way endorsed, sponsored or approved by Valve and/or Razer.
 
 Dependencies
 ------------
