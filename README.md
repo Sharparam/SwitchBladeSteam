@@ -27,7 +27,7 @@ This project is licensed under the MIT license, please see the file **LICENSE** 
 Images in **res/images** are created by Graham Hough.
 
 Razer is a trademark and/or a registered trademark of Razer USA Ltd.  
-Steam and the Steam logo are registered trademarks and/or registered trademarks of Valve Corporation.  
+Steam and the Steam logo are trademarks and/or registered trademarks of Valve Corporation.  
 All other trademarks are property of their respective owners.
 
 This project is in no way endorsed, sponsored or approved by Valve or Razer.
