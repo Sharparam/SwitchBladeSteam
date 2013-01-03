@@ -31,6 +31,7 @@ using System;
 
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
+using log4net;
 
 namespace F16Gaming.SwitchBladeSteam.Razer
 {
@@ -39,39 +40,72 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 	/// </summary>
 	public class DynamicKey
 	{
+		private ILog _log;
+
 		public RazerAPI.RZDYNAMICKEY Key { get; private set; }
+		public RazerAPI.RZDKSTATE State { get; private set; }
+		public RazerAPI.RZDKSTATE PreviousState { get; private set; }
 		public string UpImage { get; private set; }
 		public string DownImage { get; private set; }
 		public bool SingleImage { get { return UpImage == DownImage; } }
 
 		internal DynamicKey(RazerAPI.RZDYNAMICKEY key, string upImage, string downImage = null)
 		{
+			_log = Logging.LogManager.GetLogger(this);
+
+			_log.DebugFormat(">> DynamicKey({0}, \"{1}\", {2})", key, upImage, downImage == null ? "null" : "\"" + downImage + "\"");
+
 			if (string.IsNullOrEmpty(upImage))
 				throw new ArgumentException("Can't be null or empty", "upImage");
 
 			if (string.IsNullOrEmpty(downImage))
+			{
+				_log.Debug("downImage is null, setting to value of upImage");
 				downImage = upImage;
+			}
 
+			_log.Debug("Setting default states");
+			State = RazerAPI.RZDKSTATE.UNDEFINED;
+			PreviousState = RazerAPI.RZDKSTATE.UNDEFINED;
 			UpImage = upImage;
 			DownImage = downImage;
 			Key = key;
 
-			SetImage(UpImage, RazerAPI.RZDKSTATE.UP);
-			SetImage(DownImage, RazerAPI.RZDKSTATE.DOWN);
+			_log.Debug("Setting images");
+			SetUpImage(UpImage);
+			SetDownImage(DownImage);
+		}
+
+		internal void UpdateState(RazerAPI.RZDKSTATE state)
+		{
+			_log.DebugFormat(">> UpdateState({0})", state);
+			State = state;
+			_log.Debug("<< UpdateState()");
+		}
+
+		internal void UpdatePreviousState(RazerAPI.RZDKSTATE state)
+		{
+			_log.DebugFormat(">> UpdatePreviousState({0})", state);
+			PreviousState = state;
+			_log.Debug("<< UpdatePreviousState()");
 		}
 
 		public void SetImage(string image)
 		{
+			_log.DebugFormat(">> SetImage({0})", image);
 			SetUpImage(image);
 			SetDownImage(image);
+			_log.Debug("<< SetImage()");
 		}
 
 		public void SetImage(string image, RazerAPI.RZDKSTATE state)
 		{
+			_log.DebugFormat(">> SetImage({0}, {1})", image, state);
+
 			if (state != RazerAPI.RZDKSTATE.UP && state != RazerAPI.RZDKSTATE.DOWN)
 				throw new ArgumentException("State can only be up or down", "state");
 
-			var hResult = RazerAPI.RzSBSetImageDynamicKey(Key, state, image);
+			var hResult = RazerAPI.RzSBSetImageDynamicKey(Key, state, Helpers.IO.GetAbsolutePath(image));
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);
 
@@ -79,16 +113,22 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				UpImage = image;
 			else
 				DownImage = image;
+
+			_log.Debug("<< SetImage()");
 		}
 
 		public void SetUpImage(string image)
 		{
+			_log.DebugFormat(">> SetUpImage({0})", image);
 			SetImage(image, RazerAPI.RZDKSTATE.UP);
+			_log.Debug("<< SetUpImage()");
 		}
 
 		public void SetDownImage(string image)
 		{
+			_log.DebugFormat(">> SetDownImage({0})", image);
 			SetImage(image, RazerAPI.RZDKSTATE.DOWN);
+			_log.Debug("<< SetDownImage()");
 		}
 	}
 }

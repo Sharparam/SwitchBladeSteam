@@ -12,5 +12,8 @@ namespace F16Gaming.SwitchBladeSteam
 #else
 		public const bool DebugEnabled = false;
 #endif
+
+		public const string BlankTouchpadImage = @"res\images\tp_blank.png";
+		public const string DisabledTouchpadImage = @"res\images\tp_aero.png";
 	}
 }

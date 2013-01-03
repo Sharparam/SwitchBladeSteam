@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Helpers\IO.cs" />
     <Compile Include="Helpers\Threading.cs" />
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Native\Helpers.cs" />
@@ -71,19 +72,23 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Native\RazerAPI.cs" />
     <Compile Include="Razer\DynamicKey.cs" />
+    <Compile Include="Razer\Events\DynamicKey.cs" />
     <Compile Include="Razer\Exceptions\RazerException.cs" />
     <Compile Include="Razer\Exceptions\RazerNativeException.cs" />
     <Compile Include="Razer\Exceptions\RazerUnstableShutdownException.cs" />
     <Compile Include="Razer\RazerManager.cs" />
     <Compile Include="Razer\Touchpad.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>mkdir "$(TargetDir)res"
+xcopy "$(SolutionDir)res" "$(TargetDir)res" /S /Q /Y</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

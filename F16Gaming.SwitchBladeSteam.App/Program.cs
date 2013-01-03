@@ -31,13 +31,13 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
+using F16Gaming.SwitchBladeSteam.Razer;
+using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using log4net;
 using LogManager = F16Gaming.SwitchBladeSteam.Logging.LogManager;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public delegate void VoidDelegate();
-
 	internal class DynamicKeyOptions
 	{
 		public readonly string Image;
@@ -63,6 +63,8 @@ namespace F16Gaming.SwitchBladeSteam.App
 #endif
 
 		private static bool _debugMode;
+
+		private static RazerManager _razerManager;
 
 		private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
 
@@ -98,203 +100,198 @@ namespace F16Gaming.SwitchBladeSteam.App
 				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions("res\\images\\dk_home.png", HomeKeyPressed)},
 				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions("res\\images\\dk_friends.png", FriendKeyPressed)}
 			};
-
-			var result = MessageBox.Show("Call RzSBStop?", "question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-			if (result == DialogResult.Yes)
-			{
-				MessageBox.Show("Calling RzSBStop");
-				RazerAPI.RzSBStop();
-				MessageBox.Show("RzSBStop called");
-			}
 			
 #if RAZER_ENABLED
-			MessageBox.Show("RzSBStart()");
-			var hResult = RazerAPI.RzSBStart();
-			MessageBox.Show("RzSBStart called");
-			if (hResult != HRESULT.RZSB_OK)
+			try
 			{
-				MessageBox.Show("RzSBStart failed with error code: " + hResult.ToString(), "RzSBStart fail", MessageBoxButtons.OK,
-								MessageBoxIcon.Error);
-				Exit();
+				_log.Info("Initializing razer manager");
+				_razerManager = new RazerManager();
 			}
-			
-			MessageBox.Show("disabled image reached");
-			hResult = RazerAPI.RzSBWinRenderSetDisabledImage(@"res\images\tp_aero.png");
-			if (hResult != HRESULT.RZSB_OK)
+			catch (RazerUnstableShutdownException)
 			{
-				MessageBox.Show("RzSBWinRenderSetDisbledImage failed with error code: " + hResult.ToString(),
-								"RzSBWinRenderSetDisabledImage fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
+				var result = MessageBox.Show("Application was not shut down properly on the last run."
+					+ "\n\nIn order for the application to be able to start, it needs to call RzSBStop."
+					+ "\n\nIf you have restarted your computer since you last launched this application, you can disregard this message and choose \"No\"."
+					+ "\n\nDo you want to call RzSBStop? You will need to restart this application regardless of choice.",
+					"Unsafe Application Shutdown", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+				if (result == DialogResult.Yes)
+					RazerManager.Stop();
+
+				RazerManager.DeleteControlFile();
+
+				Environment.Exit(0);
 			}
 
-			MessageBox.Show("DK set cb reached");
-			hResult = RazerAPI.RzSBDynamicKeySetCallback(DynamicKeyCallback);
-			if (hResult != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBDynamicKeySetCallback failed with error code: " + hResult.ToString(),
-				                "RzSBDynamicKeySetCallback fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
+			_log.Debug("Razer manager initialized!");
 
-			/* TODO: Fix problem with RzSBSetImageDynamicKey (error on Razer's side?)
-			 * 
-			 * If marshalled to UnmanagedType.LPStr:
-			 *     Error: RZSB_IMAGE_INVALID_DATA
-			 * If marshalled to UnmanagedType.LPWStr:
-			 *     Error: E_FAIL (No specifics)
-			 */
-			MessageBox.Show("running foreach - SHOULD ERROR");
+			_log.Info("Enabling dynamic keys");
+
 			foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
 			{
-				hResult = RazerAPI.RzSBSetImageDynamicKey(pair.Key, RazerAPI.RZDKSTATE.UP, pair.Value.Image);
-				if (hResult != HRESULT.RZSB_OK)
-				{
-					MessageBox.Show(
-						"RzSBSetImageDynamicKey(" + pair.Key + ", " + RazerAPI.RZDKSTATE.UP + ", " + pair.Value.Image +
-						") failed with error code: " + hResult.ToString() + "\n\nDetail:\n" + Helpers.GetErrorMessage(hResult), "RzSBSetImageDynamicKey fail", MessageBoxButtons.OK,
-						MessageBoxIcon.Error);
-					Exit();
-				}
-
-				hResult = RazerAPI.RzSBSetImageDynamicKey(pair.Key, RazerAPI.RZDKSTATE.DOWN, pair.Value.Image);
-				if (hResult != HRESULT.RZSB_OK)
-				{
-					MessageBox.Show(
-						"RzSBSetImageDynamicKey(" + pair.Key + ", " + RazerAPI.RZDKSTATE.DOWN + ", " + pair.Value.Image +
-						") failed with error code: " + hResult.ToString(), "RzSBSetImageDynamicKey fail", MessageBoxButtons.OK,
-						MessageBoxIcon.Error);
-					Exit();
-				}
+				_razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image);
 			}
-			MessageBox.Show("foreach end - SHOULD NOT BE REACHED");
 #else
 			MessageBox.Show(
 				"RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",
 				"RAZER_ENABLED undefined", MessageBoxButtons.OK, MessageBoxIcon.Information);
 #endif
 			ShowForm(new MainWindow());
+
+			_log.Error("Reached end of Main(), unexpected behaviour. Please report to developer.");
 		}
 
 		private static void ShowForm(Form form)
 		{
+			_log.Debug(">> ShowForm([form])");
+
+			if (_activeForm != null && _activeForm.GetType() == form.GetType())
+			{
+				_log.Info("Requested form is already showing.");
+				_log.Debug("<< ShowForm()");
+				return;
+			}
+			
+			if (_activeForm != null)
+			{
+				_log.Info("A form is already showing, queueing requested form and closing active");
+				QueueForm(form);
+				ClearCurrentForm();
+				_log.Debug("<< ShowForm()");
+				return;
+			}
+
+			_log.Debug("Setting active form");
 			_activeForm = form;
 
 #if RAZER_ENABLED
-			var hResult = RazerAPI.RzSBWinRenderStart(_activeForm.Handle, true, _debugMode);
-			if (hResult != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBWinRenderStart failed with error code: " + hResult.ToString(), "RzSBWinRenderStart fail",
-								MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
+			_log.Debug("Setting handle on switchblade touchpad");
+			_razerManager.GetTouchpad().SetHandle(_activeForm.Handle);
 #endif
 
-			_activeForm.Closed += (o, e) => ActiveFormClosed();
+			_log.Debug("Registering closed event");
+			_activeForm.Closed += ActiveFormClosed;
 
 			_running = true;
 
 #if DEBUG
+			_log.Debug("Creating debug window");
 			_keyDebugWindow = new KeyDebugWindow();
 			_keyDebugWindow.Show();
 #endif
 
+			_log.Info("Running application with new form");
 			Application.Run(form);
 
 			if (_nextForm != null)
 			{
+				_log.Info("Loading next form");
 				ClearCurrentForm();
+				_log.Debug("Setting active form to next form");
 				_activeForm = _nextForm;
+				_log.Debug("nulling _nextForm var");
 				_nextForm = null;
+				_log.Debug("Showing next form");
 				ShowForm(_activeForm);
 				return;
 			}
 
+			_log.Info("No next form was set, application will exit.");
+
 			Exit();
+
+			_log.Debug("<< ShowForm() [UNEXPECTED BEHAVIOUR]");
 		}
 
 		public static void QueueForm(Form form)
 		{
+			_log.Debug(">> QueueForm([form])");
 			_nextForm = form;
+			_log.Debug("<< QueueForm()");
 		}
 
 		private static void ClearCurrentForm()
 		{
+			_log.Debug(">> ClearCurrentForm()");
+
 			if (_activeForm == null || _activeForm.IsDisposed)
 				return;
 
 #if RAZER_ENABLED
-			var hResult = RazerAPI.RzSBWinRenderStop(true);
-			if (hResult != HRESULT.RZSB_OK)
-				MessageBox.Show("RzSBWinRenderStop failed with error code: " + hResult.ToString(), "RzSBWinRenderStop fail",
-								MessageBoxButtons.OK, MessageBoxIcon.Error);
+			_log.Info("Stopping render on touchpad");
+			_razerManager.GetTouchpad().StopRender(false);
 #endif
+			if (_activeForm.Visible)
+			{
+				_log.Debug("Active form is still visible, closing...");
+				_activeForm.Closed -= ActiveFormClosed;
+				_activeForm.Close();
+			}
+			_log.Debug("Disposing active form");
 			_activeForm.Dispose();
 			_activeForm = null;
+
+			_log.Debug("<< ClearCurrentForm()");
 		}
 
-		private static void ActiveFormClosed()
+		private static void ActiveFormClosed(object sender, EventArgs e)
 		{
+			_log.Debug(">> ActiveFormClosed([sender], [args])");
+			_activeForm.Closed -= ActiveFormClosed;
 			ClearCurrentForm();
+			_log.Debug("<< ActiveFormClosed()");
 		}
 
 		public static void Exit()
 		{
+			_log.Debug(">> Exit()");
 #if RAZER_ENABLED
 			if (_running && _activeForm != null)
 			{
-				var hResult = RazerAPI.RzSBWinRenderStop(true);
-				if (hResult != HRESULT.RZSB_OK)
-					MessageBox.Show("RzSBWinRenderStop failed with error code: " + hResult.ToString(), "RzSBWinRenderStop fail",
-									MessageBoxButtons.OK, MessageBoxIcon.Error);
+				_log.Info("Active form is not null, stopping render");
+				_razerManager.GetTouchpad().StopRender();
 			}
 
-			RazerAPI.RzSBStop();
+			_log.Info("Stopping Razer interface");
+			RazerManager.Stop();
+
+			_log.Info("Deleting control file");
+			RazerManager.DeleteControlFile();
 #endif
 
 			_running = false;
 
+			_log.Info("### APPLICATION EXIT ###");
+
 			Environment.Exit(0);
-		}
-
-		private static HRESULT DynamicKeyCallback(RazerAPI.RZDYNAMICKEY dynamicKey, RazerAPI.RZDKSTATE keyState)
-		{
-			var result = HRESULT.RZSB_OK;
-
-			if (keyState != RazerAPI.RZDKSTATE.DOWN || !_dynamicKeyHandlers.ContainsKey(dynamicKey))
-				return result;
-
-			_dynamicKeyHandlers[dynamicKey].Callback();
-
-			return result;
 		}
 
 		private static void HomeKeyPressed()
 		{
-			if (_activeForm is MainWindow)
-				return;
-			
-			QueueForm(new MainWindow());
-			ClearCurrentForm();
+			_log.Debug(">> HomeKeyPressed()");
+			ShowForm(new MainWindow());
+			_log.Debug("<< HomeKeyPressed()");
 		}
 
 		private static void FriendKeyPressed()
 		{
-			if (_activeForm is FriendsWindow)
-				return;
-
-			QueueForm(new FriendsWindow());
-			ClearCurrentForm();
+			_log.Debug(">> FriendKeyPressed()");
+			ShowForm(new FriendsWindow());
+			_log.Debug("<< FriendKeyPressed()");
 		}
 
 #if DEBUG
 		public static void DebugHomeButton()
 		{
+			_log.Debug(">> DebugHomeButton()");
 			HomeKeyPressed();
+			_log.Debug("<< DebugHomeButton()");
 		}
 
 		public static void DebugFriendsButton()
 		{
+			_log.Debug(">> DebugFriendsButton()");
 			FriendKeyPressed();
+			_log.Debug("<< DebugFriendsButton()");
 		}
 #endif
 	}

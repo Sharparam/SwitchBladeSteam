@@ -33,11 +33,15 @@ using System.Linq;
 using System.Text;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
+using log4net;
+using log4net.Core;
 
 namespace F16Gaming.SwitchBladeSteam.Razer
 {
 	public class Touchpad
 	{
+		private ILog _log;
+
 		/// <summary>
 		/// Image that will show if Aero is disabled.
 		/// </summary>
@@ -53,37 +57,83 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		/// </summary>
 		public string CurrentImage { get; private set; }
 
-		internal Touchpad(IntPtr handle)
+		private Touchpad()
 		{
-			
+			_log = Logging.LogManager.GetLogger(this);
+			_log.Debug(">< Touchpad()");
 		}
 
-		internal Touchpad(string image)
+		internal Touchpad(IntPtr handle) : this()
 		{
-			
+			_log.Debug(">> Touchpad([handle])");
+			SetHandle(handle);
+			_log.Debug("<< Touchpad()");
+		}
+
+		internal Touchpad(string image) : this()
+		{
+			_log.DebugFormat(">> Touchpad({0})", image);
+			SetImage(image);
+			_log.Debug("<< Touchpad()");
 		}
 
 		public void SetHandle(IntPtr handle)
 		{
-			HRESULT hResult;
+			_log.Debug(">> SetHandle([handle])");
+			StopRender(false);
 
-			// Check if we are currently rendering a window
-			if (CurrentHandle != IntPtr.Zero)
-			{
-				// Stop current render before starting new one
-				hResult = RazerAPI.RzSBWinRenderStop(false);
-				if (!HRESULT.RZSB_SUCCESS(hResult))
-					throw new RazerNativeException(hResult);
-			}
-
-			hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
+			var hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);
+
+			_log.Debug("<< SetHandle()");
+		}
+
+		public void SetKeyboardEnabledControls(IEnumerable<IntPtr> controlHandles)
+		{
+			_log.Debug(">> SetKeyboardEnabledControls([handles])");
+			var handles = controlHandles as IntPtr[] ?? controlHandles.ToArray();
+			var controls = new RazerAPI.RZSB_KEYEVTCTRLS[handles.Length];
+			for (int i = 0; i < handles.Length; i++)
+				controls[i] = new RazerAPI.RZSB_KEYEVTCTRLS {hwndTarget = handles[i], bReleaseOnEnter = true};
+			var hResult = RazerAPI.RzSBWinRenderAddKeyInputCtrls(controls, controls.Length, true);
+			if (!HRESULT.RZSB_SUCCESS(hResult))
+				throw new RazerNativeException(hResult);
+			_log.Debug("<< SetKeyboardEnabledControls()");
 		}
 
 		public void SetImage(string image)
 		{
-			
+			_log.DebugFormat(">> SetImage({0})", image);
+			StopRender();
+
+			var hResult = RazerAPI.RzSBSetImageTouchpad(image);
+			if (!HRESULT.RZSB_SUCCESS(hResult))
+				throw new RazerNativeException(hResult);
+
+			_log.Debug("<< SetImage()");
+		}
+
+		public void StopRender(bool erase = true)
+		{
+			_log.DebugFormat(">> StopRender({0})", erase ? "true" : "false");
+			if (CurrentHandle == IntPtr.Zero)
+				return;
+
+			var hResult = RazerAPI.RzSBWinRenderStop(erase);
+			if (!HRESULT.RZSB_SUCCESS(hResult))
+				throw new RazerNativeException(hResult);
+
+			_log.Debug("<< StopRender()");
+		}
+
+		public void ClearImage()
+		{
+			_log.Debug(">> ClearImage()");
+			var hResult = RazerAPI.RzSBSetImageTouchpad(Helpers.IO.GetAbsolutePath(Constants.BlankTouchpadImage));
+			if (!HRESULT.RZSB_SUCCESS(hResult))
+				throw new RazerNativeException(hResult);
+			_log.Debug("<< ClearImage()");
 		}
 	}
 }

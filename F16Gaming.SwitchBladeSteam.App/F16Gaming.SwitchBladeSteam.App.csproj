@@ -77,6 +77,7 @@
     <Compile Include="FriendsWindow.Designer.cs">
       <DependentUpon>FriendsWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="IKeyboardEnabledForm.cs" />
     <Compile Include="KeyDebugWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -141,32 +142,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="res\images\dk_appear_offline.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\dk_appear_online.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\dk_friends.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\dk_home.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\dk_next_chat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\dk_prev_chat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\tp_aero.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="res\images\tp_splash.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\F16Gaming.SwitchBladeSteam.Steam\F16Gaming.SwitchBladeSteam.Steam.csproj">
       <Project>{afe60a20-6e47-41e4-92f8-80b7eaabf03c}</Project>
       <Name>F16Gaming.SwitchBladeSteam.Steam</Name>
@@ -213,4 +188,8 @@
     <!--Publish copies the untransformed App.config to deployment directory so overwrite it-->
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>mkdir "$(TargetDir)res"
+xcopy "$(SolutionDir)res" "$(TargetDir)res" /S /Q /Y</PreBuildEvent>
+  </PropertyGroup>
 </Project>
