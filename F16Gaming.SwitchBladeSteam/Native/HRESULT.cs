@@ -7136,8 +7136,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		/* useful? status macros
 		 * Macros defined in SwitchBladeSDK_errors.h converted to methods
 		 */
-		public static bool RZSB_SUCCESS(HRESULT a)	{ return a == S_OK; }
-		public static bool RZSB_FAILED(HRESULT a)	{ return a != S_OK; }
+		public static bool RZSB_SUCCESS(HRESULT result)	{ return result == RZSB_OK; }
+		public static bool RZSB_FAILED(HRESULT result)	{ return result != RZSB_OK; }
 
 		public const int RZSB_GENERIC_BASE				= 0x20000000;
 		/// <summary>

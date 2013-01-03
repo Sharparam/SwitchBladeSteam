@@ -1,4 +1,4 @@
-﻿/* Helpers.cs
+﻿/* WinAPI.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,28 +27,30 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using System.ComponentModel;
+using System;
 using System.Runtime.InteropServices;
 
 namespace F16Gaming.SwitchBladeSteam.Native
 {
-	public static class Helpers
+	public static class WinAPI
 	{
-		public static int GetLastErrorInfo(out string message)
-		{
-			int err = Marshal.GetLastWin32Error();
-			message = GetWin32Exception(err).Message;
-			return err;
-		}
+// ReSharper disable InconsistentNaming
+		// Functions
 
-		public static string GetErrorMessage(int err)
-		{
-			return GetWin32Exception(err).Message;
-		}
+		[DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+		public static extern IntPtr GetStdHandle(int nStdHandle);
 
-		public static Win32Exception GetWin32Exception(int err)
-		{
-			return new Win32Exception(err);
-		}
+		[DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+		public static extern bool AllocConsole();
+
+		[DllImport("kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+		public static extern int FreeConsole();
+
+		// Constants
+
+
+		public const int STD_OUTPUT_HANDLE = -11;
+		public const int CODE_PAGE = 437;
+// ReSharper restore InconsistentNaming
 	}
 }

@@ -1,4 +1,4 @@
-﻿/* Helpers.cs
+﻿/* Touchpad.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,28 +27,63 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using F16Gaming.SwitchBladeSteam.Native;
+using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 
-namespace F16Gaming.SwitchBladeSteam.Native
+namespace F16Gaming.SwitchBladeSteam.Razer
 {
-	public static class Helpers
+	public class Touchpad
 	{
-		public static int GetLastErrorInfo(out string message)
+		/// <summary>
+		/// Image that will show if Aero is disabled.
+		/// </summary>
+		public string DisabledImage { get; private set; }
+
+		/// <summary>
+		/// Will be set to IntPtr.Zero if no handle associated.
+		/// </summary>
+		public IntPtr CurrentHandle { get; private set; }
+
+		/// <summary>
+		/// Current image shown on the Touchpad, null if not using static image.
+		/// </summary>
+		public string CurrentImage { get; private set; }
+
+		internal Touchpad(IntPtr handle)
 		{
-			int err = Marshal.GetLastWin32Error();
-			message = GetWin32Exception(err).Message;
-			return err;
+			
 		}
 
-		public static string GetErrorMessage(int err)
+		internal Touchpad(string image)
 		{
-			return GetWin32Exception(err).Message;
+			
 		}
 
-		public static Win32Exception GetWin32Exception(int err)
+		public void SetHandle(IntPtr handle)
 		{
-			return new Win32Exception(err);
+			HRESULT hResult;
+
+			// Check if we are currently rendering a window
+			if (CurrentHandle != IntPtr.Zero)
+			{
+				// Stop current render before starting new one
+				hResult = RazerAPI.RzSBWinRenderStop(false);
+				if (!HRESULT.RZSB_SUCCESS(hResult))
+					throw new RazerNativeException(hResult);
+			}
+
+			hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
+			if (!HRESULT.RZSB_SUCCESS(hResult))
+				throw new RazerNativeException(hResult);
+		}
+
+		public void SetImage(string image)
+		{
+			
 		}
 	}
 }

@@ -31,6 +31,8 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
+using log4net;
+using LogManager = F16Gaming.SwitchBladeSteam.Logging.LogManager;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
@@ -50,6 +52,8 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 	public static class Program
 	{
+		private static ILog _log;
+
 		private static bool _running;
 		private static Form _activeForm;
 		private static Form _nextForm;
@@ -68,6 +72,15 @@ namespace F16Gaming.SwitchBladeSteam.App
 		[MTAThread]
 		static void Main(string[] args)
 		{
+			Helpers.Threading.SetCurrentThreadName("Main");
+
+			LogManager.SetupConsole();
+
+			_log = LogManager.GetLogger(typeof (Program));
+
+			_log.Info("### APPLICATION START ###");
+
+			LogManager.ClearOldLogs();
 #if DEBUG
 			_debugMode = true;
 #else
@@ -86,15 +99,26 @@ namespace F16Gaming.SwitchBladeSteam.App
 				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions("res\\images\\dk_friends.png", FriendKeyPressed)}
 			};
 
+			var result = MessageBox.Show("Call RzSBStop?", "question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+			if (result == DialogResult.Yes)
+			{
+				MessageBox.Show("Calling RzSBStop");
+				RazerAPI.RzSBStop();
+				MessageBox.Show("RzSBStop called");
+			}
+			
 #if RAZER_ENABLED
+			MessageBox.Show("RzSBStart()");
 			var hResult = RazerAPI.RzSBStart();
+			MessageBox.Show("RzSBStart called");
 			if (hResult != HRESULT.RZSB_OK)
 			{
 				MessageBox.Show("RzSBStart failed with error code: " + hResult.ToString(), "RzSBStart fail", MessageBoxButtons.OK,
 								MessageBoxIcon.Error);
 				Exit();
 			}
-
+			
+			MessageBox.Show("disabled image reached");
 			hResult = RazerAPI.RzSBWinRenderSetDisabledImage(@"res\images\tp_aero.png");
 			if (hResult != HRESULT.RZSB_OK)
 			{
@@ -103,6 +127,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				Exit();
 			}
 
+			MessageBox.Show("DK set cb reached");
 			hResult = RazerAPI.RzSBDynamicKeySetCallback(DynamicKeyCallback);
 			if (hResult != HRESULT.RZSB_OK)
 			{
@@ -118,6 +143,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			 * If marshalled to UnmanagedType.LPWStr:
 			 *     Error: E_FAIL (No specifics)
 			 */
+			MessageBox.Show("running foreach - SHOULD ERROR");
 			foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
 			{
 				hResult = RazerAPI.RzSBSetImageDynamicKey(pair.Key, RazerAPI.RZDKSTATE.UP, pair.Value.Image);
@@ -140,42 +166,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 					Exit();
 				}
 			}
-
-			if (RazerAPI.RzSBGestureEnable(RazerAPI.RZGESTURE.PRESS, true) != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBGestureEnable failed", "RzSBGestureEnabled fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
-			
-			if (RazerAPI.RzSBGestureEnable(RazerAPI.RZGESTURE.TAP, true) != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBGestureEnable failed", "RzSBGestureEnabled fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
-
-			if (RazerAPI.RzSBGestureSetNotification(RazerAPI.RZGESTURE.PRESS, true) != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBGestureSetNotification failed", "RzSBGestureSetNotification fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
-			
-			if (RazerAPI.RzSBGestureSetNotification(RazerAPI.RZGESTURE.TAP, true) != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBGestureSetNotification failed", "RzSBGestureSetNotification fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
-
-			if (RazerAPI.RzSBGestureSetOSNotification(RazerAPI.RZGESTURE.PRESS, true) != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBGestureSetOSNotification failed", "RzSBGestureSetOSNotification fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
-			
-			if (RazerAPI.RzSBGestureSetOSNotification(RazerAPI.RZGESTURE.TAP, true) != HRESULT.RZSB_OK)
-			{
-				MessageBox.Show("RzSBGestureSetOSNotification failed", "RzSBGestureSetOSNotification fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
+			MessageBox.Show("foreach end - SHOULD NOT BE REACHED");
 #else
 			MessageBox.Show(
 				"RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",

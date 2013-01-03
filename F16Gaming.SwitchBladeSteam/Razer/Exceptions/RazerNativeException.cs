@@ -1,4 +1,4 @@
-﻿/* Helpers.cs
+﻿/* RazerNativeException.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,28 +27,18 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using F16Gaming.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.Native
+namespace F16Gaming.SwitchBladeSteam.Razer.Exceptions
 {
-	public static class Helpers
+	public class RazerNativeException : RazerException
 	{
-		public static int GetLastErrorInfo(out string message)
+		public readonly HRESULT Hresult;
+		
+		internal RazerNativeException(HRESULT hresult)
+			: base(Native.Helpers.GetErrorMessage(hresult), Native.Helpers.GetWin32Exception(hresult))
 		{
-			int err = Marshal.GetLastWin32Error();
-			message = GetWin32Exception(err).Message;
-			return err;
-		}
-
-		public static string GetErrorMessage(int err)
-		{
-			return GetWin32Exception(err).Message;
-		}
-
-		public static Win32Exception GetWin32Exception(int err)
-		{
-			return new Win32Exception(err);
+			Hresult = hresult;
 		}
 	}
 }

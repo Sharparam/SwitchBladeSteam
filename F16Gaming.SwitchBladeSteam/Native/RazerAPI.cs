@@ -49,16 +49,16 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public static extern HRESULT RzSBQueryCapabilities(out SBSDKQUERYCAPABILITIES pSBSDKCap);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBRenderBuffer([In] RZTARGET_DISPLAY dwTarget, [In] IntPtr bufferParams);
+		public static extern HRESULT RzSBRenderBuffer([In] RZTARGET_DISPLAY dwTarget, [In] ref RZSB_BUFFERPARAMS bufferParams);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBSetImageDynamicKey(
 			[In] RZDYNAMICKEY dk,
 			[In] RZDKSTATE state,
-			[In] /*[MarshalAs(UnmanagedType.LPStr)]*/ string lpszImageFilename);
+			[In] [MarshalAs(UnmanagedType.LPWStr)] string lpszImageFilename);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBSetImageTouchpad([In] [MarshalAs(UnmanagedType.LPStr)] string lpszImageFilename);
+		public static extern HRESULT RzSBSetImageTouchpad([In] [MarshalAs(UnmanagedType.LPWStr)] string lpszImageFilename);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBAppEventSetCallback([In] AppEventCallbackDelegate pFn);
@@ -82,7 +82,10 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public static extern HRESULT RzSBWinRenderSetDisabledImage([In] [MarshalAs(UnmanagedType.LPWStr)] string pszImageFilename);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderAddKeyInputCtrls([In] IntPtr pKeyboardEvtCtrls, [In] int nCtrlCount, [In] bool bResetList);
+		public static extern HRESULT RzSBWinRenderAddKeyInputCtrls(
+			[In] RZSB_KEYEVTCTRLS[] pKeyboardEvtCtrls,
+			[In] int nCtrlCount,
+			[In] bool bResetList);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBWinRenderStart([In] IntPtr hwnd, [In] bool bTranslateGestures, [In] bool bVisibleOnDesktop);
@@ -253,18 +256,19 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		/*
 		 * definitions for the Dynamic Key display region of the Switchblade
 		 */
-		public const int SWITCHBLADE_DYNAMIC_KEYS_PER_ROW = 5;
-		public const int SWITCHBLADE_DYNAMIC_KEYS_ROWS = 2;
-		public const int SWITCHBLADE_DYNAMIC_KEY_X_SIZE = 115;
-		public const int SWITCHBLADE_DYNAMIC_KEY_Y_SIZE = 115;
-		public const int SWITCHBLADE_DK_SIZE_IMAGEDATA = SWITCHBLADE_DYNAMIC_KEY_X_SIZE * SWITCHBLADE_DYNAMIC_KEY_Y_SIZE * sizeof(ushort);
+		public const int DYNAMIC_KEYS_PER_ROW = 5;
+		public const int DYNAMIC_KEYS_ROWS = 2;
+		public const int DYNAMIC_KEYS_COUNT = DYNAMIC_KEYS_PER_ROW * DYNAMIC_KEYS_ROWS;
+		public const int DYNAMIC_KEY_X_SIZE = 115;
+		public const int DYNAMIC_KEY_Y_SIZE = 115;
+		public const int DK_SIZE_IMAGEDATA = DYNAMIC_KEY_X_SIZE * DYNAMIC_KEY_Y_SIZE * sizeof(ushort);
 
 		/*
 		 * definitions for the Touchpad display region of the Switchblade
 		 */
-		public const int SWITCHBLADE_TOUCHPAD_X_SIZE = 800;
-		public const int SWITCHBLADE_TOUCHPAD_Y_SIZE = 480;
-		public const int SWITCHBLADE_TOUCHPAD_SIZE_IMAGEDATA = SWITCHBLADE_TOUCHPAD_X_SIZE * SWITCHBLADE_TOUCHPAD_Y_SIZE * sizeof(ushort);
+		public const int TOUCHPAD_X_SIZE = 800;
+		public const int TOUCHPAD_Y_SIZE = 480;
+		public const int TOUCHPAD_SIZE_IMAGEDATA = TOUCHPAD_X_SIZE * TOUCHPAD_Y_SIZE * sizeof(ushort);
 
 		public const int SWITCHBLADE_DISPLAY_COLOR_DEPTH = 16;
 

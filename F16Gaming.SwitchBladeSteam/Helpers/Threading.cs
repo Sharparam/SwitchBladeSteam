@@ -1,4 +1,4 @@
-﻿/* Helpers.cs
+﻿/* Threading.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,28 +27,16 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using System.Threading;
 
-namespace F16Gaming.SwitchBladeSteam.Native
+namespace F16Gaming.SwitchBladeSteam.Helpers
 {
-	public static class Helpers
+	public static class Threading
 	{
-		public static int GetLastErrorInfo(out string message)
+		public static void SetCurrentThreadName(string name)
 		{
-			int err = Marshal.GetLastWin32Error();
-			message = GetWin32Exception(err).Message;
-			return err;
-		}
-
-		public static string GetErrorMessage(int err)
-		{
-			return GetWin32Exception(err).Message;
-		}
-
-		public static Win32Exception GetWin32Exception(int err)
-		{
-			return new Win32Exception(err);
+			if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
+				Thread.CurrentThread.Name = name;
 		}
 	}
 }
