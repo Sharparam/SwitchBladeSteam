@@ -29,6 +29,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
@@ -57,6 +58,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private static bool _running;
 		private static Form _activeForm;
 		private static Form _nextForm;
+		private static bool _activeFormClosed;
 
 #if DEBUG
 		private static Form _keyDebugWindow;
@@ -144,22 +146,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 		{
 			_log.Debug(">> ShowForm([form])");
 
-			if (_activeForm != null && _activeForm.GetType() == form.GetType())
-			{
-				_log.Info("Requested form is already showing.");
-				_log.Debug("<< ShowForm()");
-				return;
-			}
-			
-			if (_activeForm != null)
-			{
-				_log.Info("A form is already showing, queueing requested form and closing active");
-				QueueForm(form);
-				ClearCurrentForm();
-				_log.Debug("<< ShowForm()");
-				return;
-			}
-
 			_log.Debug("Setting active form");
 			_activeForm = form;
 
@@ -175,11 +161,16 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 #if DEBUG
 			_log.Debug("Creating debug window");
-			_keyDebugWindow = new KeyDebugWindow();
+			_keyDebugWindow = new KeyDebugWindow
+			{
+				StartPosition = FormStartPosition.Manual,
+				Location = new Point(Screen.PrimaryScreen.WorkingArea.Width / 2 + _activeForm.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - _activeForm.Height / 2)
+			};
 			_keyDebugWindow.Show();
 #endif
 
 			_log.Info("Running application with new form");
+			_activeFormClosed = false;
 			Application.Run(form);
 
 			if (_nextForm != null)
@@ -213,7 +204,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 		{
 			_log.Debug(">> ClearCurrentForm()");
 
-			if (_activeForm == null || _activeForm.IsDisposed)
+			if (_activeForm == null || _activeForm.IsDisposed || _activeFormClosed)
 				return;
 
 #if RAZER_ENABLED
@@ -224,11 +215,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 			{
 				_log.Debug("Active form is still visible, closing...");
 				_activeForm.Closed -= ActiveFormClosed;
-				_activeForm.Close();
+				_activeFormClosed = true;
+				if (_activeForm.InvokeRequired)
+					_activeForm.Invoke((VoidDelegate)(() => _activeForm.Close()));
+				else
+					_activeForm.Close();
 			}
-			_log.Debug("Disposing active form");
-			_activeForm.Dispose();
-			_activeForm = null;
 
 			_log.Debug("<< ClearCurrentForm()");
 		}
@@ -244,6 +236,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 		public static void Exit()
 		{
 			_log.Debug(">> Exit()");
+
 #if RAZER_ENABLED
 			if (_running && _activeForm != null)
 			{
@@ -268,14 +261,22 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private static void HomeKeyPressed()
 		{
 			_log.Debug(">> HomeKeyPressed()");
-			ShowForm(new MainWindow());
+			if (_activeForm is MainWindow)
+				return;
+
+			QueueForm(new MainWindow());
+			ClearCurrentForm();
 			_log.Debug("<< HomeKeyPressed()");
 		}
 
 		private static void FriendKeyPressed()
 		{
 			_log.Debug(">> FriendKeyPressed()");
-			ShowForm(new FriendsWindow());
+			if (_activeForm is FriendsWindow)
+				return;
+
+			QueueForm(new FriendsWindow());
+			ClearCurrentForm();
 			_log.Debug("<< FriendKeyPressed()");
 		}
 
