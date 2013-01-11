@@ -35,6 +35,8 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 {
 	public class Friend
 	{
+		private log4net.ILog _log;
+
 		private IClientFriends _clientFriends;
 		private CSteamID _steamId;
 
@@ -44,17 +46,22 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		internal Friend(IClientFriends clientFriends, CSteamID id)
 		{
+			_log = Logging.LogManager.GetLogger(this);
+			_log.DebugFormat(">> Friend([clientFriends], {0})", id.Render());
 			_clientFriends = clientFriends;
 			_steamId = id;
+			_log.Debug("<< Friend()");
 		}
 
 		public string GetName()
 		{
+			_log.Debug(">< GetName()");
 			return _clientFriends.GetFriendPersonaName(_steamId);
 		}
 
 		public string GetNickname()
 		{
+			_log.Debug(">> GetNickName()");
 			string nick;
 			try
 			{
@@ -64,33 +71,42 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			{
 				nick = null;
 			}
+			_log.Debug("<< GetNickName()");
 			return nick;
 		}
 
 		public EPersonaState GetState()
 		{
+			_log.Debug(">< GetState()");
 			return _clientFriends.GetFriendPersonaState(_steamId);
 		}
 
 		public string GetStateText()
 		{
+			_log.Debug(">< GetStateText()");
 			return Utils.StateToString(GetState());
 		}
 
 		public void SendType(string message, EChatEntryType type)
 		{
+			_log.DebugFormat(">> SendType([message], {0})", type);
 			Console.WriteLine("Sending to {0} to {1}: {2}", type, _steamId.Render(), message);
 			_clientFriends.SendMsgToFriend(_steamId, type, Encoding.UTF8.GetBytes(message));
+			_log.Debug("<< SendType()");
 		}
 
 		public void SendMessage(string message)
 		{
+			_log.Debug(">> SendMessage([message])");
 			SendType(message, EChatEntryType.k_EChatEntryTypeChatMsg);
+			_log.Debug("<< SendMessage()");
 		}
 
 		public void SendEmote(string message)
 		{
+			_log.Debug(">> SendEmote([message])");
 			SendType(message, EChatEntryType.k_EChatEntryTypeEmote);
+			_log.Debug("<< SendEmote()");
 		}
 	}
 }

@@ -35,6 +35,8 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 {
 	public class FriendsManager
 	{
+		private log4net.ILog _log;
+
 		private IClientFriends _clientFriends;
 
 		private Friend[] _friends;
@@ -45,12 +47,17 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		internal FriendsManager(IClientFriends clientFriends)
 		{
+			_log = Logging.LogManager.GetLogger(this);
+			_log.Debug(">> FriendsManager([clientFriends])");
+			_log.Info("FriendsManager is initializing");
 			_clientFriends = clientFriends;
 			UpdateFriends();
+			_log.Debug("<< FriendsManager()");
 		}
 
 		public void UpdateFriends()
 		{
+			_log.Debug(">> UpdateFriends()");
 			var newFriendCount = _clientFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
 			if (newFriendCount != _friendCount)
 				_friends = new Friend[newFriendCount];
@@ -61,25 +68,30 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 				_friends[i] = new Friend(_clientFriends, friend);
 			}
 			Friends = new ReadOnlyCollection<Friend>(_friends.ToList());
+			_log.Debug("<< UpdateFriends()");
 		}
 
 		public bool IsFriend(CSteamID id)
 		{
+			_log.DebugFormat(">< IsFriend({0})", id.Render());
 			return _friends.Any(f => f.SteamID == id);
 		}
 
 		public Friend GetFriendBySteamId(CSteamID id)
 		{
+			_log.DebugFormat(">< GetFriendBySteamId({0})", id.Render());
 			return _friends.FirstOrDefault(f => f.SteamID == id);
 		}
 
 		public Friend GetFriendByName(string name, bool caseSensitive = true)
 		{
+			_log.DebugFormat(">< GetFriendByName({0}, {1})", name, caseSensitive ? "true" : "false");
 			return _friends.FirstOrDefault(f => (caseSensitive ? f.GetName() : f.GetName().ToLower()) == (caseSensitive ? name : name.ToLower()));
 		}
 
 		public Friend GetFriendByMatching(string name, bool caseSensitive = true)
 		{
+			_log.DebugFormat(">< GetFriendByMatching({0}, {1})", name, caseSensitive ? "true" : "false");
 			return _friends.FirstOrDefault(f => (caseSensitive ? f.GetName() : f.GetName().ToLower()).Contains(caseSensitive ? name : name.ToLower()));
 		}
 	}
