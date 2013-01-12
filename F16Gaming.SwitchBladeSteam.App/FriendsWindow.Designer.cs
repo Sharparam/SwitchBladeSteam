@@ -68,6 +68,9 @@
             this.NameHeader,
             this.StatusHeader});
 			this.FriendList.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FriendList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.FriendList.ForeColor = System.Drawing.Color.White;
+			this.FriendList.FullRowSelect = true;
 			this.FriendList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
 			this.FriendList.Location = new System.Drawing.Point(0, 63);
 			this.FriendList.MultiSelect = false;
@@ -76,6 +79,7 @@
 			this.FriendList.TabIndex = 2;
 			this.FriendList.UseCompatibleStateImageBehavior = false;
 			this.FriendList.View = System.Windows.Forms.View.Details;
+			this.FriendList.SelectedIndexChanged += new System.EventHandler(this.FriendListSelectedIndexChanged);
 			// 
 			// NameHeader
 			// 
@@ -89,8 +93,7 @@
 			// 
 			// FriendsWindow
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.BackColor = System.Drawing.Color.Black;
 			this.BackgroundImage = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.tp_splash;
 			this.ClientSize = new System.Drawing.Size(800, 480);
@@ -104,6 +107,7 @@
 			this.Name = "FriendsWindow";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "SwitchBlade Steam App - Friends";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FriendsWindowFormClosing);
 			this.ResumeLayout(false);
 
 		}

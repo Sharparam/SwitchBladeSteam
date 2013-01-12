@@ -28,6 +28,7 @@
  */
 
 using System.Collections.Generic;
+using System.Drawing;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
@@ -48,6 +49,36 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public static string StateToString(EPersonaState state)
 		{
 			return StateMapping.ContainsKey(state) ? StateMapping[state] : "Unknown";
+		}
+
+		// All credit to kimoto on GitHub
+		// https://gist.github.com/986866/b2dc849940d4bdba858f3b305bf68afda641e21e
+		public static Bitmap GetAvatarFromHandle(int handle, ISteamUtils005 utils)
+		{
+			uint width = 0;
+			uint height = 0;
+			if (!utils.GetImageSize(handle, ref width, ref height))
+				return null;
+
+			var size = 4 * width * height;
+			var buffer = new byte[size];
+			if (!utils.GetImageRGBA(handle, buffer, (int) size))
+				return null;
+
+			var bitmap = new Bitmap((int) width, (int) height);
+			for (var x = 0; x < width; x++)
+				for (var y = 0; y < height; y++)
+				{
+					var index = (y * (int) width + x) * 4;
+					int r = buffer[index + 0];
+					int g = buffer[index + 1];
+					int b = buffer[index + 2];
+					int a = buffer[index + 3];
+					var color = Color.FromArgb(a, r, g, b);
+					bitmap.SetPixel(x, y, color);
+				}
+
+			return bitmap;
 		}
 	}
 }

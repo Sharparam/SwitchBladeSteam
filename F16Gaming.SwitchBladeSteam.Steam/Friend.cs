@@ -28,6 +28,7 @@
  */
 
 using System;
+using System.Drawing;
 using System.Text;
 using Steam4NET;
 
@@ -39,6 +40,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		private CSteamID _steamId;
 
 		public CSteamID SteamID { get { return _steamId; } }
+		public Bitmap Avatar { get; internal set; }
 
 		public bool Online { get { return GetState() != EPersonaState.k_EPersonaStateOffline; } }
 

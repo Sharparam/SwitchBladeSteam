@@ -43,6 +43,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		private IClientEngine _clientEngine;
 		private IClientFriends _clientFriends;
 		private ISteamUser016 _steamUser;
+		private ISteamUtils005 _steamUtils;
 
 		private FriendsManager _friendsManager;
 
@@ -79,6 +80,8 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			if (_steamUser == null)
 				throw new SteamException("SteamUser is null!");
 
+			_steamUtils = _steamClient.GetISteamUtils<ISteamUtils005>(_pipe);
+
 			_clientEngine = Steamworks.CreateInterface<IClientEngine>();
 
 			if (_clientEngine == null)
@@ -89,7 +92,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			if (_clientFriends == null)
 				throw new SteamException("ClientFriends is null");
 
-			_friendsManager = new FriendsManager(_clientFriends);
+			_friendsManager = new FriendsManager(_clientFriends, _steamUtils);
 			
 			// Set up callbacks
 			_friendChatCallback = new Callback<FriendChatMsg_t>(HandleFriendChatMessage);
@@ -131,6 +134,11 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public bool IsMe(CSteamID id)
 		{
 			return id == Me;
+		}
+
+		public string GetMyName()
+		{
+			return _clientFriends.GetPersonaName();
 		}
 
 		private void HandleFriendChatMessage(FriendChatMsg_t callback)

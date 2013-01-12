@@ -57,7 +57,8 @@
 			this.EntryBox.Name = "EntryBox";
 			this.EntryBox.Size = new System.Drawing.Size(800, 80);
 			this.EntryBox.TabIndex = 1;
-			this.EntryBox.Text = "The quick brown fox jumps over the lazy dog";
+			this.EntryBox.TextChanged += new System.EventHandler(this.EntryBox_TextChanged);
+			this.EntryBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EntryBox_KeyDown);
 			// 
 			// ChatHistory
 			// 
@@ -72,7 +73,7 @@
 			this.ChatHistory.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.ChatHistory.Size = new System.Drawing.Size(800, 380);
 			this.ChatHistory.TabIndex = 2;
-			this.ChatHistory.Text = "The quick brown fox jumps over the lazy dog";
+			this.ChatHistory.Text = "";
 			// 
 			// ChatWindow
 			// 
@@ -92,6 +93,7 @@
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "ChatWindow";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatWindow_FormClosing);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

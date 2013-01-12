@@ -34,6 +34,7 @@ using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
+using F16Gaming.SwitchBladeSteam.Steam;
 using log4net;
 using LogManager = F16Gaming.SwitchBladeSteam.Logging.LogManager;
 
@@ -70,6 +71,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
 
+		internal static Client SteamClient;
+		internal static FriendsManager SteamFriends;
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
@@ -96,6 +100,10 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
+
+			_log.Info("Initializing steam objects");
+			SteamClient = SteamManager.Client;
+			SteamFriends = SteamManager.FriendsManager;
 
 			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
 			{

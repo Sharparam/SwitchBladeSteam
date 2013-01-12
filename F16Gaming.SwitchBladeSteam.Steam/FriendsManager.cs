@@ -29,12 +29,16 @@
 
 using System.Collections.ObjectModel;
 using System.Linq;
+using F16Gaming.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
 {
 	public class FriendsManager
 	{
+		public event FriendsUpdatedEventHandler FriendsUpdated;
+
+		private ISteamUtils005 _steamUtils;
 		private IClientFriends _clientFriends;
 
 		private Friend[] _friends;
@@ -43,10 +47,18 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public ReadOnlyCollection<Friend> Friends;
 
-		internal FriendsManager(IClientFriends clientFriends)
+		internal FriendsManager(IClientFriends clientFriends, ISteamUtils005 steamUtils)
 		{
 			_clientFriends = clientFriends;
+			_steamUtils = steamUtils;
 			UpdateFriends();
+		}
+
+		private void OnFriendsUpdated()
+		{
+			var func = FriendsUpdated;
+			if (func != null)
+				func(this, null);
 		}
 
 		public void UpdateFriends()
@@ -59,8 +71,13 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			{
 				var friend = _clientFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
 				_friends[i] = new Friend(_clientFriends, friend);
+				var avatarHandle = _clientFriends.GetSmallFriendAvatar(_friends[i].SteamID);
+				var avatar = Utils.GetAvatarFromHandle(avatarHandle, _steamUtils);
+				if (avatar != null)
+					_friends[i].Avatar = avatar;
 			}
 			Friends = new ReadOnlyCollection<Friend>(_friends.ToList());
+			OnFriendsUpdated();
 		}
 
 		public bool IsFriend(CSteamID id)

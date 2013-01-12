@@ -27,15 +27,72 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
+using System;
+using System.Drawing;
 using System.Windows.Forms;
+using F16Gaming.SwitchBladeSteam.Razer;
+using F16Gaming.SwitchBladeSteam.Steam;
+using F16Gaming.SwitchBladeSteam.Steam.Events;
+using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
 	public partial class ChatWindow : Form
 	{
-		public ChatWindow()
+		private const string ChatLineFormat = "{0}: {1}";
+
+		private Friend _friend;
+
+		public ChatWindow(CSteamID friendId)
 		{
 			InitializeComponent();
+
+			_friend = Program.SteamFriends.GetFriendBySteamId(friendId);
+			ChatTitle.Text = "Chatting with " + _friend.GetName();
+			Program.SteamClient.ChatMessageReceived += HandleChatMessage;
+		}
+
+		private void EntryBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode != Keys.Enter || string.IsNullOrEmpty(EntryBox.Text))
+				return;
+
+			var message = EntryBox.Text;
+			_friend.SendMessage(message + "\0");
+			EntryBox.Clear();
+		}
+
+		private void EntryBox_TextChanged(object sender, EventArgs e)
+		{
+			EntryBox.Text = EntryBox.Text.TrimStart('\n', '\r', ' ');
+		}
+
+		private void WriteChatMessage(string name, string message)
+		{
+			ChatHistory.SelectionColor = Color.CornflowerBlue;
+			ChatHistory.AppendText(name + ": ");
+			ChatHistory.SelectionColor = Color.DarkGray;
+			ChatHistory.AppendText(message + Environment.NewLine);
+		}
+
+		private void HandleChatMessage(object sender, ChatMessageEventArgs e)
+		{
+			var msg = e.Message;
+			string senderName;
+			if (Program.SteamClient.IsMe(msg.Sender))
+				senderName = Program.SteamClient.GetMyName();
+			else
+				senderName = Program.SteamFriends.GetFriendBySteamId(msg.Sender).GetName();
+			var message = msg.Message;
+			if (ChatHistory.InvokeRequired)
+				ChatHistory.Invoke((VoidDelegate) (() => WriteChatMessage(senderName, message)));
+			else
+				WriteChatMessage(senderName, message);
+		}
+
+		private void ChatWindow_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			Program.SteamClient.ChatMessageReceived -= HandleChatMessage;
 		}
 	}
 }

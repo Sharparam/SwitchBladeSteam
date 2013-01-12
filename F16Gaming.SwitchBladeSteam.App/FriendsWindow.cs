@@ -28,7 +28,11 @@
  */
 
 using System;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using F16Gaming.SwitchBladeSteam.Razer;
+using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
@@ -37,12 +41,54 @@ namespace F16Gaming.SwitchBladeSteam.App
 		public FriendsWindow()
 		{
 			InitializeComponent();
+
+			UpdateFriendList();
+
+			Program.SteamFriends.FriendsUpdated += FriendsUpdated;
 		}
 
-		private void HomeButton_Click(object sender, EventArgs e)
+		private void FriendsUpdated(object sender, EventArgs e)
 		{
-			Program.QueueForm(new MainWindow());
+			UpdateFriendList();
+		}
+
+		private void UpdateFriendList()
+		{
+			if (InvokeRequired)
+			{
+				Invoke((VoidDelegate) UpdateFriendList);
+				return;
+			}
+
+			var friends = Program.SteamFriends.Friends.Where(f => f.Online);
+			var avatars = new ImageList { ImageSize = new Size(32, 32), ColorDepth = ColorDepth.Depth32Bit };
+			FriendList.SmallImageList = avatars;
+			foreach (var friend in friends)
+			{
+				avatars.Images.Add(friend.GetName(), friend.Avatar);
+				FriendList.Items.Add(new ListViewItem(new[] { friend.GetName(), friend.GetStateText() }) { Tag = friend.SteamID, ImageKey = friend.GetName() });
+			}
+		}
+
+		private void FriendListSelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (FriendList.SelectedItems.Count < 1)
+				return;
+
+			var item = FriendList.SelectedItems[0];
+
+			if (item == null)
+				return;
+
+			var friendId = (CSteamID) item.Tag;
+
+			Program.QueueForm(new ChatWindow(friendId));
 			Close();
+		}
+
+		private void FriendsWindowFormClosing(object sender, FormClosingEventArgs e)
+		{
+			Program.SteamFriends.FriendsUpdated -= FriendsUpdated;
 		}
 	}
 }
