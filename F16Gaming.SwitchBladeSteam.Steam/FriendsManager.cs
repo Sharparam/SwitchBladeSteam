@@ -50,7 +50,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public ReadOnlyCollection<Friend> Friends;
 
-		internal FriendsManager(IClientFriends clientFriends, ISteamUtils005 steamUtils)
+		internal FriendsManager(IClientFriends clientFriends, ISteamUtils005 steamUtils, Client client)
 		{
 			_log = Logging.LogManager.GetLogger(this);
 			_log.Debug(">> FriendsManager([clientFriends])");
@@ -58,6 +58,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			_clientFriends = clientFriends;
 			_steamUtils = steamUtils;
 			UpdateFriends();
+			client.ChatMessageReceived += HandleChatMessage;
 			_log.Debug("<< FriendsManager()");
 		}
 
@@ -71,19 +72,25 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public void UpdateFriends()
 		{
 			_log.Debug(">> UpdateFriends()");
+			var oldFriends = _friends == null ? null : (Friend[]) _friends.Clone();
 			var newFriendCount = _clientFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
-			if (newFriendCount != _friendCount)
-				_friends = new Friend[newFriendCount];
-			_friendCount = newFriendCount;
+			if (_friends == null || newFriendCount != _friendCount)
+			{
+				_friendCount = newFriendCount;
+				_friends = new Friend[_friendCount];
+			}
+			
 			for (int i = 0; i < _friendCount; i++)
 			{
 				var friend = _clientFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
-				_friends[i] = new Friend(_clientFriends, friend);
+				Friend oldFriend = oldFriends == null ? null : oldFriends.FirstOrDefault(f => f.SteamID == friend);
+				_friends[i] = new Friend(_clientFriends, friend, oldFriend == null ? null :  oldFriend.ChatHistory.ToList());
 				var avatarHandle = _clientFriends.GetSmallFriendAvatar(_friends[i].SteamID);
 				var avatar = Utils.GetAvatarFromHandle(avatarHandle, _steamUtils);
 				if (avatar != null)
 					_friends[i].Avatar = avatar;
 			}
+
 			Friends = new ReadOnlyCollection<Friend>(_friends.ToList());
 			OnFriendsUpdated();
 			_log.Debug("<< UpdateFriends()");
@@ -111,6 +118,15 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		{
 			_log.DebugFormat(">< GetFriendByMatching({0}, {1})", name, caseSensitive ? "true" : "false");
 			return _friends.FirstOrDefault(f => (caseSensitive ? f.GetName() : f.GetName().ToLower()).Contains(caseSensitive ? name : name.ToLower()));
+		}
+
+		private void HandleChatMessage(object sender, ChatMessageEventArgs e)
+		{
+			var msg = e.Message;
+			var friend = _friends.FirstOrDefault(f => f.SteamID == msg.Sender || f.SteamID == msg.Receiver);
+			if (friend == null)
+				return;
+			friend.AddChatMessage(msg);
 		}
 	}
 }

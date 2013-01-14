@@ -28,31 +28,57 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Text;
+using F16Gaming.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
 {
 	public class Friend
 	{
-		private log4net.ILog _log;
+		public event ChatMessageReceivedEventHandler ChatMessageReceived;
 
-		private IClientFriends _clientFriends;
-		private CSteamID _steamId;
+		private readonly log4net.ILog _log;
+
+		private readonly IClientFriends _clientFriends;
+		private readonly CSteamID _steamId;
+		private List<ChatMessage> _chatHistory;
+
+		public ReadOnlyCollection<ChatMessage> ChatHistory;
 
 		public CSteamID SteamID { get { return _steamId; } }
 		public Bitmap Avatar { get; internal set; }
 
 		public bool Online { get { return GetState() != EPersonaState.k_EPersonaStateOffline; } }
 
-		internal Friend(IClientFriends clientFriends, CSteamID id)
+		internal Friend(IClientFriends clientFriends, CSteamID id, List<ChatMessage> oldChatHistory = null)
 		{
 			_log = Logging.LogManager.GetLogger(this);
 			_log.DebugFormat(">> Friend([clientFriends], {0})", id.Render());
 			_clientFriends = clientFriends;
 			_steamId = id;
+			if (oldChatHistory == null)
+				_chatHistory = new List<ChatMessage>();
+			else
+				_chatHistory = oldChatHistory;
+			ChatHistory = new ReadOnlyCollection<ChatMessage>(_chatHistory);
 			_log.Debug("<< Friend()");
+		}
+
+		private void OnChatMessageReceived(ChatMessage message)
+		{
+			var func = ChatMessageReceived;
+			if (func != null)
+				func(this, new ChatMessageEventArgs(message));
+		}
+
+		internal void AddChatMessage(ChatMessage message)
+		{
+			_chatHistory.Add(message);
+			OnChatMessageReceived(message);
 		}
 
 		public string GetName()

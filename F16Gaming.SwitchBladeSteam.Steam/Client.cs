@@ -121,7 +121,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			}
 
 			_log.Debug("Creataing friends manager");
-			_friendsManager = new FriendsManager(_clientFriends);
+			_friendsManager = new FriendsManager(_clientFriends, _steamUtils, this);
 			
 			// Set up callbacks
 			_log.Debug("Setting up callbacks");

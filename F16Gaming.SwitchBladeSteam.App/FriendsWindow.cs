@@ -60,6 +60,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 			}
 
+			FriendList.Items.Clear();
 			var friends = Program.SteamFriends.Friends.Where(f => f.Online);
 			var avatars = new ImageList { ImageSize = new Size(32, 32), ColorDepth = ColorDepth.Depth32Bit };
 			FriendList.SmallImageList = avatars;

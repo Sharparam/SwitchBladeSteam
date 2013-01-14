@@ -41,6 +41,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 	{
 		private const string ChatLineFormat = "{0}: {1}";
 
+		private log4net.ILog _log;
 		private Friend _friend;
 
 		public ChatWindow(CSteamID friendId)
@@ -49,7 +50,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			_friend = Program.SteamFriends.GetFriendBySteamId(friendId);
 			ChatTitle.Text = "Chatting with " + _friend.GetName();
-			Program.SteamClient.ChatMessageReceived += HandleChatMessage;
+			_friend.ChatMessageReceived += HandleChatMessage;
+			foreach (var message in _friend.ChatHistory)
+			{
+				WriteChatMessage(message.Sender, message.Message);
+			}
+			Program.SteamFriends.FriendsUpdated += HandleFriendsUpdated;
 		}
 
 		private void EntryBox_KeyDown(object sender, KeyEventArgs e)
@@ -67,32 +73,54 @@ namespace F16Gaming.SwitchBladeSteam.App
 			EntryBox.Text = EntryBox.Text.TrimStart('\n', '\r', ' ');
 		}
 
-		private void WriteChatMessage(string name, string message)
+		private void WriteChatMessage(CSteamID sender, string message)
 		{
+			bool isMe = Program.SteamClient.IsMe(sender);
+			string name = isMe
+				              ? Program.SteamClient.GetMyName()
+				              : Program.SteamFriends.GetFriendBySteamId(sender).GetName();
+			ChatHistory.AppendText("");
 			ChatHistory.SelectionColor = Color.CornflowerBlue;
 			ChatHistory.AppendText(name + ": ");
-			ChatHistory.SelectionColor = Color.DarkGray;
+			ChatHistory.SelectionColor = isMe ? Color.DarkGray : Color.White;
 			ChatHistory.AppendText(message + Environment.NewLine);
+			ChatHistory.ScrollToCaret();
 		}
 
 		private void HandleChatMessage(object sender, ChatMessageEventArgs e)
 		{
-			var msg = e.Message;
-			string senderName;
-			if (Program.SteamClient.IsMe(msg.Sender))
-				senderName = Program.SteamClient.GetMyName();
-			else
-				senderName = Program.SteamFriends.GetFriendBySteamId(msg.Sender).GetName();
-			var message = msg.Message;
-			if (ChatHistory.InvokeRequired)
-				ChatHistory.Invoke((VoidDelegate) (() => WriteChatMessage(senderName, message)));
-			else
-				WriteChatMessage(senderName, message);
+			try
+			{
+				var msg = e.Message;
+				var message = msg.Message;
+				if (ChatHistory.InvokeRequired)
+					ChatHistory.Invoke((VoidDelegate) (() => WriteChatMessage(msg.Sender, message)));
+				else
+					WriteChatMessage(msg.Sender, message);
+			}
+			catch (ObjectDisposedException ex)
+			{
+				_log.WarnFormat("ObjectDisposedException while attempting to add message to chatlog. Message was: {0}", ex.Message);
+			}
+		}
+
+		private void HandleFriendsUpdated(object sender, EventArgs e)
+		{
+			_friend.ChatMessageReceived -= HandleChatMessage;
+			var newFriend = Program.SteamFriends.GetFriendBySteamId(_friend.SteamID);
+			if (newFriend == null)
+			{
+				Program.QueueForm(new FriendsWindow());
+				Close();
+			}
+			_friend = newFriend;
+			_friend.ChatMessageReceived += HandleChatMessage;
 		}
 
 		private void ChatWindow_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			Program.SteamClient.ChatMessageReceived -= HandleChatMessage;
+			Program.SteamFriends.FriendsUpdated -= HandleFriendsUpdated;
+			_friend.ChatMessageReceived -= HandleChatMessage;
 		}
 	}
 }
