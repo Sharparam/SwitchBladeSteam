@@ -83,6 +83,14 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			StopRender(false);
 
 			var hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
+			if (hResult == HRESULT.RZSB_ALREADY_STARTED)
+			{
+				_log.Warn("WinRender already started, attempting to force render stop and try again...");
+				StopRender(false, true);
+				_log.Info("Attempting to start WinRender again...");
+				hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
+			}
+			
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);
 
@@ -114,12 +122,16 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("<< SetImage()");
 		}
 
-		public void StopRender(bool erase = true)
+		public void StopRender(bool erase = true, bool force = false)
 		{
 			_log.DebugFormat(">> StopRender({0})", erase ? "true" : "false");
-			if (CurrentHandle == IntPtr.Zero)
+			if (CurrentHandle == IntPtr.Zero && !force)
+			{
+				_log.Debug("CurrentHandle is null and force was not specified, aborting.");
+				_log.Debug("<< StopRender()");
 				return;
-
+			}
+			
 			var hResult = RazerAPI.RzSBWinRenderStop(erase);
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);

@@ -153,8 +153,11 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		public void DisableTouchpad()
 		{
 			_log.Debug(">> DisableTouchpad()");
-			_touchpad.StopRender();
-			_touchpad.ClearImage();
+			if (_touchpad != null)
+			{
+				_touchpad.StopRender();
+				_touchpad.ClearImage();
+			}
 			_log.Debug("<< DisableTouchpad()");
 		}
 

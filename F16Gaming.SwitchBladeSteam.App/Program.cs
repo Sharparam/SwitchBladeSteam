@@ -159,7 +159,11 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 #if RAZER_ENABLED
 			_log.Debug("Setting handle on switchblade touchpad");
-			_razerManager.GetTouchpad().SetHandle(_activeForm.Handle);
+			var touchpad = _razerManager.GetTouchpad();
+			if (touchpad == null)
+				_razerManager.EnableTouchpad(_activeForm.Handle);
+			else
+				touchpad.SetHandle(_activeForm.Handle);
 #endif
 
 			_log.Debug("Registering closed event");
