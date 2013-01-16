@@ -57,28 +57,29 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		internal Friend(IClientFriends clientFriends, CSteamID id, List<ChatMessage> oldChatHistory = null)
 		{
 			_log = Logging.LogManager.GetLogger(this);
-			_log.DebugFormat(">> Friend([clientFriends], {0})", id.Render());
+			_log.DebugFormat(">> Friend([clientFriends], {0}, {1})", id.Render(), oldChatHistory == null ? "null" : "[oldChatHistory]");
 			_clientFriends = clientFriends;
 			_steamId = id;
-			if (oldChatHistory == null)
-				_chatHistory = new List<ChatMessage>();
-			else
-				_chatHistory = oldChatHistory;
+			_chatHistory = oldChatHistory ?? new List<ChatMessage>();
 			ChatHistory = new ReadOnlyCollection<ChatMessage>(_chatHistory);
 			_log.Debug("<< Friend()");
 		}
 
 		private void OnChatMessageReceived(ChatMessage message)
 		{
+			_log.Debug(">> OnChatMessageReceived([message])");
 			var func = ChatMessageReceived;
 			if (func != null)
 				func(this, new ChatMessageEventArgs(message));
+			_log.Debug("<< OnChatMessageReceived()");
 		}
 
 		internal void AddChatMessage(ChatMessage message)
 		{
+			_log.Debug(">> AddChatMessage([message])");
 			_chatHistory.Add(message);
 			OnChatMessageReceived(message);
+			_log.Debug("<< AddChatMessage()");
 		}
 
 		public string GetName()

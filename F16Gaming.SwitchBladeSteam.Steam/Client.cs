@@ -185,6 +185,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public string GetMyName()
 		{
+			_log.Debug(">< GetMyName()");
 			return _clientFriends.GetPersonaName();
 		}
 
