@@ -31,6 +31,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using F16Gaming.SwitchBladeSteam.Logging;
 using F16Gaming.SwitchBladeSteam.Razer;
 using Steam4NET;
 
@@ -38,58 +39,94 @@ namespace F16Gaming.SwitchBladeSteam.App
 {
 	public partial class FriendsWindow : Form
 	{
+		private readonly log4net.ILog _log;
+
 		public FriendsWindow()
 		{
+			_log = LogManager.GetLogger(this);
+			_log.Debug(">> FriendsWindow()");
+
 			InitializeComponent();
 
 			UpdateFriendList();
 
+			_log.Debug("Subscribing to SteamFriends.FriendsUpdated event");
 			Program.SteamFriends.FriendsUpdated += FriendsUpdated;
+
+			_log.Debug("<< FriendsWindow()");
 		}
 
 		private void FriendsUpdated(object sender, EventArgs e)
 		{
+			_log.Debug(">> FriendsUpdated([sender], [e])");
 			UpdateFriendList();
+			_log.Debug("<< FriendsUpdated()");
 		}
 
 		private void UpdateFriendList()
 		{
+			_log.Debug(">> UpdateFriendList()");
 			if (InvokeRequired)
 			{
+				_log.Debug("Invoke is required, calling Invoke method");
 				Invoke((VoidDelegate) UpdateFriendList);
+				_log.Debug("<< UpdateFriendList()");
 				return;
 			}
 
+			_log.Info("Updating the friend list");
+			_log.Debug("Clearing old items");
 			FriendList.Items.Clear();
+			_log.Debug("Retrieving online friends");
 			var friends = Program.SteamFriends.Friends.Where(f => f.Online);
+			_log.Debug("Creating ImageList to hold avatars");
 			var avatars = new ImageList { ImageSize = new Size(32, 32), ColorDepth = ColorDepth.Depth32Bit };
 			FriendList.SmallImageList = avatars;
+			_log.Debug("Populating friend and avatar list");
 			foreach (var friend in friends)
 			{
 				avatars.Images.Add(friend.GetName(), friend.Avatar);
 				FriendList.Items.Add(new ListViewItem(new[] { friend.GetName(), friend.GetStateText() }) { Tag = friend.SteamID, ImageKey = friend.GetName() });
 			}
+			_log.Debug("Friend list updated!");
+			_log.Debug("<< UpdateFriendList()");
 		}
 
 		private void FriendListSelectedIndexChanged(object sender, EventArgs e)
 		{
+			_log.Debug(">> FriendListSelectedIndexChanged([sender], [e])");
 			if (FriendList.SelectedItems.Count < 1)
+			{
+				_log.Debug("Not a valid selection (count < 1), aborting");
+				_log.Debug("<< FriendListSelectedIndexChanged()");
 				return;
+			}
 
 			var item = FriendList.SelectedItems[0];
 
 			if (item == null)
+			{
+				_log.Debug("Not a valid selection (item is null), aborting");
+				_log.Debug("<< FriendListSelectedIndexChanged()");
 				return;
+			}
 
 			var friendId = (CSteamID) item.Tag;
 
+			_log.DebugFormat("User selected friend: {0}", friendId.Render());
+
+			_log.Debug("Queueing the chatwindow form");
 			Program.QueueForm(new ChatWindow(friendId));
 			Close();
+			_log.Debug("<< FriendListSelectedIndexChanged()");
 		}
 
 		private void FriendsWindowFormClosing(object sender, FormClosingEventArgs e)
 		{
+			_log.Debug(">> FriendsWindowFormClosing([sender], [e])");
+			_log.Debug("Unsubscribing from SteamFriends.FriendsUpdated event");
 			Program.SteamFriends.FriendsUpdated -= FriendsUpdated;
+			_log.Debug("<< FriendsWindowFormClosing()");
 		}
 	}
 }

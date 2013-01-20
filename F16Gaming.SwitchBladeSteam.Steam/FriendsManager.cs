@@ -64,9 +64,11 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private void OnFriendsUpdated()
 		{
+			_log.Debug(">> OnFriendsUpdated()");
 			var func = FriendsUpdated;
 			if (func != null)
 				func(this, null);
+			_log.Debug("<< OnFriendsUpdated()");
 		}
 
 		public void UpdateFriends()
@@ -122,11 +124,17 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private void HandleChatMessage(object sender, ChatMessageEventArgs e)
 		{
+			_log.Debug(">> HandleChatMessage([sender], [e])");
 			var msg = e.Message;
 			var friend = _friends.FirstOrDefault(f => f.SteamID == msg.Sender || f.SteamID == msg.Receiver);
 			if (friend == null)
+			{
+				_log.Debug("Friend is null (sender nor receiver is friend of current user), aborting");
+				_log.Debug("<< HandleChatMessage()");
 				return;
+			}
 			friend.AddChatMessage(msg);
+			_log.Debug("<< HandleChatMessage()");
 		}
 	}
 }

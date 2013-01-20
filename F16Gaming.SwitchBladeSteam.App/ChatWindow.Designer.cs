@@ -57,8 +57,8 @@
 			this.EntryBox.Name = "EntryBox";
 			this.EntryBox.Size = new System.Drawing.Size(800, 80);
 			this.EntryBox.TabIndex = 1;
-			this.EntryBox.TextChanged += new System.EventHandler(this.EntryBox_TextChanged);
-			this.EntryBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EntryBox_KeyDown);
+			this.EntryBox.TextChanged += new System.EventHandler(this.EntryBoxTextChanged);
+			this.EntryBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EntryBoxKeyDown);
 			// 
 			// ChatHistory
 			// 
@@ -93,7 +93,7 @@
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "ChatWindow";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatWindow_FormClosing);
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatWindowFormClosing);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
