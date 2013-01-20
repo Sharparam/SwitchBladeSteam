@@ -161,9 +161,38 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("Setting handle on switchblade touchpad");
 			var touchpad = _razerManager.GetTouchpad();
 			if (touchpad == null)
+			{
 				_razerManager.EnableTouchpad(_activeForm.Handle);
+				touchpad = _razerManager.GetTouchpad();
+			}
 			else
 				touchpad.SetHandle(_activeForm.Handle);
+
+			// Add controls, if needed
+			var kbForm = _activeForm as IKeyboardEnabledForm;
+			if (kbForm != null)
+			{
+				_log.Debug("Form is keyboard enabled, obtaining control handles to set active keyboard controls");
+				var controls = kbForm.GetKeyboardEnabledControls() as List<Control>;
+				if (controls == null) // GetKeyboardEnabledControls should never return null, but just in case
+				{
+					// According to docs, Razer's API will fall back to registering _everything_ as keyboard interactive
+					_log.Error("GetKeyboardEnabledControls returned null! Keyboard support will NOT work as expected!");
+				}
+				else
+				{
+					var numCtrls = controls.Count;
+					_log.DebugFormat("{0} controls will be registered", numCtrls);
+					var handles = new IntPtr[numCtrls];
+					for (int i = 0; i < numCtrls; i++)
+					{
+						handles[i] = controls[i].Handle;
+					}
+					_log.Debug("Calling SetKeyboardEnabledControls on touchpad object");
+					touchpad.SetKeyboardEnabledControls(handles);
+					_log.Debug("Done! Controls have been registered for keyboard interaction!");
+				}
+			}
 #endif
 
 			_log.Debug("Registering closed event");

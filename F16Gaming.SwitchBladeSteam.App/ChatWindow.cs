@@ -28,6 +28,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Razer;
@@ -37,7 +38,7 @@ using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public partial class ChatWindow : Form
+	public partial class ChatWindow : Form, IKeyboardEnabledForm
 	{
 		private const string ChatLineFormat = "{0}: {1}";
 
@@ -121,6 +122,11 @@ namespace F16Gaming.SwitchBladeSteam.App
 		{
 			Program.SteamFriends.FriendsUpdated -= HandleFriendsUpdated;
 			_friend.ChatMessageReceived -= HandleChatMessage;
+		}
+
+		public IEnumerable<Control> GetKeyboardEnabledControls()
+		{
+			return new List<Control> {EntryBox};
 		}
 	}
 }

@@ -30,11 +30,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using log4net;
-using log4net.Core;
 
 namespace F16Gaming.SwitchBladeSteam.Razer
 {
@@ -97,14 +95,18 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("<< SetHandle()");
 		}
 
-		public void SetKeyboardEnabledControls(IEnumerable<IntPtr> controlHandles)
+		public void SetKeyboardEnabledControls(IEnumerable<IntPtr> controlHandles, bool resetList = true)
 		{
 			_log.Debug(">> SetKeyboardEnabledControls([handles])");
+			_log.Debug("Getting handles array");
 			var handles = controlHandles as IntPtr[] ?? controlHandles.ToArray();
+			_log.Debug("Creating RZSB_KEYEVTCTRLS array");
 			var controls = new RazerAPI.RZSB_KEYEVTCTRLS[handles.Length];
-			for (int i = 0; i < handles.Length; i++)
+			_log.Debug("Populating controls array");
+			for (var i = 0; i < handles.Length; i++)
 				controls[i] = new RazerAPI.RZSB_KEYEVTCTRLS {hwndTarget = handles[i], bReleaseOnEnter = true};
-			var hResult = RazerAPI.RzSBWinRenderAddKeyInputCtrls(controls, controls.Length, true);
+			_log.DebugFormat("Calling RzSBWinRenderAddKeyInputCtrls with {0} controls", controls.Length);
+			var hResult = RazerAPI.RzSBWinRenderAddKeyInputCtrls(controls, controls.Length, resetList);
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);
 			_log.Debug("<< SetKeyboardEnabledControls()");
