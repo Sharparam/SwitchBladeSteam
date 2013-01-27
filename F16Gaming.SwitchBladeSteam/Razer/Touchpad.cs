@@ -92,6 +92,8 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);
 
+			CurrentHandle = handle;
+
 			_log.Debug("<< SetHandle()");
 		}
 

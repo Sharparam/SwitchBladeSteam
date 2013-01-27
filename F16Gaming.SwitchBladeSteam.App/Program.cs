@@ -195,8 +195,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 			}
 #endif
 
-			_log.Debug("Registering closed event");
+			_log.Debug("Registering closing event");
 			_activeForm.Closing += ActiveFormClosing;
+			_log.Debug("Registering closed event");
 			_activeForm.Closed += ActiveFormClosed;
 
 			_running = true;
@@ -315,7 +316,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 
 			QueueForm(new MainWindow());
-			ClearCurrentForm();
+			_activeForm.Close();
 			_log.Debug("<< HomeKeyPressed()");
 		}
 
@@ -326,7 +327,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 
 			QueueForm(new FriendsWindow());
-			ClearCurrentForm();
+			_activeForm.Close();
 			_log.Debug("<< FriendKeyPressed()");
 		}
 
