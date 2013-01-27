@@ -196,6 +196,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 #endif
 
 			_log.Debug("Registering closed event");
+			_activeForm.Closing += ActiveFormClosing;
 			_activeForm.Closed += ActiveFormClosed;
 
 			_running = true;
@@ -255,6 +256,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			if (_activeForm.Visible)
 			{
 				_log.Debug("Active form is still visible, closing...");
+				_activeForm.Closing -= ActiveFormClosing;
 				_activeForm.Closed -= ActiveFormClosed;
 				_activeFormClosed = true;
 				if (_activeForm.InvokeRequired)
@@ -264,6 +266,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			}
 
 			_log.Debug("<< ClearCurrentForm()");
+		}
+
+		private static void ActiveFormClosing(object sender, EventArgs e)
+		{
+			_log.Debug(">> ActiveFormClosing([sender], [e])");
+			_razerManager.GetTouchpad().StopRender(false);
+			_log.Debug("<< ActiveFormClosing()");
 		}
 
 		private static void ActiveFormClosed(object sender, EventArgs e)

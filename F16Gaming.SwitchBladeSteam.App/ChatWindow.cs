@@ -41,8 +41,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 {
 	public partial class ChatWindow : Form, IKeyboardEnabledForm
 	{
-		private const string ChatLineFormat = "{0}: {1}";
-
 		private readonly log4net.ILog _log;
 		private Friend _friend;
 
