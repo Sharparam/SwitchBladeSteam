@@ -84,7 +84,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public string GetName()
 		{
-			_log.Debug(">< GetName()");
+			//_log.Debug(">< GetName()");
 			return _clientFriends.GetFriendPersonaName(_steamId);
 		}
 
@@ -106,13 +106,13 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public EPersonaState GetState()
 		{
-			_log.Debug(">< GetState()");
+			//_log.Debug(">< GetState()");
 			return _clientFriends.GetFriendPersonaState(_steamId);
 		}
 
 		public string GetStateText()
 		{
-			_log.Debug(">< GetStateText()");
+			//_log.Debug(">< GetStateText()");
 			return Utils.StateToString(GetState());
 		}
 

@@ -243,6 +243,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< QueueForm()");
 		}
 
+		private static void CloseCurrentForm()
+		{
+			if (_activeForm.InvokeRequired)
+				_activeForm.Invoke((VoidDelegate)(() => _activeForm.Close()));
+			else
+				_activeForm.Close();
+		}
+
 		private static void ClearCurrentForm()
 		{
 			_log.Debug(">> ClearCurrentForm()");
@@ -260,10 +268,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				_activeForm.Closing -= ActiveFormClosing;
 				_activeForm.Closed -= ActiveFormClosed;
 				_activeFormClosed = true;
-				if (_activeForm.InvokeRequired)
-					_activeForm.Invoke((VoidDelegate)(() => _activeForm.Close()));
-				else
-					_activeForm.Close();
+				CloseCurrentForm();
 			}
 
 			_log.Debug("<< ClearCurrentForm()");
@@ -272,7 +277,10 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private static void ActiveFormClosing(object sender, EventArgs e)
 		{
 			_log.Debug(">> ActiveFormClosing([sender], [e])");
+			_activeForm.Closing -= ActiveFormClosing;
+#if RAZER_ENABLED
 			_razerManager.GetTouchpad().StopRender(false);
+#endif
 			_log.Debug("<< ActiveFormClosing()");
 		}
 
@@ -316,7 +324,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 
 			QueueForm(new MainWindow());
-			_activeForm.Close();
+			CloseCurrentForm();
 			_log.Debug("<< HomeKeyPressed()");
 		}
 
@@ -327,7 +335,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 
 			QueueForm(new FriendsWindow());
-			_activeForm.Close();
+			CloseCurrentForm();
 			_log.Debug("<< FriendKeyPressed()");
 		}
 

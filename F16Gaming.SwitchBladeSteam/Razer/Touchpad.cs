@@ -140,6 +140,8 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				throw new RazerNativeException(hResult);
 
+			CurrentHandle = IntPtr.Zero;
+
 			_log.Debug("<< StopRender()");
 		}
 
