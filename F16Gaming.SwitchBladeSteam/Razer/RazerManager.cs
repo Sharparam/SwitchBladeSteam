@@ -262,8 +262,16 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				return result;
 			}
 
-			_log.Debug("Calling callback");
-			callback();
+			try
+			{
+				_log.Debug("Calling callback");
+				callback();
+			}
+			catch (ObjectDisposedException ex)
+			{
+				_log.ErrorFormat("Call to dyamic key callback #{0} failed (ObjectDisposedException): {1}", index + 1, ex.Message);
+				_log.Error("Exception details as follows", ex);
+			}
 
 			_log.Debug("<< HandleDynamicKeyEvent()");
 			return result;
