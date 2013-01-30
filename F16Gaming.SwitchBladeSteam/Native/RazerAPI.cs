@@ -101,7 +101,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 		// Delegates
 
-		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		public delegate HRESULT DynamicKeyCallbackFunctionDelegate(RZDYNAMICKEY dynamicKey, RZDKSTATE dynamicKeyState);
 
 		public delegate HRESULT AppEventCallbackDelegate(RZSDKAPPEVENTTYPE appEventType, int dwAppMode, int dwProcessID);
