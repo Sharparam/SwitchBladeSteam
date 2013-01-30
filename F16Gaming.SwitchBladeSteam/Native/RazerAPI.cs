@@ -64,7 +64,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public static extern HRESULT RzSBAppEventSetCallback([In] AppEventCallbackDelegate pFn);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBDynamicKeySetCallback([In] /*DynamicKeyCallbackFunctionDelegate*/ MulticastDelegate pFn);
+		public static extern HRESULT RzSBDynamicKeySetCallback([In] /*MulticastDelegate*/ DynamicKeyCallbackFunctionDelegate pFn);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBGestureSetCallback([In] TouchpadGestureCallbackFunctionDelegate pFn);
@@ -101,7 +101,9 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 		// Delegates
 
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		public delegate HRESULT DynamicKeyCallbackFunctionDelegate(RZDYNAMICKEY dynamicKey, RZDKSTATE dynamicKeyState);
+
 		public delegate HRESULT AppEventCallbackDelegate(RZSDKAPPEVENTTYPE appEventType, int dwAppMode, int dwProcessID);
 		public delegate HRESULT TouchpadGestureCallbackFunctionDelegate(RZGESTURE gesture, int dwParameters, ushort wXPos, ushort wYPos, ushort wZPos);
 		public delegate HRESULT KeyboardCallbackFunctionDelegate(uint uMsg, ushort wParam, int lParam);

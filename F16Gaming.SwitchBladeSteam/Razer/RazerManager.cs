@@ -49,6 +49,9 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		private readonly DynamicKey[] _dynamicKeys;
 		private readonly VoidDelegate[] _dkCallbacks;
 
+		// Callback for handling dynamic keys
+		private static RazerAPI.DynamicKeyCallbackFunctionDelegate _dkCallback;
+
 		public RazerManager(string disabledImage = Constants.DisabledTouchpadImage)
 		{
 			_log = LogManager.GetLogger(this);
@@ -80,9 +83,10 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 			_log.Info("Setting up dynamic keys");
 
+			_log.Debug("Creating dynamic key callback");
+			_dkCallback = new RazerAPI.DynamicKeyCallbackFunctionDelegate(HandleDynamicKeyEvent);
 			_log.Debug("Calling RzSBDynamicKeySetCallback");
-
-			hResult = RazerAPI.RzSBDynamicKeySetCallback(HandleDynamicKeyEvent);
+			hResult = RazerAPI.RzSBDynamicKeySetCallback(_dkCallback);
 			if (!HRESULT.RZSB_SUCCESS(hResult))
 				NativeCallFailure("RzSBDynamicKeySetCallback", hResult);
 
