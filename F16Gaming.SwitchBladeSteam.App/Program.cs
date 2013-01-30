@@ -101,9 +101,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
+#if STEAM
 			_log.Info("Initializing steam objects");
 			SteamClient = SteamManager.Client;
 			SteamFriends = SteamManager.FriendsManager;
+#else
+			MessageBox.Show("Steam is not enabled in this build, steam features will be disabled.", "Steam Disabled",
+			                MessageBoxButtons.OK, MessageBoxIcon.Information);
+#endif
 
 			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
 			{

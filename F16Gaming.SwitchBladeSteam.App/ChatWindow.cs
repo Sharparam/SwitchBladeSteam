@@ -46,6 +46,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		public ChatWindow(CSteamID friendId)
 		{
+			if (Program.SteamFriends == null)
+				throw new Exception("ChatWindow does not work without steam features enabled");
+
 			_log = LogManager.GetLogger(this);
 			_log.DebugFormat(">> ChatWindow({0})", friendId.Render());
 

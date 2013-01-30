@@ -48,10 +48,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			InitializeComponent();
 
-			UpdateFriendList();
+			if (Program.SteamFriends != null)
+			{
+				UpdateFriendList();
 
-			_log.Debug("Subscribing to SteamFriends.FriendsUpdated event");
-			Program.SteamFriends.FriendsUpdated += FriendsUpdated;
+				_log.Debug("Subscribing to SteamFriends.FriendsUpdated event");
+				Program.SteamFriends.FriendsUpdated += FriendsUpdated;
+			}
 
 			_log.Debug("<< FriendsWindow()");
 		}
@@ -124,8 +127,11 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private void FriendsWindowFormClosing(object sender, FormClosingEventArgs e)
 		{
 			_log.Debug(">> FriendsWindowFormClosing([sender], [e])");
-			_log.Debug("Unsubscribing from SteamFriends.FriendsUpdated event");
-			Program.SteamFriends.FriendsUpdated -= FriendsUpdated;
+			if (Program.SteamFriends != null)
+			{
+				_log.Debug("Unsubscribing from SteamFriends.FriendsUpdated event");
+				Program.SteamFriends.FriendsUpdated -= FriendsUpdated;
+			}
 			_log.Debug("<< FriendsWindowFormClosing()");
 		}
 	}
