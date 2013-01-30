@@ -27,6 +27,8 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
+#define STEAM
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;

@@ -118,6 +118,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public void SendType(string message, EChatEntryType type)
 		{
+			_log.Warn("Chat message functionality is temporary disabled");
+			return;
+
 			_log.DebugFormat(">> SendType([message], {0})", type);
 			Console.WriteLine("Sending to {0} to {1}: {2}", type, _steamId.Render(), message);
 			_clientFriends.SendMsgToFriend(_steamId, type, Encoding.UTF8.GetBytes(message));
@@ -126,6 +129,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public void SendMessage(string message)
 		{
+			_log.Warn("Chat message functionality is temporary disabled");
+			return;
+
 			_log.Debug(">> SendMessage([message])");
 			SendType(message, EChatEntryType.k_EChatEntryTypeChatMsg);
 			_log.Debug("<< SendMessage()");
@@ -133,6 +139,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public void SendEmote(string message)
 		{
+			_log.Warn("Chat message functionality is temporary disabled");
+			return;
+
 			_log.Debug(">> SendEmote([message])");
 			SendType(message, EChatEntryType.k_EChatEntryTypeEmote);
 			_log.Debug("<< SendEmote()");

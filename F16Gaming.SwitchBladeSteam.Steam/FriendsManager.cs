@@ -124,6 +124,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private void HandleChatMessage(object sender, ChatMessageEventArgs e)
 		{
+			_log.Warn("Chat message functionality is temporary disabled");
+			return;
+
 			_log.Debug(">> HandleChatMessage([sender], [e])");
 			var msg = e.Message;
 			var friend = _friends.FirstOrDefault(f => f.SteamID == msg.Sender || f.SteamID == msg.Receiver);
