@@ -52,5 +52,19 @@ namespace F16Gaming.SwitchBladeSteam.App
 			Program.DebugFriendsButton();
 #endif
 		}
+
+		private void OnlineButtonClick(object sender, EventArgs e)
+		{
+#if DEBUG
+			Program.DebugOnlineButton();
+#endif
+		}
+
+		private void OfflineButtonClick(object sender, EventArgs e)
+		{
+#if DEBUG
+			Program.DebugOfflineButton();
+#endif
+		}
 	}
 }

@@ -68,6 +68,7 @@
 			this.OfflineButton.Size = new System.Drawing.Size(115, 115);
 			this.OfflineButton.TabIndex = 3;
 			this.OfflineButton.UseVisualStyleBackColor = true;
+			this.OfflineButton.Click += new System.EventHandler(this.OfflineButtonClick);
 			// 
 			// OnlineButton
 			// 
@@ -79,6 +80,7 @@
 			this.OnlineButton.Size = new System.Drawing.Size(115, 115);
 			this.OnlineButton.TabIndex = 2;
 			this.OnlineButton.UseVisualStyleBackColor = true;
+			this.OnlineButton.Click += new System.EventHandler(this.OnlineButtonClick);
 			// 
 			// FriendsButton
 			// 

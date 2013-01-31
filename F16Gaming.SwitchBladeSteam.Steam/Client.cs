@@ -189,6 +189,19 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			return _clientFriends.GetPersonaName();
 		}
 
+		public EPersonaState GetMyState()
+		{
+			return _clientFriends.GetPersonaState();
+		}
+
+		public void SetMyState(EPersonaState state)
+		{
+			if (GetMyState() == state)
+				return;
+
+			_clientFriends.SetPersonaState(state);
+		}
+
 		private void HandleFriendChatMessage(FriendChatMsg_t callback)
 		{
 			_log.Debug(">> HandleFriendChatMessage([callback])");

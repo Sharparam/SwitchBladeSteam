@@ -38,6 +38,7 @@ using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using F16Gaming.SwitchBladeSteam.Steam;
+using Steam4NET;
 using log4net;
 using LogManager = F16Gaming.SwitchBladeSteam.Logging.LogManager;
 
@@ -121,7 +122,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
 			{
 				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions("res\\images\\dk_home.png", HomeKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions("res\\images\\dk_friends.png", FriendKeyPressed)}
+				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions("res\\images\\dk_friends.png", FriendKeyPressed)},
+				{RazerAPI.RZDYNAMICKEY.DK3, new DynamicKeyOptions("res\\images\\dk_appear_online.png", OnlineKeyPressed)},
+				{RazerAPI.RZDYNAMICKEY.DK4, new DynamicKeyOptions("res\\images\\dk_appear_offline.png", OfflineKeyPressed)}
 			};
 
 			try
@@ -376,6 +379,20 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< FriendKeyPressed()");
 		}
 
+		private static void OnlineKeyPressed()
+		{
+			_log.Debug(">> OnlineKeyPressed()");
+			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOnline);
+			_log.Debug("<< OnlineKeyPressed()");
+		}
+
+		private static void OfflineKeyPressed()
+		{
+			_log.Debug(">> OfflineKeyPressed()");
+			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOffline);
+			_log.Debug("<< OfflineKeyPressed()");
+		}
+
 #if DEBUG
 		public static void DebugHomeButton()
 		{
@@ -389,6 +406,20 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug(">> DebugFriendsButton()");
 			FriendKeyPressed();
 			_log.Debug("<< DebugFriendsButton()");
+		}
+
+		public static void DebugOnlineButton()
+		{
+			_log.Debug(">> DebugOnlineButton()");
+			OnlineKeyPressed();
+			_log.Debug("<< DebugOnlineButton()");
+		}
+
+		public static void DebugOfflineButton()
+		{
+			_log.Debug(">> DebugOfflineButton()");
+			OfflineKeyPressed();
+			_log.Debug("<< DebugOfflineButton()");
 		}
 #endif
 	}
