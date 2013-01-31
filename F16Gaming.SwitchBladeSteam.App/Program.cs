@@ -69,8 +69,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private static Form _keyDebugWindow;
 #endif
 
-		private static bool _debugMode;
-
 #if RAZER_ENABLED
 		private static RazerManager _razerManager;
 
@@ -78,6 +76,8 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		private static RazerAPI.AppEventCallbackDelegate _appEventCallback;
 #endif
+
+		internal static bool DebugMode { get; private set; }
 
 		internal static Client SteamClient;
 		internal static FriendsManager SteamFriends;
@@ -98,7 +98,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			LogManager.ClearOldLogs();
 #if DEBUG
-			_debugMode = true;
+			DebugMode = true;
 #else
 			if (Debugger.IsAttached)
 				_debugMode = true;

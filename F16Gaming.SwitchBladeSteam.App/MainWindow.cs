@@ -37,9 +37,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			if (!Program.DebugMode)
+				DebugExitButton.Visible = false;
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		private void DebugExitButtonClick(object sender, EventArgs e)
 		{
 			Close();
 		}
