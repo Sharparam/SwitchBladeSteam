@@ -31,6 +31,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
@@ -69,9 +70,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		private static bool _debugMode;
 
+#if RAZER_ENABLED
 		private static RazerManager _razerManager;
 
 		private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
+
+		private static RazerAPI.AppEventCallbackDelegate _appEventCallback;
+#endif
 
 		internal static Client SteamClient;
 		internal static FriendsManager SteamFriends;
@@ -112,13 +117,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			                MessageBoxButtons.OK, MessageBoxIcon.Information);
 #endif
 
+#if RAZER_ENABLED
 			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
 			{
 				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions("res\\images\\dk_home.png", HomeKeyPressed)},
 				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions("res\\images\\dk_friends.png", FriendKeyPressed)}
 			};
-			
-#if RAZER_ENABLED
+
 			try
 			{
 				_log.Info("Initializing razer manager");
@@ -140,6 +145,17 @@ namespace F16Gaming.SwitchBladeSteam.App
 			}
 
 			_log.Debug("Razer manager initialized!");
+
+			_log.Info("Registering app event callback");
+			_appEventCallback = new RazerAPI.AppEventCallbackDelegate(AppEventCallback);
+			var hResult = RazerAPI.RzSBAppEventSetCallback(_appEventCallback);
+			if (HRESULT.RZSB_FAILED(hResult))
+			{
+				MessageBox.Show("Failed to register the application event callback with the SwitchBlade SDK.",
+				                "AppEvent register fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Exit();
+			}
+			_log.Debug("App event callback registered!");
 
 			_log.Info("Enabling dynamic keys");
 
@@ -307,7 +323,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 			if (_running && _activeForm != null)
 			{
 				_log.Info("Active form is not null, stopping render");
-				_razerManager.GetTouchpad().StopRender();
+				var touchpad = _razerManager.GetTouchpad();
+				if (touchpad != null)
+					touchpad.StopRender();
 			}
 
 			_log.Info("Stopping Razer interface");
@@ -322,6 +340,18 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Info("### APPLICATION EXIT ###");
 
 			Environment.Exit(0);
+		}
+
+		private static HRESULT AppEventCallback(RazerAPI.RZSDKAPPEVENTTYPE appEventType, int dwAppMode, int dwProcessID)
+		{
+			var result = HRESULT.RZSB_OK;
+			// Ownership has been changed to someone else, shut down this application
+			if (appEventType == RazerAPI.RZSDKAPPEVENTTYPE.APPMODE && dwAppMode == (int) RazerAPI.RZSDKAPPEVENTMODE.APPLET && dwProcessID != Process.GetCurrentProcess().Id)
+			{
+				_log.Info("Process ownership changed, shutting down.");
+				Exit();
+			}
+			return result;
 		}
 
 		private static void HomeKeyPressed()
