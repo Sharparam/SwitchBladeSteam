@@ -30,13 +30,11 @@
 #define STEAM
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
-using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using F16Gaming.SwitchBladeSteam.Steam;
 using Steam4NET;
 using log4net;
@@ -60,7 +58,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 	{
 		private static ILog _log;
 
-		private static bool _running;
 		private static Form _activeForm;
 		private static Form _nextForm;
 		private static bool _activeFormClosed;
@@ -73,8 +70,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private static RazerManager _razerManager;
 
 		private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
-
-		private static RazerAPI.AppEventCallbackDelegate _appEventCallback;
 #endif
 
 		internal static bool DebugMode { get; private set; }
@@ -121,10 +116,10 @@ namespace F16Gaming.SwitchBladeSteam.App
 #if RAZER_ENABLED
 			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
 			{
-				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions("res\\images\\dk_home.png", HomeKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions("res\\images\\dk_friends.png", FriendKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK3, new DynamicKeyOptions("res\\images\\dk_appear_online.png", OnlineKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK4, new DynamicKeyOptions("res\\images\\dk_appear_offline.png", OfflineKeyPressed)}
+				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions(@"res\images\dk_home.png", HomeKeyPressed)},
+				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions(@"res\images\dk_friends.png", FriendKeyPressed)},
+				{RazerAPI.RZDYNAMICKEY.DK3, new DynamicKeyOptions(@"res\images\dk_appear_online.png", OnlineKeyPressed)},
+				{RazerAPI.RZDYNAMICKEY.DK4, new DynamicKeyOptions(@"res\images\dk_appear_offline.png", OfflineKeyPressed)}
 			};
 
 			try
@@ -150,22 +145,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("Razer manager initialized!");
 
 			_log.Info("Registering app event callback");
-			_appEventCallback = new RazerAPI.AppEventCallbackDelegate(AppEventCallback);
-			var hResult = RazerAPI.RzSBAppEventSetCallback(_appEventCallback);
-			if (HRESULT.RZSB_FAILED(hResult))
-			{
-				MessageBox.Show("Failed to register the application event callback with the SwitchBlade SDK.",
-				                "AppEvent register fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Exit();
-			}
+			_razerManager.AppEvent += OnAppEvent;
 			_log.Debug("App event callback registered!");
 
 			_log.Info("Enabling dynamic keys");
 
 			foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
-			{
 				_razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image);
-			}
 #else
 			MessageBox.Show(
 				"RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",
@@ -225,8 +211,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_activeForm.Closing += ActiveFormClosing;
 			_log.Debug("Registering closed event");
 			_activeForm.Closed += ActiveFormClosed;
-
-			_running = true;
 
 #if DEBUG
 			_log.Debug("Creating debug window");
@@ -338,23 +322,19 @@ namespace F16Gaming.SwitchBladeSteam.App
 			RazerManager.DeleteControlFile();
 #endif
 
-			_running = false;
-
 			_log.Info("### APPLICATION EXIT ###");
 
 			Environment.Exit(0);
 		}
 
-		private static HRESULT AppEventCallback(RazerAPI.RZSDKAPPEVENTTYPE appEventType, int dwAppMode, int dwProcessID)
+		private static void OnAppEvent(object sender, Razer.Events.AppEventEventArgs e)
 		{
-			var result = HRESULT.RZSB_OK;
-			// Ownership has been changed to someone else, shut down this application
-			if (appEventType == RazerAPI.RZSDKAPPEVENTTYPE.APPMODE && dwAppMode == (int) RazerAPI.RZSDKAPPEVENTMODE.APPLET && dwProcessID != Process.GetCurrentProcess().Id)
-			{
-				_log.Info("Process ownership changed, shutting down.");
-				Exit();
-			}
-			return result;
+			if (e.Type != RazerAPI.RZSDKAPPEVENTTYPE.APPMODE || e.Mode != RazerAPI.RZSDKAPPEVENTMODE.APPLET ||
+			    e.ProcessID == Process.GetCurrentProcess().Id)
+				return;
+
+			_log.Info("Process ownership changed, shutting down.");
+			Exit();
 		}
 
 		private static void HomeKeyPressed()

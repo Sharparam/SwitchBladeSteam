@@ -30,6 +30,7 @@
 using System;
 using System.IO;
 using F16Gaming.SwitchBladeSteam.Native;
+using F16Gaming.SwitchBladeSteam.Razer.Events;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using log4net;
 
@@ -41,15 +42,19 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 	public class RazerManager
 	{
+		public event AppEventEventHandler AppEvent;
+		public event DynamicKeyEventHandler DynamicKeyEvent;
+
 		private const string RazerControlFile = "DO_NOT_TOUCH__RAZER_CONTROL_FILE";
 
-		private ILog _log;
+		private readonly ILog _log;
 
 		private Touchpad _touchpad;
 		private readonly DynamicKey[] _dynamicKeys;
 		private readonly VoidDelegate[] _dkCallbacks;
 
-		// Callback for handling dynamic keys
+		// Native code callbacks
+		private static RazerAPI.AppEventCallbackDelegate _appEventCallback;
 		private static RazerAPI.DynamicKeyCallbackFunctionDelegate _dkCallback;
 
 		public RazerManager(string disabledImage = Constants.DisabledTouchpadImage)
@@ -88,11 +93,18 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 			_log.Info("Setting up dynamic keys");
 
+			_log.Debug("Creating new app event callback");
+			_appEventCallback = HandleAppEvent;
+			_log.Debug("Calling RzSBAppEventSetCallback");
+			hResult = RazerAPI.RzSBAppEventSetCallback(_appEventCallback);
+			if (HRESULT.RZSB_FAILED(hResult))
+				NativeCallFailure("RzSBAppEventSetCallback", hResult);
+
 			_log.Debug("Creating dynamic key callback");
-			_dkCallback = new RazerAPI.DynamicKeyCallbackFunctionDelegate(HandleDynamicKeyEvent);
+			_dkCallback = HandleDynamicKeyEvent;
 			_log.Debug("Calling RzSBDynamicKeySetCallback");
 			hResult = RazerAPI.RzSBDynamicKeySetCallback(_dkCallback);
-			if (!HRESULT.RZSB_SUCCESS(hResult))
+			if (HRESULT.RZSB_FAILED(hResult))
 				NativeCallFailure("RzSBDynamicKeySetCallback", hResult);
 
 			_log.Debug("Initializing dynamic key arrays");
@@ -101,6 +113,20 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_dkCallbacks = new VoidDelegate[RazerAPI.DYNAMIC_KEYS_COUNT];
 
 			_log.Debug("<< RazerManager()");
+		}
+
+		private void OnAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, int processId)
+		{
+			var func = AppEvent;
+			if (func != null)
+				func(this, new AppEventEventArgs(type, mode, processId));
+		}
+
+		private void OnDynamicKeyEvent(RazerAPI.RZDYNAMICKEY key, RazerAPI.RZDKSTATE state)
+		{
+			var func = DynamicKeyEvent;
+			if (func != null)
+				func(this, new DynamicKeyEventArgs(key, state));
 		}
 
 		public static void DeleteControlFile()
@@ -229,6 +255,20 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("<< UnregisterDynamicKeyCallback()");
 		}
 
+		private HRESULT HandleAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, int appMode, int processId)
+		{
+			var hResult = HRESULT.RZSB_OK;
+			if (type != RazerAPI.RZSDKAPPEVENTTYPE.APPMODE)
+			{
+				_log.DebugFormat("Unsupported AppEventType: {0}", type);
+				return hResult;
+			}
+
+			OnAppEvent(type, (RazerAPI.RZSDKAPPEVENTMODE) appMode, processId);
+
+			return hResult;
+		}
+
 		private HRESULT HandleDynamicKeyEvent(RazerAPI.RZDYNAMICKEY key, RazerAPI.RZDKSTATE state)
 		{
 			_log.DebugFormat(">> HandleDynamicKeyEvent({0}, {1})", key, state);
@@ -248,6 +288,9 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			dk.UpdatePreviousState(dk.State);
 			_log.Debug("Updating current key state");
 			dk.UpdateState(state);
+
+			_log.Debug("Raising DynamicKeyEvent event");
+			OnDynamicKeyEvent(dk.Key, dk.State);
 
 			// Only proceed if this is the first down event on the key
 			if (dk.PreviousState == RazerAPI.RZDKSTATE.DOWN || dk.State != RazerAPI.RZDKSTATE.DOWN)

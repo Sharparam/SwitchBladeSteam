@@ -92,7 +92,7 @@
 			this.FriendsButton.Size = new System.Drawing.Size(115, 115);
 			this.FriendsButton.TabIndex = 1;
 			this.FriendsButton.UseVisualStyleBackColor = true;
-			this.FriendsButton.Click += new System.EventHandler(this.FriendsButton_Click);
+			this.FriendsButton.Click += new System.EventHandler(this.FriendsButtonClick);
 			// 
 			// HomeButton
 			// 
@@ -104,7 +104,7 @@
 			this.HomeButton.Size = new System.Drawing.Size(115, 115);
 			this.HomeButton.TabIndex = 0;
 			this.HomeButton.UseVisualStyleBackColor = true;
-			this.HomeButton.Click += new System.EventHandler(this.HomeButton_Click);
+			this.HomeButton.Click += new System.EventHandler(this.HomeButtonClick);
 			// 
 			// KeyDebugWindow
 			// 

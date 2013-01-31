@@ -36,13 +36,13 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 {
 	public class FriendsManager
 	{
-		private log4net.ILog _log;
+		private readonly log4net.ILog _log;
 
 		public event FriendsUpdatedEventHandler FriendsUpdated;
 
-		private ISteamUtils005 _steamUtils;
+		private readonly ISteamUtils005 _steamUtils;
 
-		private IClientFriends _clientFriends;
+		private readonly IClientFriends _clientFriends;
 
 		private Friend[] _friends;
 
@@ -124,9 +124,6 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private void HandleChatMessage(object sender, ChatMessageEventArgs e)
 		{
-			_log.Warn("Chat message functionality is temporary disabled");
-			return;
-
 			_log.Debug(">> HandleChatMessage([sender], [e])");
 			var msg = e.Message;
 			var friend = _friends.FirstOrDefault(f => f.SteamID == msg.Sender || f.SteamID == msg.Receiver);

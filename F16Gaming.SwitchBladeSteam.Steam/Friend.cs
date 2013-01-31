@@ -45,7 +45,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private readonly IClientFriends _clientFriends;
 		private readonly CSteamID _steamId;
-		private List<ChatMessage> _chatHistory;
+		private readonly List<ChatMessage> _chatHistory;
 
 		public ReadOnlyCollection<ChatMessage> ChatHistory;
 
@@ -118,10 +118,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public void SendType(string message, EChatEntryType type)
 		{
-			_log.Warn("Chat message functionality is temporary disabled");
-			return;
-
 			_log.DebugFormat(">> SendType([message], {0})", type);
+			if (type == EChatEntryType.k_EChatEntryTypeEmote)
+				_log.Warn("Steam no longer supports sending emotes to chat");
 			Console.WriteLine("Sending to {0} to {1}: {2}", type, _steamId.Render(), message);
 			_clientFriends.SendMsgToFriend(_steamId, type, Encoding.UTF8.GetBytes(message));
 			_log.Debug("<< SendType()");
@@ -129,20 +128,15 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public void SendMessage(string message)
 		{
-			_log.Warn("Chat message functionality is temporary disabled");
-			return;
-
 			_log.Debug(">> SendMessage([message])");
 			SendType(message, EChatEntryType.k_EChatEntryTypeChatMsg);
 			_log.Debug("<< SendMessage()");
 		}
 
+		[Obsolete("Steam no longer supports sending emotes to chat")]
 		public void SendEmote(string message)
 		{
-			_log.Warn("Chat message functionality is temporary disabled");
-			return;
-
-			_log.Debug(">> SendEmote([message])");
+			_log.Debug(">> SendEmote([message]) [OBSOLETE]");
 			SendType(message, EChatEntryType.k_EChatEntryTypeEmote);
 			_log.Debug("<< SendEmote()");
 		}

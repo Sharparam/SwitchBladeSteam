@@ -40,7 +40,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 	/// </summary>
 	public class DynamicKey
 	{
-		private ILog _log;
+		private readonly ILog _log;
 
 		public RazerAPI.RZDYNAMICKEY Key { get; private set; }
 		public RazerAPI.RZDKSTATE State { get; private set; }

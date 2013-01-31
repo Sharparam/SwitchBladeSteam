@@ -38,16 +38,16 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		// Events
 		public event ChatMessageReceivedEventHandler ChatMessageReceived;
 
-		private log4net.ILog _log;
+		private readonly log4net.ILog _log;
 
 		// Interfaces
-		private ISteamClient012 _steamClient;
-		private IClientEngine _clientEngine;
-		private IClientFriends _clientFriends;
-		private ISteamUser016 _steamUser;
-		private ISteamUtils005 _steamUtils;
+		private readonly ISteamClient012 _steamClient;
+		private readonly IClientEngine _clientEngine;
+		private readonly IClientFriends _clientFriends;
+		private readonly ISteamUser016 _steamUser;
+		private readonly ISteamUtils005 _steamUtils;
 
-		private FriendsManager _friendsManager;
+		private readonly FriendsManager _friendsManager;
 
 		private int _pipe;
 		private int _user;
@@ -56,9 +56,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		private Callback<FriendChatMsg_t> _friendChatCallback;
 		private Callback<FriendAdded_t> _friendAddedCallback;
 		private Callback<PersonaStateChange_t> _personaStateChangeCallback;
-		private Callback<FriendProfileInfoResponse_t> _friendProfileInfoResponseCallback; 
-
-		private bool _running;
+		private Callback<FriendProfileInfoResponse_t> _friendProfileInfoResponseCallback;
 
 		// Accessors
 		public CSteamID Me { get { return _steamUser.GetSteamID(); } }
@@ -132,8 +130,6 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 			_log.Debug("CallbackDispatcher is spawning dispatch thread");
 			CallbackDispatcher.SpawnDispatchThread(_pipe);
-
-			_running = true;
 
 			_log.Info("Steam client initialization complete!");
 			_log.Debug("<< Client())");

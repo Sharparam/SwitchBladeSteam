@@ -64,7 +64,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public static extern HRESULT RzSBAppEventSetCallback([In] AppEventCallbackDelegate pFn);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBDynamicKeySetCallback([In] /*MulticastDelegate*/ DynamicKeyCallbackFunctionDelegate pFn);
+		public static extern HRESULT RzSBDynamicKeySetCallback([In] DynamicKeyCallbackFunctionDelegate pFn);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBGestureSetCallback([In] TouchpadGestureCallbackFunctionDelegate pFn);

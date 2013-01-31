@@ -1,4 +1,4 @@
-﻿/* KeyDebugWindow.cs
+﻿/* AppEvent.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -28,43 +28,23 @@
  */
 
 using System;
-using System.Windows.Forms;
+using F16Gaming.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace F16Gaming.SwitchBladeSteam.Razer.Events
 {
-	public partial class KeyDebugWindow : Form
+	public class AppEventEventArgs : EventArgs
 	{
-		public KeyDebugWindow()
-		{
-			InitializeComponent();
-		}
+		public readonly RazerAPI.RZSDKAPPEVENTTYPE Type;
+		public readonly RazerAPI.RZSDKAPPEVENTMODE Mode;
+		public readonly int ProcessID;
 
-		private void HomeButtonClick(object sender, EventArgs e)
+		internal AppEventEventArgs(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, int processId)
 		{
-#if DEBUG
-			Program.DebugHomeButton();
-#endif
-		}
-
-		private void FriendsButtonClick(object sender, EventArgs e)
-		{
-#if DEBUG
-			Program.DebugFriendsButton();
-#endif
-		}
-
-		private void OnlineButtonClick(object sender, EventArgs e)
-		{
-#if DEBUG
-			Program.DebugOnlineButton();
-#endif
-		}
-
-		private void OfflineButtonClick(object sender, EventArgs e)
-		{
-#if DEBUG
-			Program.DebugOfflineButton();
-#endif
+			Type = type;
+			Mode = mode;
+			ProcessID = processId;
 		}
 	}
+
+	public delegate void AppEventEventHandler(object sender, AppEventEventArgs e);
 }

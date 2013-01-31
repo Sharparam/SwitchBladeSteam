@@ -38,7 +38,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 {
 	public class Touchpad
 	{
-		private ILog _log;
+		private readonly ILog _log;
 
 		/// <summary>
 		/// Image that will show if Aero is disabled.
