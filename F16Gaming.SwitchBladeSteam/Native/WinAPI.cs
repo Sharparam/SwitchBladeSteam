@@ -48,7 +48,6 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 		// Constants
 
-
 		public const int STD_OUTPUT_HANDLE = -11;
 		public const int CODE_PAGE = 437;
 // ReSharper restore InconsistentNaming
