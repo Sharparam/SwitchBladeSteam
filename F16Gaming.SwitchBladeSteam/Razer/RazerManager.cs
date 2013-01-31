@@ -72,8 +72,13 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("Calling RzSBStart()");
 
 			var hResult = RazerAPI.RzSBStart();
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				NativeCallFailure("RzSBStart", hResult);
+			if (HRESULT.RZSB_FAILED(hResult))
+			{
+				// Try one more time
+				hResult = RazerAPI.RzSBStart();
+				if (HRESULT.RZSB_FAILED(hResult))
+					NativeCallFailure("RzSBStart", hResult);
+			}
 
 			_log.Debug("Calling RzSBWinRenderSetDisabledImage");
 			
