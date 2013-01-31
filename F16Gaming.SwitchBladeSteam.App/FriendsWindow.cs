@@ -41,6 +41,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 	{
 		private readonly log4net.ILog _log;
 
+		private readonly TimeSpan _updateInterval = new TimeSpan(0, 0, 30);
+		private DateTime _lastUpdate;
+
 		public FriendsWindow()
 		{
 			_log = LogManager.GetLogger(this);
@@ -50,7 +53,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			if (Program.SteamFriends != null)
 			{
-				UpdateFriendList();
+				UpdateFriendList(true);
 
 				_log.Debug("Subscribing to SteamFriends.FriendsUpdated event");
 				Program.SteamFriends.FriendsUpdated += FriendsUpdated;
@@ -66,13 +69,21 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< FriendsUpdated()");
 		}
 
-		private void UpdateFriendList()
+		private void UpdateFriendList(bool force = false)
 		{
-			_log.Debug(">> UpdateFriendList()");
+			_log.DebugFormat(">> UpdateFriendList({0})", force ? "true" : "false");
+
+			var now = DateTime.Now;
+			if (!force && (now - _lastUpdate) <= _updateInterval)
+			{
+				_log.Debug("<< UpdateFriendList()");
+				return;
+			}
+
 			if (InvokeRequired)
 			{
 				_log.Debug("Invoke is required, calling Invoke method");
-				Invoke((VoidDelegate) UpdateFriendList);
+				Invoke((VoidDelegate) (() => UpdateFriendList()));
 				_log.Debug("<< UpdateFriendList()");
 				return;
 			}
@@ -83,7 +94,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("Retrieving online friends");
 			var friends = Program.SteamFriends.Friends.Where(f => f.Online);
 			_log.Debug("Creating ImageList to hold avatars");
-			var avatars = new ImageList { ImageSize = new Size(32, 32), ColorDepth = ColorDepth.Depth32Bit };
+			var avatars = new ImageList { ImageSize = new Size(64, 64), ColorDepth = ColorDepth.Depth32Bit };
 			FriendList.SmallImageList = avatars;
 			_log.Debug("Populating friend and avatar list");
 			foreach (var friend in friends)
@@ -92,6 +103,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				FriendList.Items.Add(new ListViewItem(new[] { friend.GetName(), friend.GetStateText() }) { Tag = friend.SteamID, ImageKey = friend.GetName() });
 			}
 			_log.Debug("Friend list updated!");
+			_lastUpdate = DateTime.Now;
 			_log.Debug("<< UpdateFriendList()");
 		}
 

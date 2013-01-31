@@ -68,7 +68,7 @@
             this.NameHeader,
             this.StatusHeader});
 			this.FriendList.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FriendList.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.FriendList.Font = new System.Drawing.Font("Microsoft Sans Serif", 22F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.FriendList.ForeColor = System.Drawing.Color.White;
 			this.FriendList.FullRowSelect = true;
 			this.FriendList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
@@ -84,12 +84,12 @@
 			// NameHeader
 			// 
 			this.NameHeader.Text = "Name";
-			this.NameHeader.Width = 300;
+			this.NameHeader.Width = 460;
 			// 
 			// StatusHeader
 			// 
 			this.StatusHeader.Text = "Status";
-			this.StatusHeader.Width = 500;
+			this.StatusHeader.Width = 322;
 			// 
 			// FriendsWindow
 			// 

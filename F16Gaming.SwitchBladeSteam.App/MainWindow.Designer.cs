@@ -53,7 +53,6 @@
 			this.ErrorLabel.Name = "ErrorLabel";
 			this.ErrorLabel.Size = new System.Drawing.Size(267, 115);
 			this.ErrorLabel.TabIndex = 1;
-			this.ErrorLabel.Text = "Error Text";
 			this.ErrorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// MainWindow

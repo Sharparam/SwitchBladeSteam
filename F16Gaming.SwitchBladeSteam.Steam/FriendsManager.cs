@@ -87,7 +87,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 				var friend = _clientFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
 				Friend oldFriend = oldFriends == null ? null : oldFriends.FirstOrDefault(f => f.SteamID == friend);
 				_friends[i] = new Friend(_clientFriends, friend, oldFriend == null ? null :  oldFriend.ChatHistory.ToList());
-				var avatarHandle = _clientFriends.GetSmallFriendAvatar(_friends[i].SteamID);
+				var avatarHandle = _clientFriends.GetMediumFriendAvatar(_friends[i].SteamID);
 				var avatar = Utils.GetAvatarFromHandle(avatarHandle, _steamUtils);
 				if (avatar != null)
 					_friends[i].Avatar = avatar;
