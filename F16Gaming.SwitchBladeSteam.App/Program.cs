@@ -96,9 +96,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 			DebugMode = true;
 #else
 			if (Debugger.IsAttached)
-				_debugMode = true;
+				DebugMode = true;
 			else if (args.Length > 0)
-				_debugMode = args[0] == "debug";
+				DebugMode = args[0] == "debug";
 #endif
 
 			Application.EnableVisualStyles();
