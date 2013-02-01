@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
+using F16Gaming.SwitchBladeSteam.Razer.Structs;
 using log4net;
 
 namespace F16Gaming.SwitchBladeSteam.Razer
@@ -55,23 +56,15 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		/// </summary>
 		public string CurrentImage { get; private set; }
 
-		private Touchpad()
+		internal Touchpad(string disabledImage = Constants.DisabledTouchpadImage)
 		{
 			_log = Logging.LogManager.GetLogger(this);
-			_log.Debug(">< Touchpad()");
-		}
-
-		internal Touchpad(IntPtr handle) : this()
-		{
-			_log.Debug(">> Touchpad([handle])");
-			SetHandle(handle);
-			_log.Debug("<< Touchpad()");
-		}
-
-		internal Touchpad(string image) : this()
-		{
-			_log.DebugFormat(">> Touchpad({0})", image);
-			SetImage(image);
+			_log.Debug(">> Touchpad()");
+			_log.Info("Setting disabled image");
+			DisabledImage = Helpers.IO.GetAbsolutePath(disabledImage);
+			var hResult = RazerAPI.RzSBWinRenderSetDisabledImage(DisabledImage);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBWinRenderSetDisabledImage", hResult);
 			_log.Debug("<< Touchpad()");
 		}
 
@@ -88,29 +81,34 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				_log.Info("Attempting to start WinRender again...");
 				hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
 			}
-			
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBWinRenderStart", hResult);
 
 			CurrentHandle = handle;
 
 			_log.Debug("<< SetHandle()");
 		}
 
-		public void SetKeyboardEnabledControls(IEnumerable<IntPtr> controlHandles, bool resetList = true)
+		public void SetKeyboardEnabledControls(IEnumerable<KeyboardControl> keyboardControls, bool resetList = true)
 		{
 			_log.Debug(">> SetKeyboardEnabledControls([handles])");
-			_log.Debug("Getting handles array");
-			var handles = controlHandles as IntPtr[] ?? controlHandles.ToArray();
+
+			_log.Debug("Getting keyboard controls array");
+			var kbControlArray = keyboardControls as KeyboardControl[] ?? keyboardControls.ToArray();
+
 			_log.Debug("Creating RZSB_KEYEVTCTRLS array");
-			var controls = new RazerAPI.RZSB_KEYEVTCTRLS[handles.Length];
+			var controls = new RazerAPI.RZSB_KEYEVTCTRLS[kbControlArray.Length];
+
 			_log.Debug("Populating controls array");
-			for (var i = 0; i < handles.Length; i++)
-				controls[i] = new RazerAPI.RZSB_KEYEVTCTRLS {hwndTarget = handles[i], bReleaseOnEnter = true};
+			for (var i = 0; i < kbControlArray.Length; i++)
+				controls[i] = new RazerAPI.RZSB_KEYEVTCTRLS {hwndTarget = kbControlArray[i].Handle, bReleaseOnEnter = kbControlArray[i].ReleaseOnEnter};
+
 			_log.DebugFormat("Calling RzSBWinRenderAddKeyInputCtrls with {0} controls", controls.Length);
 			var hResult = RazerAPI.RzSBWinRenderAddKeyInputCtrls(controls, controls.Length, resetList);
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBWinRenderAddKeyInputCtrls", hResult);
+
 			_log.Debug("<< SetKeyboardEnabledControls()");
 		}
 
@@ -119,9 +117,13 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.DebugFormat(">> SetImage({0})", image);
 			StopRender();
 
+			image = Helpers.IO.GetAbsolutePath(image);
+
 			var hResult = RazerAPI.RzSBSetImageTouchpad(image);
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBSetImageTouchpad", hResult);
+
+			CurrentImage = image;
 
 			_log.Debug("<< SetImage()");
 		}
@@ -137,8 +139,8 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			}
 			
 			var hResult = RazerAPI.RzSBWinRenderStop(erase);
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBWinRenderStop", hResult);
 
 			CurrentHandle = IntPtr.Zero;
 
@@ -148,10 +150,20 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		public void ClearImage()
 		{
 			_log.Debug(">> ClearImage()");
+
 			var hResult = RazerAPI.RzSBSetImageTouchpad(Helpers.IO.GetAbsolutePath(Constants.BlankTouchpadImage));
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBSetImageTouchpad", hResult);
+
+			CurrentImage = null;
+
 			_log.Debug("<< ClearImage()");
+		}
+
+		public void StopAll()
+		{
+			StopRender();
+			ClearImage();
 		}
 	}
 }

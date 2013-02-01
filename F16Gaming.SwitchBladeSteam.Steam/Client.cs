@@ -27,13 +27,14 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
+using System;
 using System.Text;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
 {
-	public class Client
+	public class Client : IDisposable
 	{
 		// Events
 		public event ChatMessageReceivedEventHandler ChatMessageReceived;
@@ -127,12 +128,28 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			_friendAddedCallback = new Callback<FriendAdded_t>(HandleFriendAdded);
 			_personaStateChangeCallback = new Callback<PersonaStateChange_t>(HandlePersonaStateChange);
 			_friendProfileInfoResponseCallback = new Callback<FriendProfileInfoResponse_t>(HandleFriendProfileInfoResponse);
-
+			
 			_log.Debug("CallbackDispatcher is spawning dispatch thread");
 			CallbackDispatcher.SpawnDispatchThread(_pipe);
 
 			_log.Info("Steam client initialization complete!");
 			_log.Debug("<< Client())");
+		}
+
+		public void Dispose()
+		{
+			_log.Debug(">> Dispose()");
+			_log.Debug("Unregistering callbacks...");
+			_friendChatCallback.UnRegister();
+			_log.Debug("Friend chat callback unregistered");
+			_friendAddedCallback.UnRegister();
+			_log.Debug("Friend added callback unregistered");
+			_personaStateChangeCallback.UnRegister();
+			_log.Debug("Persona state change callback unregistered");
+			_friendProfileInfoResponseCallback.UnRegister();
+			_log.Debug("Friend profile info response callback unregistered");
+			_log.Debug("All callbacks unregistered!");
+			_log.Debug("<< Dispose()");
 		}
 
 		private void GetSteamPipe()

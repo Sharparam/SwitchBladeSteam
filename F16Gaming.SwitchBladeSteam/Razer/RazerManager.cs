@@ -48,6 +48,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		private const string RazerControlFile = "DO_NOT_TOUCH__RAZER_CONTROL_FILE";
 
 		private readonly ILog _log;
+		private static readonly ILog StaticLog = LogManager.GetLogger(typeof (RazerManager));
 
 		private Touchpad _touchpad;
 		private readonly DynamicKey[] _dynamicKeys;
@@ -72,7 +73,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				throw new RazerUnstableShutdownException();
 			}
 
-			File.Create(RazerControlFile);
+			CreateControlFile();
 
 			_log.Debug("Calling RzSBStart()");
 
@@ -88,7 +89,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("Calling RzSBWinRenderSetDisabledImage");
 			
 			hResult = RazerAPI.RzSBWinRenderSetDisabledImage(Helpers.IO.GetAbsolutePath(disabledImage));
-			if (!HRESULT.RZSB_SUCCESS(hResult))
+			if (HRESULT.RZSB_FAILED(hResult))
 				NativeCallFailure("RzSBWinRenderSetDisabledImage", hResult);
 
 			_log.Info("Setting up dynamic keys");
@@ -99,6 +100,9 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			hResult = RazerAPI.RzSBAppEventSetCallback(_appEventCallback);
 			if (HRESULT.RZSB_FAILED(hResult))
 				NativeCallFailure("RzSBAppEventSetCallback", hResult);
+
+			_log.Info("Setting up touchpad");
+			_touchpad = new Touchpad();
 
 			_log.Debug("Creating dynamic key callback");
 			_dkCallback = HandleDynamicKeyEvent;
@@ -129,23 +133,57 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				func(this, new DynamicKeyEventArgs(key, state));
 		}
 
+		public static void CreateControlFile()
+		{
+			try
+			{
+				if (File.Exists(RazerControlFile))
+					StaticLog.Warn("CreateControlFile: File already exists");
+				else
+				{
+					File.Create(RazerControlFile);
+					StaticLog.Info("CreateControlFile: Success!");
+				}
+			}
+			catch (IOException ex)
+			{
+				StaticLog.ErrorFormat("CreateControlFile: [IOException] Failed to create control file: {0}", ex.Message);
+			}
+		}
+
 		public static void DeleteControlFile()
 		{
-			if (File.Exists(RazerControlFile))
-				File.Delete(RazerControlFile);
+			try
+			{
+				if (File.Exists(RazerControlFile))
+				{
+					File.Delete(RazerControlFile);
+					StaticLog.Info("DeleteControlFile: Success!");
+				}
+				else
+					StaticLog.Warn("DeleteControlFile: File does not exist");
+			}
+			catch (IOException ex)
+			{
+				StaticLog.ErrorFormat("DeleteControlFile: [IOException] Failed to delete control file: {0}", ex.Message);
+			}
 		}
 
-		public static void Stop()
+		public static void Stop(bool cleanup = true)
 		{
+			StaticLog.Info("RazerManager is stopping! Calling RzSBStop...");
 			var hResult = RazerAPI.RzSBStop();
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+			if (HRESULT.RZSB_FAILED(hResult))
+				NativeCallFailure("RzSBStop", hResult);
+			if (cleanup)
+				DeleteControlFile();
+			StaticLog.Info("RazerManager has stopped.");
 		}
 
-		private void NativeCallFailure(string func, HRESULT result)
+		internal static void NativeCallFailure(string func, HRESULT result)
 		{
-			_log.FatalFormat("Call to RazerAPI native function {0} FAILED with error: {1}", func, result.ToString());
-			_log.Debug("Throwing exception...");
+			StaticLog.FatalFormat("Call to RazerAPI native function {0} FAILED with error: {1}", func, result.ToString());
+			StaticLog.Debug("Throwing exception...");
 			throw new RazerNativeException(result);
 		}
 
@@ -157,43 +195,6 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		public DynamicKey GetDynamicKey(RazerAPI.RZDYNAMICKEY key)
 		{
 			return _dynamicKeys[(int) key - 1];
-		}
-
-		public bool EnableTouchpad(IntPtr windowHandle)
-		{
-			_log.Debug(">> EnableTouchpad([handle])");
-
-			DisableTouchpad();
-
-			_log.Debug("Initializing new Touchpad object");
-			_touchpad = new Touchpad(windowHandle);
-
-			_log.Debug("<< EnableTouchpad()");
-			return true;
-		}
-
-		public bool EnableTouchpad(string image)
-		{
-			_log.DebugFormat(">> EnableTouchpad({0})", image);
-
-			DisableTouchpad();
-
-			_log.Debug("Initializing new Touchpad object");
-			_touchpad = new Touchpad(image);
-
-			_log.Debug("<< EnableTouchpad()");
-			return true;
-		}
-
-		public void DisableTouchpad()
-		{
-			_log.Debug(">> DisableTouchpad()");
-			if (_touchpad != null)
-			{
-				_touchpad.StopRender();
-				_touchpad.ClearImage();
-			}
-			_log.Debug("<< DisableTouchpad()");
 		}
 
 		public bool EnableDynamicKey(RazerAPI.RZDYNAMICKEY key, VoidDelegate callback, string upImage, string downImage = null, bool replace = false)
@@ -211,7 +212,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				return false;
 			}
 
-			_log.Debug("Resetting dynamic key (DisableDynamicKey");
+			_log.Debug("Resetting dynamic key (DisableDynamicKey)");
 			DisableDynamicKey(key);
 			try
 			{
@@ -223,7 +224,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			}
 			catch (RazerNativeException ex)
 			{
-				_log.ErrorFormat("Failed to enable dynamic key {0}: {1}", key, ex.Hresult.ToString());
+				_log.ErrorFormat("Failed to enable dynamic key {0}: {1}", key, ex.Hresult);
 				_log.Debug("<< EnableDynamicKey()");
 				result = false;
 			}

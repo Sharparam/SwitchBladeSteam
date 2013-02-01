@@ -30,11 +30,14 @@
 #define STEAM
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
+using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
+using F16Gaming.SwitchBladeSteam.Razer.Structs;
 using F16Gaming.SwitchBladeSteam.Steam;
 using Steam4NET;
 using log4net;
@@ -172,13 +175,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 #if RAZER_ENABLED
 			_log.Debug("Setting handle on switchblade touchpad");
 			var touchpad = _razerManager.GetTouchpad();
-			if (touchpad == null)
-			{
-				_razerManager.EnableTouchpad(_activeForm.Handle);
-				touchpad = _razerManager.GetTouchpad();
-			}
-			else
-				touchpad.SetHandle(_activeForm.Handle);
+			touchpad.SetHandle(_activeForm.Handle);
 
 			// Add controls, if needed
 			var kbForm = _activeForm as IKeyboardEnabledForm;
@@ -195,13 +192,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 				{
 					var numCtrls = controls.Count;
 					_log.DebugFormat("{0} controls will be registered", numCtrls);
-					var handles = new IntPtr[numCtrls];
+					var kbControls = new KeyboardControl[numCtrls];
 					for (int i = 0; i < numCtrls; i++)
 					{
-						handles[i] = controls[i].Handle;
+						kbControls[i] = new KeyboardControl(controls[i].Handle);
 					}
 					_log.Debug("Calling SetKeyboardEnabledControls on touchpad object");
-					touchpad.SetKeyboardEnabledControls(handles);
+					touchpad.SetKeyboardEnabledControls(kbControls);
 					_log.Debug("Done! Controls have been registered for keyboard interaction!");
 				}
 			}
@@ -307,7 +304,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug(">> Exit()");
 
 #if RAZER_ENABLED
-			if (_running && _activeForm != null)
+			if (_activeForm != null)
 			{
 				_log.Info("Active form is not null, stopping render");
 				var touchpad = _razerManager.GetTouchpad();
@@ -317,10 +314,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			_log.Info("Stopping Razer interface");
 			RazerManager.Stop();
-
-			_log.Info("Deleting control file");
-			RazerManager.DeleteControlFile();
 #endif
+
+			if (SteamClient != null)
+			{
+				_log.Info("Disposing steam client");
+				SteamClient.Dispose();
+			}
 
 			_log.Info("### APPLICATION EXIT ###");
 

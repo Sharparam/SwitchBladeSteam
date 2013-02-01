@@ -77,13 +77,14 @@
     <Compile Include="Razer\Exceptions\RazerException.cs" />
     <Compile Include="Razer\Exceptions\RazerNativeException.cs" />
     <Compile Include="Razer\Exceptions\RazerUnstableShutdownException.cs" />
+    <Compile Include="Razer\Structs\KeyboardControl.cs" />
     <Compile Include="Razer\RazerManager.cs" />
     <Compile Include="Razer\Touchpad.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UseGlobalSettings="False" />
+      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
