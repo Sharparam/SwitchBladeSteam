@@ -34,9 +34,14 @@ namespace F16Gaming.SwitchBladeSteam.Native
 {
 	public static class Helpers
 	{
+		public static int GetLastError()
+		{
+			return Marshal.GetLastWin32Error();
+		}
+
 		public static int GetLastErrorInfo(out string message)
 		{
-			int err = Marshal.GetLastWin32Error();
+			int err = GetLastError();
 			message = GetWin32Exception(err).Message;
 			return err;
 		}
@@ -46,9 +51,19 @@ namespace F16Gaming.SwitchBladeSteam.Native
 			return GetWin32Exception(err).Message;
 		}
 
+		public static string GetLastErrorMessage()
+		{
+			return GetErrorMessage(GetLastError());
+		}
+
 		public static Win32Exception GetWin32Exception(int err)
 		{
 			return new Win32Exception(err);
+		}
+
+		public static Win32Exception GetLastWin32Exception()
+		{
+			return GetWin32Exception(GetLastError());
 		}
 	}
 }
