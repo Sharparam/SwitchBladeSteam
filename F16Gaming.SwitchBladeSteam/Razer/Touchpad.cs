@@ -30,8 +30,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using F16Gaming.SwitchBladeSteam.Extensions;
 using F16Gaming.SwitchBladeSteam.Native;
-using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using F16Gaming.SwitchBladeSteam.Razer.Structs;
 using log4net;
 
@@ -40,6 +40,8 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 	public class Touchpad
 	{
 		private readonly ILog _log;
+
+		private RazerAPI.RZGESTURE _activeGestures;
 
 		/// <summary>
 		/// Image that will show if Aero is disabled.
@@ -164,6 +166,46 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		{
 			StopRender();
 			ClearImage();
+		}
+
+		public void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enabled)
+		{
+			_log.DebugFormat(">> SetOSGesture({0}, {1})", gesture, enabled ? "true" : "false");
+
+			RazerAPI.RZGESTURE newGestures;
+			if (enabled)
+			{
+				if (_activeGestures.Has(gesture))
+					return;
+				newGestures = _activeGestures.Include(gesture);
+			}
+			else
+			{
+				if (!_activeGestures.Has(gesture))
+					return;
+				newGestures = _activeGestures.Remove(gesture);
+			}
+
+			var hResult = RazerAPI.RzSBGestureSetOSNotification(newGestures, enabled);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBGestureSetOSNotification", hResult);
+
+			_activeGestures = newGestures;
+			_log.Debug("<< SetOSGesture()");
+		}
+
+		public void EnableOSGesture(RazerAPI.RZGESTURE gesture)
+		{
+			_log.DebugFormat(">> EnableOSGesture({0})", gesture);
+			SetOSGesture(gesture, true);
+			_log.Debug("<< EnableOSGesture()");
+		}
+
+		public void DisableOSGesture(RazerAPI.RZGESTURE gesture)
+		{
+			_log.DebugFormat(">> DisableOSGesture({0})", gesture);
+			SetOSGesture(gesture, false);
+			_log.Debug("<< DisableOSGesture()");
 		}
 	}
 }

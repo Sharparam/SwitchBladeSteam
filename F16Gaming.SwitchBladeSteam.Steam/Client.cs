@@ -41,6 +41,8 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private readonly log4net.ILog _log;
 
+		private bool _isDisposed;
+
 		// Interfaces
 		private readonly ISteamClient012 _steamClient;
 		private readonly IClientEngine _clientEngine;
@@ -138,6 +140,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public void Dispose()
 		{
+			if (_isDisposed)
+				return;
+
 			_log.Debug(">> Dispose()");
 			_log.Debug("Unregistering callbacks...");
 			_friendChatCallback.UnRegister();
@@ -149,6 +154,11 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			_friendProfileInfoResponseCallback.UnRegister();
 			_log.Debug("Friend profile info response callback unregistered");
 			_log.Debug("All callbacks unregistered!");
+			_friendChatCallback = null;
+			_friendAddedCallback = null;
+			_personaStateChangeCallback = null;
+			_friendProfileInfoResponseCallback = null;
+			_isDisposed = true;
 			_log.Debug("<< Dispose()");
 		}
 

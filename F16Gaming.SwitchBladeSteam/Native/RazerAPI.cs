@@ -238,6 +238,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 			NORMAL = 0x04
 		}
 
+		[Flags]
 		public enum RZGESTURE : uint
 		{
 			INVALID = 0x00000000,
