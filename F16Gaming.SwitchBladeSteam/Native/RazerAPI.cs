@@ -294,15 +294,13 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public static bool SingleGesture(uint a) { return 0 == ((a - a) & a); }
 		public static int TARGET_MASK(int x) { return (1 << 16) | x; }
 
-#if DEBUG
 		// Is this needed?
 		public static void DebugCheckFault()
 		{
+#if DEBUG
 			if (Debugger.IsAttached)
 				Debugger.Break();
-		}
-#else
-		public static void DebugCheckFault() {}
 #endif
+		}
 	}
 }
