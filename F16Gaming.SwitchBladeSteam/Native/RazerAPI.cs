@@ -40,8 +40,8 @@
  * │ WORD   │ UInt16  │                      │
  * │ DWORD  │ UInt32  │                      │
  * │ LPARAM │ Int32   │                      │
- * │ WPARAM │ UInt16  │                      │
- * │ LPWSTR │ string  │ UnmanagedType.LPWStr │
+ * │ WPARAM │ UInt32  │                      │
+ * │ LPWSTR │ String  │ UnmanagedType.LPWStr │
  * └────────┴─────────┴──────────────────────┘
  */
 
@@ -110,7 +110,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public static extern HRESULT RzSBWinRenderStop([In] bool bEraseOnStop);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderGetStats(out IntPtr pdwCount, out IntPtr pdwMaxTime, out IntPtr pdwLastTime, out IntPtr pdwAverageTime);
+		public static extern HRESULT RzSBWinRenderGetStats(out uint pdwCount, out uint pdwMaxTime, out uint pdwLastTime, out uint pdwAverageTime);
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBWinRenderResetStats();
@@ -121,13 +121,13 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public delegate HRESULT DynamicKeyCallbackFunctionDelegate(RZDYNAMICKEY dynamicKey, RZDKSTATE dynamicKeyState);
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT AppEventCallbackDelegate(RZSDKAPPEVENTTYPE appEventType, int dwAppMode, int dwProcessID);
+		public delegate HRESULT AppEventCallbackDelegate(RZSDKAPPEVENTTYPE appEventType, uint dwAppMode, uint dwProcessID);
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT TouchpadGestureCallbackFunctionDelegate(RZGESTURE gesture, int dwParameters, ushort wXPos, ushort wYPos, ushort wZPos);
+		public delegate HRESULT TouchpadGestureCallbackFunctionDelegate(RZGESTURE gesture, uint dwParameters, ushort wXPos, ushort wYPos, ushort wZPos);
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT KeyboardCallbackFunctionDelegate(uint uMsg, ushort wParam, int lParam);
+		public delegate HRESULT KeyboardCallbackFunctionDelegate(uint uMsg, uint wParam, int lParam);
 
 		// Structs
 
@@ -142,16 +142,16 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public struct SBSDKQUERYCAPABILITIES
 		{
 			[FieldOffset(0)]
-			public int qc_version;
+			public uint qc_version;
 
 			[FieldOffset(4)]
-			public int qc_BEVersion;
+			public uint qc_BEVersion;
 
 			[FieldOffset(8)]
 			public SWITCHBLADEHARDWARETYPE qc_HardwareType;
 
 			[FieldOffset(12)]
-			public int qc_numSurfaces;
+			public uint qc_numSurfaces;
 
 			[FieldOffset(16)]
 			[MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_SUPPORTED_SURFACES)]
@@ -159,7 +159,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 			[FieldOffset(32)]
 			[MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_SUPPORTED_SURFACES)]
-			public int[] qc_pixelformat;
+			public uint[] qc_pixelformat;
 
 			[FieldOffset(40)]
 			public byte qc_numDynamicKeys;
@@ -178,7 +178,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 			public PIXEL_TYPE PixelType;
 
 			[FieldOffset(4)]
-			public int DataSize;
+			public uint DataSize;
 
 			[FieldOffset(8)]
 			public IntPtr pData;

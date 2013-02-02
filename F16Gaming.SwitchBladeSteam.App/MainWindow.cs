@@ -39,12 +39,22 @@ namespace F16Gaming.SwitchBladeSteam.App
 			InitializeComponent();
 
 			if (!Program.DebugMode)
+			{
 				DebugExitButton.Visible = false;
+				ShowStatsButton.Visible = false;
+			}
 		}
 
 		private void DebugExitButtonClick(object sender, EventArgs e)
 		{
 			Close();
+		}
+
+		private void ShowStatsButtonClick(object sender, EventArgs e)
+		{
+#if DEBUG && RAZER_ENABLED
+			Program.ShowRenderStats();
+#endif
 		}
 	}
 }

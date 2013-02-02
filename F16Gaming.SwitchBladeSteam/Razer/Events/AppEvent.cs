@@ -36,9 +36,9 @@ namespace F16Gaming.SwitchBladeSteam.Razer.Events
 	{
 		public readonly RazerAPI.RZSDKAPPEVENTTYPE Type;
 		public readonly RazerAPI.RZSDKAPPEVENTMODE Mode;
-		public readonly int ProcessID;
+		public readonly uint ProcessID;
 
-		internal AppEventEventArgs(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, int processId)
+		internal AppEventEventArgs(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, uint processId)
 		{
 			Type = type;
 			Mode = mode;

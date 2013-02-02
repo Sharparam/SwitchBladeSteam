@@ -152,15 +152,22 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 		public RenderStats GetRenderStats()
 		{
-			IntPtr count;
-			IntPtr maxTime;
-			IntPtr lastTime;
-			IntPtr averageTime;
+			uint count;
+			uint maxTime;
+			uint lastTime;
+			uint averageTime;
 			var hResult = RazerAPI.RzSBWinRenderGetStats(out count, out maxTime, out lastTime, out averageTime);
 			if (HRESULT.RZSB_FAILED(hResult))
 				RazerManager.NativeCallFailure("RzSBWinRenderGetStats", hResult);
-			var stats = new RenderStats((uint) count, (uint) maxTime, (uint) lastTime, (uint) averageTime);
+			var stats = new RenderStats(count, maxTime, lastTime, averageTime);
 			return stats;
+		}
+
+		public void ResetRenderStats()
+		{
+			var hResult = RazerAPI.RzSBWinRenderResetStats();
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBWinRenderResetStats", hResult);
 		}
 
 		public void ClearImage()

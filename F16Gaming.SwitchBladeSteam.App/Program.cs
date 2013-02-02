@@ -341,7 +341,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			Environment.Exit(0);
 		}
 
-		private static void OnAppEvent(object sender, Razer.Events.AppEventEventArgs e)
+		private static void OnAppEvent(object sender, AppEventEventArgs e)
 		{
 			if (e.Type != RazerAPI.RZSDKAPPEVENTTYPE.APPMODE || e.Mode != RazerAPI.RZSDKAPPEVENTMODE.APPLET ||
 			    e.ProcessID == Process.GetCurrentProcess().Id)
@@ -434,6 +434,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug(">> DebugOfflineButton()");
 			GoOffline();
 			_log.Debug("<< DebugOfflineButton()");
+		}
+
+		public static void ShowRenderStats()
+		{
+			var stats = _razerManager.GetTouchpad().GetRenderStats();
+			var statsText = string.Format("Count: {0}\nMax Time: {1}\nLast Time: {2}\nAverage Time: {3}",
+										  stats.Count, stats.MaxTime, stats.LastTime, stats.AverageTime);
+			MessageBox.Show(statsText, "Render Stats", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 #endif
 	}

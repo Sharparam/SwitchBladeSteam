@@ -119,7 +119,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("<< RazerManager()");
 		}
 
-		private void OnAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, int processId)
+		private void OnAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, uint processId)
 		{
 			var func = AppEvent;
 			if (func != null)
@@ -236,7 +236,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("<< DisableDynamicKey()");
 		}
 
-		private HRESULT HandleAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, int appMode, int processId)
+		private HRESULT HandleAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, uint appMode, uint processId)
 		{
 			var hResult = HRESULT.RZSB_OK;
 			if (type != RazerAPI.RZSDKAPPEVENTTYPE.APPMODE)

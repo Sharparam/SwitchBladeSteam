@@ -30,6 +30,7 @@
 		{
 			this.DebugExitButton = new System.Windows.Forms.Button();
 			this.ErrorLabel = new System.Windows.Forms.Label();
+			this.ShowStatsButton = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// DebugExitButton
@@ -55,6 +56,18 @@
 			this.ErrorLabel.TabIndex = 1;
 			this.ErrorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
+			// ShowStatsButton
+			// 
+			this.ShowStatsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.ShowStatsButton.ForeColor = System.Drawing.Color.Black;
+			this.ShowStatsButton.Location = new System.Drawing.Point(251, 40);
+			this.ShowStatsButton.Name = "ShowStatsButton";
+			this.ShowStatsButton.Size = new System.Drawing.Size(276, 68);
+			this.ShowStatsButton.TabIndex = 2;
+			this.ShowStatsButton.Text = "SHOW RENDER STATS";
+			this.ShowStatsButton.UseVisualStyleBackColor = true;
+			this.ShowStatsButton.Click += new System.EventHandler(this.ShowStatsButtonClick);
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -63,6 +76,7 @@
 			this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.ClientSize = new System.Drawing.Size(800, 480);
 			this.ControlBox = false;
+			this.Controls.Add(this.ShowStatsButton);
 			this.Controls.Add(this.ErrorLabel);
 			this.Controls.Add(this.DebugExitButton);
 			this.DoubleBuffered = true;
@@ -81,6 +95,7 @@
 
 		private System.Windows.Forms.Button DebugExitButton;
 		private System.Windows.Forms.Label ErrorLabel;
+		private System.Windows.Forms.Button ShowStatsButton;
 
 	}
 }
