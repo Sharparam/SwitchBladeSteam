@@ -173,7 +173,21 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.DebugFormat(">> SetOSGesture({0}, {1})", gesture, enabled ? "true" : "false");
 
 			RazerAPI.RZGESTURE newGestures;
-			if (enabled)
+			if (gesture == RazerAPI.RZGESTURE.ALL)
+			{
+				// Invert the enabled value because of how Razer API works
+				enabled = !enabled;
+				// "ALL" replaces any other gesture, so we don't want to include/remove it
+				newGestures = gesture;
+			}
+			else if (gesture == RazerAPI.RZGESTURE.NONE)
+			{
+				if (_activeGestures == RazerAPI.RZGESTURE.NONE)
+					return;
+				// "NONE" replaces any other gesture, so we don't want to include/remove it
+				newGestures = gesture;
+			}
+			else if (enabled)
 			{
 				if (_activeGestures.Has(gesture))
 					return;
