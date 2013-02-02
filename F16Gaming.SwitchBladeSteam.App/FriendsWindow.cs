@@ -32,17 +32,20 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Logging;
+using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public partial class FriendsWindow : Form
+	public partial class FriendsWindow : Form, IGestureEnabledForm
 	{
 		private readonly log4net.ILog _log;
 
 		private readonly TimeSpan _updateInterval = new TimeSpan(0, 0, 30);
 		private DateTime _lastUpdate;
+
+		public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.ALL; } }
 
 		public FriendsWindow()
 		{

@@ -203,6 +203,19 @@ namespace F16Gaming.SwitchBladeSteam.App
 					_log.Debug("Done! Controls have been registered for keyboard interaction!");
 				}
 			}
+
+			// Forward gestures, if needed
+			var gestureForm = _activeForm as IGestureEnabledForm;
+			if (gestureForm == null)
+			{
+				_log.Debug("Form is not gesture enabled, resetting gestures");
+				touchpad.DisableOSGesture(RazerAPI.RZGESTURE.ALL);
+			}
+			else
+			{
+				_log.Debug("Form is gesture enabled, setting gestures to be forwarded");
+				touchpad.EnableOSGesture(gestureForm.EnabledGestures);
+			}
 #endif
 
 			_log.Debug("Registering closing event");

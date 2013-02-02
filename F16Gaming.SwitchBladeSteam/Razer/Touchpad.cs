@@ -184,6 +184,13 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			{
 				if (_activeGestures == RazerAPI.RZGESTURE.NONE)
 					return;
+				if (!enabled) 
+				{
+					// Request to "disable no gesture"?
+					// Then just enable all, since that's the same
+					SetOSGesture(RazerAPI.RZGESTURE.ALL, true);
+					return;
+				}
 				// "NONE" replaces any other gesture, so we don't want to include/remove it
 				newGestures = gesture;
 			}
