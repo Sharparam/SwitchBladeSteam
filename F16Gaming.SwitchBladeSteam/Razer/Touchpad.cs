@@ -30,6 +30,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using F16Gaming.SwitchBladeSteam.Extensions;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer.Structs;
@@ -147,6 +148,19 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			CurrentHandle = IntPtr.Zero;
 
 			_log.Debug("<< StopRender()");
+		}
+
+		public RenderStats GetRenderStats()
+		{
+			IntPtr count;
+			IntPtr maxTime;
+			IntPtr lastTime;
+			IntPtr averageTime;
+			var hResult = RazerAPI.RzSBWinRenderGetStats(out count, out maxTime, out lastTime, out averageTime);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBWinRenderGetStats", hResult);
+			var stats = new RenderStats((uint) count, (uint) maxTime, (uint) lastTime, (uint) averageTime);
+			return stats;
 		}
 
 		public void ClearImage()

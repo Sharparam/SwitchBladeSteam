@@ -80,6 +80,7 @@
     <Compile Include="Razer\Exceptions\RazerUnstableShutdownException.cs" />
     <Compile Include="Razer\Structs\KeyboardControl.cs" />
     <Compile Include="Razer\RazerManager.cs" />
+    <Compile Include="Razer\Structs\RenderStats.cs" />
     <Compile Include="Razer\Touchpad.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

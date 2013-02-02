@@ -29,6 +29,22 @@
 
 // Credits to itsbth for helping with P/Invoke
 
+/* ╔══════════════════════════════╗
+ * ║ Help table for mapping types ║
+ * ╠════════╦═════════╦═══════════╩──────────┐
+ * │ C Type │ C# Type │ MarshalAs            │
+ * ├────────┼─────────┼──────────────────────┤
+ * │ BYTE   │ Byte    │                      │
+ * │ UINT   │ UInt32  │                      │
+ * │ HWND   │ IntPtr  │                      │
+ * │ WORD   │ UInt16  │                      │
+ * │ DWORD  │ UInt32  │                      │
+ * │ LPARAM │ Int32   │                      │
+ * │ WPARAM │ UInt16  │                      │
+ * │ LPWSTR │ string  │ UnmanagedType.LPWStr │
+ * └────────┴─────────┴──────────────────────┘
+ */
+
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -44,7 +60,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBStop();
-
+		
 		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
 		public static extern HRESULT RzSBQueryCapabilities(out SBSDKQUERYCAPABILITIES pSBSDKCap);
 

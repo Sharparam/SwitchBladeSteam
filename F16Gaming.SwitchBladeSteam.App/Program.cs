@@ -151,9 +151,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Info("Registering app event callback");
 			_razerManager.AppEvent += OnAppEvent;
 			_log.Debug("App event callback registered!");
-
+			
 			_log.Info("Enabling dynamic keys");
-
+			
 			foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
 				_razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image);
 #else
