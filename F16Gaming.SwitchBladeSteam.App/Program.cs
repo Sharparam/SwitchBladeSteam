@@ -36,6 +36,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
+using F16Gaming.SwitchBladeSteam.Razer.Events;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using F16Gaming.SwitchBladeSteam.Razer.Structs;
 using F16Gaming.SwitchBladeSteam.Steam;
@@ -48,9 +49,9 @@ namespace F16Gaming.SwitchBladeSteam.App
 	internal class DynamicKeyOptions
 	{
 		public readonly string Image;
-		public readonly VoidDelegate Callback;
+		public readonly DynamicKeyPressedEventHandler Callback;
 
-		internal DynamicKeyOptions(string image, VoidDelegate callback)
+		internal DynamicKeyOptions(string image, DynamicKeyPressedEventHandler callback)
 		{
 			Image = image;
 			Callback = callback;
@@ -121,8 +122,8 @@ namespace F16Gaming.SwitchBladeSteam.App
 			{
 				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions(@"res\images\dk_home.png", HomeKeyPressed)},
 				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions(@"res\images\dk_friends.png", FriendKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK3, new DynamicKeyOptions(@"res\images\dk_appear_online.png", OnlineKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK4, new DynamicKeyOptions(@"res\images\dk_appear_offline.png", OfflineKeyPressed)}
+				{RazerAPI.RZDYNAMICKEY.DK6, new DynamicKeyOptions(@"res\images\dk_appear_online.png", OnlineKeyPressed)},
+				{RazerAPI.RZDYNAMICKEY.DK7, new DynamicKeyOptions(@"res\images\dk_appear_offline.png", OfflineKeyPressed)}
 			};
 
 			try
@@ -337,39 +338,59 @@ namespace F16Gaming.SwitchBladeSteam.App
 			Exit();
 		}
 
-		private static void HomeKeyPressed()
+		private static void ShowHome()
 		{
-			_log.Debug(">> HomeKeyPressed()");
 			if (_activeForm is MainWindow)
 				return;
 
 			QueueForm(new MainWindow());
 			CloseCurrentForm();
-			_log.Debug("<< HomeKeyPressed()");
 		}
 
-		private static void FriendKeyPressed()
+		private static void ShowFriends()
 		{
-			_log.Debug(">> FriendKeyPressed()");
 			if (_activeForm is FriendsWindow)
 				return;
 
 			QueueForm(new FriendsWindow());
 			CloseCurrentForm();
+		}
+
+		private static void GoOnline()
+		{
+			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOnline);
+		}
+
+		private static void GoOffline()
+		{
+			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOffline);
+		}
+
+		private static void HomeKeyPressed(object sender, EventArgs e)
+		{
+			_log.Debug(">> HomeKeyPressed()");
+			ShowHome();
+			_log.Debug("<< HomeKeyPressed()");
+		}
+
+		private static void FriendKeyPressed(object sender, EventArgs e)
+		{
+			_log.Debug(">> FriendKeyPressed()");
+			ShowFriends();
 			_log.Debug("<< FriendKeyPressed()");
 		}
 
-		private static void OnlineKeyPressed()
+		private static void OnlineKeyPressed(object sender, EventArgs e)
 		{
 			_log.Debug(">> OnlineKeyPressed()");
-			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOnline);
+			GoOnline();
 			_log.Debug("<< OnlineKeyPressed()");
 		}
 
-		private static void OfflineKeyPressed()
+		private static void OfflineKeyPressed(object sender, EventArgs e)
 		{
 			_log.Debug(">> OfflineKeyPressed()");
-			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOffline);
+			GoOffline();
 			_log.Debug("<< OfflineKeyPressed()");
 		}
 
@@ -377,28 +398,28 @@ namespace F16Gaming.SwitchBladeSteam.App
 		public static void DebugHomeButton()
 		{
 			_log.Debug(">> DebugHomeButton()");
-			HomeKeyPressed();
+			ShowHome();
 			_log.Debug("<< DebugHomeButton()");
 		}
 
 		public static void DebugFriendsButton()
 		{
 			_log.Debug(">> DebugFriendsButton()");
-			FriendKeyPressed();
+			ShowFriends();
 			_log.Debug("<< DebugFriendsButton()");
 		}
 
 		public static void DebugOnlineButton()
 		{
 			_log.Debug(">> DebugOnlineButton()");
-			OnlineKeyPressed();
+			GoOnline();
 			_log.Debug("<< DebugOnlineButton()");
 		}
 
 		public static void DebugOfflineButton()
 		{
 			_log.Debug(">> DebugOfflineButton()");
-			OfflineKeyPressed();
+			GoOffline();
 			_log.Debug("<< DebugOfflineButton()");
 		}
 #endif

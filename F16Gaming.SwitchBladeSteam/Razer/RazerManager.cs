@@ -197,19 +197,17 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			return _dynamicKeys[(int) key - 1];
 		}
 
-		public bool EnableDynamicKey(RazerAPI.RZDYNAMICKEY key, VoidDelegate callback, string upImage, string downImage = null, bool replace = false)
+		public DynamicKey EnableDynamicKey(RazerAPI.RZDYNAMICKEY key, DynamicKeyPressedEventHandler callback, string upImage, string downImage = null, bool replace = false)
 		{
 			_log.DebugFormat(">> EnableDynamicKey({0}, [callback], \"{1}\", {2}, {3})", key, upImage,
 			                 downImage == null ? "null" : "\"" + downImage + "\"", replace ? "true" : "false");
-
-			bool result = true;
 
 			var index = (int) key - 1;
 			if (_dynamicKeys[index] != null && !replace)
 			{
 				_log.Info("Dynamic key already enabled and replace is false.");
 				_log.Debug("<< EnableDynamicKey()");
-				return false;
+				return _dynamicKeys[index];
 			}
 
 			_log.Debug("Resetting dynamic key (DisableDynamicKey)");
@@ -217,43 +215,25 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			try
 			{
 				_log.Debug("Creating new DynamicKey object");
-				var dk = new DynamicKey(key, upImage, downImage);
+				var dk = new DynamicKey(key, upImage, downImage, callback);
 				_dynamicKeys[index] = dk;
-				_log.Debug("Registering dynamic key callback");
-				RegisterDynamicKeyCallback(key, callback);
 			}
 			catch (RazerNativeException ex)
 			{
 				_log.ErrorFormat("Failed to enable dynamic key {0}: {1}", key, ex.Hresult);
 				_log.Debug("<< EnableDynamicKey()");
-				result = false;
+				return null;
 			}
 
 			_log.Debug("<< EnableDynamicKey()");
-			return result;
+			return _dynamicKeys[index];
 		}
 
 		public void DisableDynamicKey(RazerAPI.RZDYNAMICKEY key)
 		{
 			_log.DebugFormat(">> DisableDynamicKey({0})", key);
-			_log.Debug("Unregistering dynamic key callback");
-			UnregisterDynamicKeyCallback(key);
-			_dynamicKeys[(int) key - 1] = null;
+			_dynamicKeys[(int)key - 1] = null;
 			_log.Debug("<< DisableDynamicKey()");
-		}
-
-		private void RegisterDynamicKeyCallback(RazerAPI.RZDYNAMICKEY key, VoidDelegate callback)
-		{
-			_log.DebugFormat(">> RegisterDynamicKeyCallback({0}, [callback])", key);
-			_dkCallbacks[(int) key - 1] = callback;
-			_log.Debug("<< RegisterDynamicKeyCallback()");
-		}
-
-		private void UnregisterDynamicKeyCallback(RazerAPI.RZDYNAMICKEY key)
-		{
-			_log.DebugFormat(">> UnregisterDynamicKeyCallback({0})", key);
-			_dkCallbacks[(int) key - 1] = null;
-			_log.Debug("<< UnregisterDynamicKeyCallback()");
 		}
 
 		private HRESULT HandleAppEvent(RazerAPI.RZSDKAPPEVENTTYPE type, int appMode, int processId)
@@ -276,51 +256,21 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 			var result = HRESULT.RZSB_OK;
 
+			_log.Debug("Raising DynamicKeyEvent event");
+			OnDynamicKeyEvent(key, state);
+
 			var index = (int) key - 1;
 			var dk = _dynamicKeys[index];
 			if (dk == null)
 			{
-				_log.Debug("No callback registered for key");
+				_log.Debug("Key has not been registered by app");
 				_log.Debug("<< HandleDynamicKeyEvent()");
 				return result;
 			}
 
-			_log.Debug("Updating previous key state");
-			dk.UpdatePreviousState(dk.State);
-			_log.Debug("Updating current key state");
+			_log.Debug("Updating key state");
+			// UpdateState will check if it's a valid press and call any event subscribers
 			dk.UpdateState(state);
-
-			_log.Debug("Raising DynamicKeyEvent event");
-			OnDynamicKeyEvent(dk.Key, dk.State);
-
-			// Only proceed if this is the first down event on the key
-			if (dk.PreviousState == RazerAPI.RZDKSTATE.DOWN || dk.State != RazerAPI.RZDKSTATE.DOWN)
-			{
-				_log.Debug("Key already pressed");
-				_log.Debug("<< HandleDynamicKeyEvent()");
-				return result;
-			}
-
-			_log.Debug("Getting callback");
-			var callback = _dkCallbacks[index];
-
-			if (callback == null)
-			{
-				_log.Debug("Callback is null");
-				_log.Debug("<< HandleDynamicKeyEvent()");
-				return result;
-			}
-
-			try
-			{
-				_log.Debug("Calling callback");
-				callback();
-			}
-			catch (ObjectDisposedException ex)
-			{
-				_log.ErrorFormat("Call to dyamic key callback #{0} failed (ObjectDisposedException): {1}", index + 1, ex.Message);
-				_log.Error("Exception details as follows", ex);
-			}
 
 			_log.Debug("<< HandleDynamicKeyEvent()");
 			return result;

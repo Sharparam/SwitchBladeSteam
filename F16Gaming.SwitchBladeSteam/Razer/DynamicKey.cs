@@ -30,16 +30,21 @@
 using System;
 
 using F16Gaming.SwitchBladeSteam.Native;
+using F16Gaming.SwitchBladeSteam.Razer.Events;
 using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
 using log4net;
 
 namespace F16Gaming.SwitchBladeSteam.Razer
 {
+	public delegate void DynamicKeyCallbackDelegate();
+
 	/// <summary>
 	/// Represents a dynamic key on the SwitchBlade device
 	/// </summary>
 	public class DynamicKey
 	{
+		public event DynamicKeyPressedEventHandler KeyPressed;
+
 		private readonly ILog _log;
 
 		public RazerAPI.RZDYNAMICKEY Key { get; private set; }
@@ -49,7 +54,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		public string DownImage { get; private set; }
 		public bool SingleImage { get { return UpImage == DownImage; } }
 
-		internal DynamicKey(RazerAPI.RZDYNAMICKEY key, string upImage, string downImage = null)
+		internal DynamicKey(RazerAPI.RZDYNAMICKEY key, string upImage, string downImage = null, DynamicKeyPressedEventHandler callback = null)
 		{
 			_log = Logging.LogManager.GetLogger(this);
 
@@ -74,15 +79,43 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.Debug("Setting images");
 			SetUpImage(UpImage);
 			SetDownImage(DownImage);
+
+			if (callback != null)
+			{
+				_log.Debug("Setting callback");
+				KeyPressed += callback;
+			}
+
+			_log.Debug("<< DynamicKey()");
+		}
+
+		private void OnKeyPressed()
+		{
+			var func = KeyPressed;
+			if (func == null)
+				return;
+
+			try
+			{
+				func(this, null);
+			}
+			catch (ObjectDisposedException ex)
+			{
+				_log.ErrorFormat("OnKeyPressed: ObjectDisposedException: {0}", ex.Message);
+			}
 		}
 
 		internal void UpdateState(RazerAPI.RZDKSTATE state)
 		{
 			_log.DebugFormat(">> UpdateState({0})", state);
+			PreviousState = State;
 			State = state;
+			if (State == RazerAPI.RZDKSTATE.DOWN && PreviousState == RazerAPI.RZDKSTATE.UP)
+				OnKeyPressed();
 			_log.Debug("<< UpdateState()");
 		}
 
+		[Obsolete("UpdateState now handles setting the previous state")]
 		internal void UpdatePreviousState(RazerAPI.RZDKSTATE state)
 		{
 			_log.DebugFormat(">> UpdatePreviousState({0})", state);

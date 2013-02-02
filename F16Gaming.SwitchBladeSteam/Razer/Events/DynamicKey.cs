@@ -45,4 +45,6 @@ namespace F16Gaming.SwitchBladeSteam.Razer.Events
 	}
 
 	public delegate void DynamicKeyEventHandler(object sender, DynamicKeyEventArgs e);
+
+	public delegate void DynamicKeyPressedEventHandler(object sender, EventArgs e);
 }
