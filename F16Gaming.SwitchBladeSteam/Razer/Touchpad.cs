@@ -189,7 +189,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			}
 			else if (enabled)
 			{
-				if (_activeGestures.Has(gesture))
+				if (_activeGestures.Has(gesture) || _activeGestures == RazerAPI.RZGESTURE.ALL)
 					return;
 				newGestures = _activeGestures.Include(gesture);
 			}
