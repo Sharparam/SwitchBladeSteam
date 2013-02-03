@@ -45,6 +45,11 @@ namespace F16Gaming.SwitchBladeSteam.App
 			}
 		}
 
+		public MainWindow(string error) : this()
+		{
+			ErrorLabel.Text = error;
+		}
+
 		private void DebugExitButtonClick(object sender, EventArgs e)
 		{
 			Close();

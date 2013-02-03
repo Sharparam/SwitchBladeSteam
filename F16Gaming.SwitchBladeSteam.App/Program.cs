@@ -170,16 +170,27 @@ namespace F16Gaming.SwitchBladeSteam.App
 		{
 			_log.Debug(">> ShowForm([form])");
 
-			_log.Debug("Setting active form");
-			_activeForm = form;
-
 #if RAZER_ENABLED
 			_log.Debug("Setting handle on switchblade touchpad");
 			var touchpad = _razerManager.GetTouchpad();
-			touchpad.SetHandle(_activeForm.Handle);
+			try
+			{
+				touchpad.SetHandle(form.Handle);
+			}
+			catch (ObjectDisposedException ex)
+			{
+				_log.ErrorFormat("ShowForm: touchpad.SetHandle failed [ObjectDisposedException]: {0}", ex.Message);
+				_log.Error("Exception detail:", ex);
+				_log.Warn("Attempting to recover by showing main window");
+				ShowForm(new MainWindow("Failed to complete the requested action."));
+				return;
+			}
+
+			_log.Debug("Nulling _nextForm");
+			_nextForm = null;
 
 			// Add controls, if needed
-			var kbForm = _activeForm as IKeyboardEnabledForm;
+			var kbForm = form as IKeyboardEnabledForm;
 			if (kbForm != null)
 			{
 				_log.Debug("Form is keyboard enabled, obtaining control handles to set active keyboard controls");
@@ -205,7 +216,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			}
 
 			// Forward gestures, if needed
-			var gestureForm = _activeForm as IGestureEnabledForm;
+			var gestureForm = form as IGestureEnabledForm;
 			if (gestureForm == null)
 			{
 				_log.Debug("Form is not gesture enabled, resetting gestures");
@@ -219,34 +230,32 @@ namespace F16Gaming.SwitchBladeSteam.App
 #endif
 
 			_log.Debug("Registering closing event");
-			_activeForm.Closing += ActiveFormClosing;
+			form.Closing += ActiveFormClosing;
 			_log.Debug("Registering closed event");
-			_activeForm.Closed += ActiveFormClosed;
+			form.Closed += ActiveFormClosed;
 
 #if DEBUG
 			_log.Debug("Creating debug window");
 			_keyDebugWindow = new KeyDebugWindow
 			{
 				StartPosition = FormStartPosition.Manual,
-				Location = new Point(Screen.PrimaryScreen.WorkingArea.Width / 2 + _activeForm.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - _activeForm.Height / 2)
+				Location = new Point(Screen.PrimaryScreen.WorkingArea.Width / 2 + form.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - form.Height / 2)
 			};
 			_keyDebugWindow.Show();
 #endif
 
+			_log.Debug("Setting active form");
+			_activeForm = form;
 			_log.Info("Running application with new form");
 			_activeFormClosed = false;
-			Application.Run(form);
+			Application.Run(_activeForm);
 
 			if (_nextForm != null)
 			{
 				_log.Info("Loading next form");
 				ClearCurrentForm();
-				_log.Debug("Setting active form to next form");
-				_activeForm = _nextForm;
-				_log.Debug("nulling _nextForm var");
-				_nextForm = null;
 				_log.Debug("Showing next form");
-				ShowForm(_activeForm);
+				ShowForm(_nextForm);
 				return;
 			}
 
