@@ -31,7 +31,7 @@ using F16Gaming.SwitchBladeSteam.Native;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public interface IGestureEnabledForm
+	internal interface IGestureEnabledForm
 	{
 		RazerAPI.RZGESTURE EnabledGestures { get; }
 	}
