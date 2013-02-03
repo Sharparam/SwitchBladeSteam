@@ -12,9 +12,18 @@ PRIMARY AUTHORS:
 THANKS TO:
 
  * Bjørn Tore Håvie (itsbth)
-   - Helping with P/Invoke signatures (F16Gaming.SwitchBladeSteam/Native/RazerAPI.cs)
+   - Helping with P/Invoke signatures
+     (F16Gaming.SwitchBladeSteam/Native/RazerAPI.cs)
+ 
+ * kimoto
+   - Code to get a Steam user's avatar into a Bitmap object
+     (https://gist.github.com/986866/b2dc849940d4bdba858f3b305bf68afda641e21e)
+ 
+ * Hugo Bonacci (hugoware)
+   - Enumeration extensions
+     (http://hugoware.net/blog/enumeration-extensions-2-0)
 
-Note: F16Gaming.SwitchBladeSteam is distributed with the source files for Steam4NET2
+Note: F16Gaming.SwitchBladeSteam is distributed with the source code for Steam4NET2
 from OpenSteamWorks (http://www.opensteamworks.org), Steam4NET is considered a
 separate package and is not part of F16Gaming.SwitchBladeSteam proper.
 
