@@ -45,6 +45,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		private readonly ILog _log;
 
 		private RazerAPI.RZGESTURE _activeGestures;
+		private RazerAPI.RZGESTURE _activeOSGestures;
 
 		private static RazerAPI.TouchpadGestureCallbackFunctionDelegate _gestureCallback;
 
@@ -207,17 +208,59 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 		public void SetGesture(RazerAPI.RZGESTURE gesture, bool enabled)
 		{
-			
+			_log.DebugFormat(">> SetGesture({0}, {1})", gesture, enabled ? "true" : "false");
+			RazerAPI.RZGESTURE newGestures;
+			if (gesture == RazerAPI.RZGESTURE.ALL)
+			{
+				newGestures = gesture;
+			}
+			else if (gesture == RazerAPI.RZGESTURE.NONE)
+			{
+				if (_activeGestures == RazerAPI.RZGESTURE.NONE)
+					return;
+				if (!enabled)
+				{
+					// Request to "disable no gesture"?
+					// Then just enable all, since that's the same
+					SetGesture(RazerAPI.RZGESTURE.ALL, true);
+					return;
+				}
+				newGestures = gesture;
+			}
+			else if (enabled)
+			{
+				if (_activeGestures.Has(gesture) || _activeGestures == RazerAPI.RZGESTURE.ALL)
+					return;
+				newGestures = _activeOSGestures.Include(gesture);
+			}
+			else
+			{
+				if (!_activeGestures.Has(gesture))
+					return;
+				newGestures = _activeOSGestures.Remove(gesture);
+			}
+
+			var hResult = RazerAPI.RzSBGestureEnable(newGestures, enabled);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBGestureEnable", hResult);
+
+			hResult = RazerAPI.RzSBGestureSetNotification(newGestures, enabled);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBGestureSetNotification", hResult);
+
+			_activeGestures = newGestures;
+
+			_log.Debug("<< SetGesture()");
 		}
 
 		public void EnableGesture(RazerAPI.RZGESTURE gesture)
 		{
-			
+			SetGesture(gesture, true);
 		}
 
 		public void DisableGesture(RazerAPI.RZGESTURE gesture)
 		{
-			
+			SetGesture(gesture, false);
 		}
 
 		public void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enabled)
@@ -234,7 +277,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			}
 			else if (gesture == RazerAPI.RZGESTURE.NONE)
 			{
-				if (_activeGestures == RazerAPI.RZGESTURE.NONE)
+				if (_activeOSGestures == RazerAPI.RZGESTURE.NONE)
 					return;
 				if (!enabled) 
 				{
@@ -248,22 +291,22 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			}
 			else if (enabled)
 			{
-				if (_activeGestures.Has(gesture) || _activeGestures == RazerAPI.RZGESTURE.ALL)
+				if (_activeOSGestures.Has(gesture) || _activeOSGestures == RazerAPI.RZGESTURE.ALL)
 					return;
-				newGestures = _activeGestures.Include(gesture);
+				newGestures = _activeOSGestures.Include(gesture);
 			}
 			else
 			{
-				if (!_activeGestures.Has(gesture))
+				if (!_activeOSGestures.Has(gesture))
 					return;
-				newGestures = _activeGestures.Remove(gesture);
+				newGestures = _activeOSGestures.Remove(gesture);
 			}
 
 			var hResult = RazerAPI.RzSBGestureSetOSNotification(newGestures, enabled);
 			if (HRESULT.RZSB_FAILED(hResult))
 				RazerManager.NativeCallFailure("RzSBGestureSetOSNotification", hResult);
 
-			_activeGestures = newGestures;
+			_activeOSGestures = newGestures;
 			_log.Debug("<< SetOSGesture()");
 		}
 
