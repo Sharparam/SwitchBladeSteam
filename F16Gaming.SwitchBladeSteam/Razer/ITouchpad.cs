@@ -52,11 +52,11 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		void StopAll();
 		void StopRender(bool erase, bool force);
 
-		void SetGesture(RazerAPI.RZGESTURE gesture, bool enable);
+		void SetGesture(RazerAPI.RZGESTURE gesture, bool enabled);
 		void EnableGesture(RazerAPI.RZGESTURE gesture);
 		void DisableGesture(RazerAPI.RZGESTURE gesture);
 
-		void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enable);
+		void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enabled);
 		void EnableOSGesture(RazerAPI.RZGESTURE gesture);
 		void DisableOSGesture(RazerAPI.RZGESTURE gesture);
 
