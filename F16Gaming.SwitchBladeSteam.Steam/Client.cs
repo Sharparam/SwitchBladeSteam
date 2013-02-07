@@ -68,6 +68,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		// Accessors
 		public CSteamID Me { get { return _steamUser.GetSteamID(); } }
+		public SteamFriends SteamFriends { get { return _steamFriends; } }
 		public FriendsManager FriendsManager { get { return _friendsManager; } }
 
 		public Client()
