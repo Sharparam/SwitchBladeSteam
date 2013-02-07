@@ -30,6 +30,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
+using F16Gaming.SwitchBladeSteam.Steam.Extensions;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
@@ -42,7 +43,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private readonly ISteamUtils005 _steamUtils;
 
-		private readonly IClientFriends _clientFriends;
+		private readonly SteamFriends _steamFriends;
 
 		private Friend[] _friends;
 
@@ -50,12 +51,12 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public ReadOnlyCollection<Friend> Friends;
 
-		internal FriendsManager(IClientFriends clientFriends, ISteamUtils005 steamUtils, Client client)
+		internal FriendsManager(SteamFriends steamFriends, ISteamUtils005 steamUtils, Client client)
 		{
 			_log = Logging.LogManager.GetLogger(this);
 			_log.Debug(">> FriendsManager([clientFriends])");
 			_log.Info("FriendsManager is initializing");
-			_clientFriends = clientFriends;
+			_steamFriends = steamFriends;
 			_steamUtils = steamUtils;
 			UpdateFriends();
 			client.ChatMessageReceived += HandleChatMessage;
@@ -75,7 +76,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		{
 			_log.Debug(">> UpdateFriends()");
 			var oldFriends = _friends == null ? null : (Friend[]) _friends.Clone();
-			var newFriendCount = _clientFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
+			var newFriendCount = _steamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
 			if (_friends == null || newFriendCount != _friendCount)
 			{
 				_friendCount = newFriendCount;
@@ -84,11 +85,10 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			
 			for (int i = 0; i < _friendCount; i++)
 			{
-				var friend = _clientFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
+				var friend = _steamFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
 				Friend oldFriend = oldFriends == null ? null : oldFriends.FirstOrDefault(f => f.SteamID == friend);
-				_friends[i] = new Friend(_clientFriends, friend, oldFriend == null ? null :  oldFriend.ChatHistory.ToList());
-				var avatarHandle = _clientFriends.GetMediumFriendAvatar(_friends[i].SteamID);
-				var avatar = Utils.GetAvatarFromHandle(avatarHandle, _steamUtils);
+				_friends[i] = new Friend(_steamFriends, friend, oldFriend == null ? null :  oldFriend.ChatHistory.ToList());
+				var avatar = _steamFriends.GetMediumFriendAvatar(_friends[i].SteamID);
 				if (avatar != null)
 					_friends[i].Avatar = avatar;
 			}

@@ -43,7 +43,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		private readonly log4net.ILog _log;
 
-		private readonly IClientFriends _clientFriends;
+		private readonly SteamFriends _steamFriends;
 		private readonly CSteamID _steamId;
 		private readonly List<ChatMessage> _chatHistory;
 
@@ -54,11 +54,11 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 		public bool Online { get { return GetState() != EPersonaState.k_EPersonaStateOffline; } }
 
-		internal Friend(IClientFriends clientFriends, CSteamID id, List<ChatMessage> oldChatHistory = null)
+		internal Friend(SteamFriends steamFriends, CSteamID id, List<ChatMessage> oldChatHistory = null)
 		{
 			_log = Logging.LogManager.GetLogger(this);
 			_log.DebugFormat(">> Friend([clientFriends], {0}, {1})", id.Render(), oldChatHistory == null ? "null" : "[oldChatHistory]");
-			_clientFriends = clientFriends;
+			_steamFriends = steamFriends;
 			_steamId = id;
 			_chatHistory = oldChatHistory ?? new List<ChatMessage>();
 			ChatHistory = new ReadOnlyCollection<ChatMessage>(_chatHistory);
@@ -85,7 +85,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public string GetName()
 		{
 			//_log.Debug(">< GetName()");
-			return _clientFriends.GetFriendPersonaName(_steamId);
+			return _steamFriends.GetFriendName(_steamId);
 		}
 
 		public string GetNickname()
@@ -94,7 +94,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			string nick;
 			try
 			{
-				nick = _clientFriends.GetPlayerNickname(_steamId);
+				nick = _steamFriends.GetFriendNickname(_steamId);
 			}
 			catch (ArgumentNullException) // No nickname set for this friend
 			{
@@ -107,13 +107,13 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public EPersonaState GetState()
 		{
 			//_log.Debug(">< GetState()");
-			return _clientFriends.GetFriendPersonaState(_steamId);
+			return _steamFriends.GetFriendState(_steamId);
 		}
 
 		public string GetStateText()
 		{
 			//_log.Debug(">< GetStateText()");
-			return Utils.StateToString(GetState());
+			return _steamFriends.GetFriendStateText(_steamId);
 		}
 
 		public void SendType(string message, EChatEntryType type)
@@ -121,8 +121,7 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 			_log.DebugFormat(">> SendType([message], {0})", type);
 			if (type == EChatEntryType.k_EChatEntryTypeEmote)
 				_log.Warn("Steam no longer supports sending emotes to chat");
-			Console.WriteLine("Sending to {0} to {1}: {2}", type, _steamId.Render(), message);
-			_clientFriends.SendMsgToFriend(_steamId, type, Encoding.UTF8.GetBytes(message));
+			_steamFriends.SendMessage(_steamId, type, message);
 			_log.Debug("<< SendType()");
 		}
 

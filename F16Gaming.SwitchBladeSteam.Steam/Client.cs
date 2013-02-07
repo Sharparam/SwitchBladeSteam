@@ -28,7 +28,6 @@
  */
 
 using System;
-using System.Text;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
@@ -46,9 +45,15 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		// Interfaces
 		private readonly ISteamClient012 _steamClient;
 		private readonly IClientEngine _clientEngine;
+
+		private readonly ISteamFriends002 _steamFriends002;
+		private readonly ISteamFriends013 _steamFriends013;
 		private readonly IClientFriends _clientFriends;
+
 		private readonly ISteamUser016 _steamUser;
 		private readonly ISteamUtils005 _steamUtils;
+
+		private readonly SteamFriends _steamFriends;
 
 		private readonly FriendsManager _friendsManager;
 
@@ -112,6 +117,24 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 				throw new SteamException("ClientEngine is null");
 			}
 
+			_log.Debug("Getting steam friends (002) interface");
+			_steamFriends002 = _steamClient.GetISteamFriends<ISteamFriends002>(_user, _pipe);
+
+			if (_steamFriends002 == null)
+			{
+				_log.Error("Steam friends (002) interface is null! Throwing exception");
+				throw new SteamException("SteamFriends (002) is null");
+			}
+
+			_log.Debug("Getting steam friends (013) interface");
+			_steamFriends013 = _steamClient.GetISteamFriends<ISteamFriends013>(_user, _pipe);
+
+			if (_steamFriends013 == null)
+			{
+				_log.Error("Steam friends (013) interface is null! Throwing exception");
+				throw new SteamException("SteamFriends (013) is null");
+			}
+
 			_log.Debug("Getting client friends interface...");
 			_clientFriends = _clientEngine.GetIClientFriends<IClientFriends>(_user, _pipe);
 
@@ -121,8 +144,11 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 				throw new SteamException("ClientFriends is null");
 			}
 
-			_log.Debug("Creataing friends manager");
-			_friendsManager = new FriendsManager(_clientFriends, _steamUtils, this);
+			_log.Debug("Creating SteamFriends wrapper");
+			_steamFriends = new SteamFriends(_steamFriends002, _steamFriends013, _clientFriends, _steamUtils);
+
+			_log.Debug("Creating friends manager");
+			_friendsManager = new FriendsManager(_steamFriends, _steamUtils, this);
 			
 			// Set up callbacks
 			_log.Debug("Setting up callbacks");
@@ -209,41 +235,31 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public string GetMyName()
 		{
 			_log.Debug(">< GetMyName()");
-			return _clientFriends.GetPersonaName();
+			return _steamFriends.GetMyName();
 		}
 
 		public EPersonaState GetMyState()
 		{
-			return _clientFriends.GetPersonaState();
+			return _steamFriends.GetMyState();
 		}
 
 		public void SetMyState(EPersonaState state)
 		{
-			if (GetMyState() == state)
-				return;
-
-			_clientFriends.SetPersonaState(state);
+			_steamFriends.SetMyState(state);
 		}
 
 		private void HandleFriendChatMessage(FriendChatMsg_t callback)
 		{
 			_log.Debug(">> HandleFriendChatMessage([callback])");
-			// Messages should usually be only between Me -> Friend or Friend -> Me
-			// Unknown if this catches group chats, probably not
-			var sender = new CSteamID(callback.m_ulSenderID); // Who sent the message
-			var receiver = new CSteamID(callback.m_ulFriendID); // Who received the message
-			var bytes = new byte[4096]; // Create byte array to hold message data
-			var type = EChatEntryType.k_EChatEntryTypeChatMsg; // Set a temporary message type
-			var length = _clientFriends.GetChatMessage(receiver, (int) callback.m_iChatID, bytes, ref type, ref sender); // Load message into bytes, also get type, sender and length of message
-			if (type != EChatEntryType.k_EChatEntryTypeChatMsg && type != EChatEntryType.k_EChatEntryTypeEmote) // We only care about normal or emote messages
+			
+			var message = _steamFriends.GetChatMessage(callback); // Construct the message class
+			if (message.Type != EChatEntryType.k_EChatEntryTypeChatMsg && message.Type != EChatEntryType.k_EChatEntryTypeEmote)
 			{
-				_log.Debug("Not a chat message, returning");
+				_log.Debug("Not a chat or emote message, aborting.");
 				_log.Debug("<< HandleFriendChatMessage()");
 				return;
 			}
-			
-			string msg = Encoding.UTF8.GetString(bytes, 0, length - 1); // Convert the byte array to string
-			var message = new ChatMessage(sender, receiver, type, msg); // Construct the message class
+
 			_log.Debug("Handling friend chat message");
 			OnChatMessageReceived(message); // Throw the message event
 			_log.Debug("<< HandleFriendChatMessage()");

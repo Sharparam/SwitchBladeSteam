@@ -447,10 +447,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		public static void ShowRenderStats()
 		{
+#if RAZER_ENABLED
 			var stats = _razerManager.GetTouchpad().GetRenderStats();
 			var statsText = string.Format("Count: {0}\nMax Time: {1}\nLast Time: {2}\nAverage Time: {3}",
 										  stats.Count, stats.MaxTime, stats.LastTime, stats.AverageTime);
 			MessageBox.Show(statsText, "Render Stats", MessageBoxButtons.OK, MessageBoxIcon.Information);
+#endif
 		}
 #endif
 	}

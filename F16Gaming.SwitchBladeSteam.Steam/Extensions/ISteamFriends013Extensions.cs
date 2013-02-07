@@ -1,4 +1,4 @@
-﻿/* ChatMessage.cs
+﻿/* Friend.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -29,21 +29,18 @@
 
 using Steam4NET;
 
-namespace F16Gaming.SwitchBladeSteam.Steam
+namespace F16Gaming.SwitchBladeSteam.Steam.Extensions
 {
-	public struct ChatMessage
+	public static class ISteamFriends013Extensions
 	{
-		public readonly CSteamID Sender;
-		public readonly CSteamID Receiver;
-		public readonly EChatEntryType Type;
-		public readonly string Message;
-
-		internal ChatMessage(CSteamID sender, CSteamID receiver, EChatEntryType type, string message)
+		public static int GetFriendCount(this ISteamFriends013 steamFriends, EFriendFlags flags)
 		{
-			Sender = sender;
-			Receiver = receiver;
-			Type = type;
-			Message = message;
+			return steamFriends.GetFriendCount((int) flags);
+		}
+
+		public static CSteamID GetFriendByIndex(this ISteamFriends013 steamFriends, int index, EFriendFlags flags)
+		{
+			return steamFriends.GetFriendByIndex(index, (int) flags);
 		}
 	}
 }
