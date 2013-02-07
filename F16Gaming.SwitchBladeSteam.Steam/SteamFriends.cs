@@ -1,4 +1,4 @@
-﻿/* ChatMessage.cs
+﻿/* SteamFriends.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 

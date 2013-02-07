@@ -1,4 +1,4 @@
-﻿/* Friend.cs
+﻿/* ISteamFriends013Extensions.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
