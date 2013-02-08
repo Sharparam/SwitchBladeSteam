@@ -75,6 +75,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug(">> EntryBoxKeyDown([sender], [e])");
 			if (e.KeyCode != Keys.Enter || string.IsNullOrEmpty(EntryBox.Text))
 			{
+				EntryBox.Invalidate();
 				_log.Debug("<< EntryBoxKeyDown()");
 				return;
 			}
@@ -84,6 +85,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			var message = EntryBox.Text;
 			_friend.SendMessage(message + "\0");
 			EntryBox.Clear();
+			EntryBox.Invalidate();
 			_log.Debug("<< EntryBoxKeyDown()");
 		}
 
@@ -91,6 +93,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 		{
 			_log.Debug(">> EntryBoxTextChanged([sender], [e])");
 			EntryBox.Text = EntryBox.Text.TrimStart('\n', '\r', ' ');
+			EntryBox.Invalidate();
 			_log.Debug("<< EntryBoxTextChanged()");
 		}
 
@@ -108,6 +111,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			ChatHistory.SelectionColor = isMe ? Color.DarkGray : Color.White;
 			ChatHistory.AppendText(message + Environment.NewLine);
 			ChatHistory.ScrollToCaret();
+			ChatHistory.Invalidate();
 			_log.Debug("<< WriteChatMessage()");
 		}
 
