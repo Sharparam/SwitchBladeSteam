@@ -28,12 +28,13 @@
  */
 
 using System;
+using System.Collections.Generic;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
 {
-	public class Client : IDisposable
+	public class Client
 	{
 		// Events
 		public event ChatMessageReceivedEventHandler ChatMessageReceived;
@@ -163,30 +164,6 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 
 			_log.Info("Steam client initialization complete!");
 			_log.Debug("<< Client())");
-		}
-
-		public void Dispose()
-		{
-			if (_isDisposed)
-				return;
-
-			_log.Debug(">> Dispose()");
-			_log.Debug("Unregistering callbacks...");
-			_friendChatCallback.UnRegister();
-			_log.Debug("Friend chat callback unregistered");
-			_friendAddedCallback.UnRegister();
-			_log.Debug("Friend added callback unregistered");
-			_personaStateChangeCallback.UnRegister();
-			_log.Debug("Persona state change callback unregistered");
-			_friendProfileInfoResponseCallback.UnRegister();
-			_log.Debug("Friend profile info response callback unregistered");
-			_log.Debug("All callbacks unregistered!");
-			_friendChatCallback = null;
-			_friendAddedCallback = null;
-			_personaStateChangeCallback = null;
-			_friendProfileInfoResponseCallback = null;
-			_isDisposed = true;
-			_log.Debug("<< Dispose()");
 		}
 
 		private void GetSteamPipe()

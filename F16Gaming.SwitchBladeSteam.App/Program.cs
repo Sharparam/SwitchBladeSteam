@@ -186,9 +186,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 			}
 
-			_log.Debug("Nulling _nextForm");
-			_nextForm = null;
-
 			// Add controls, if needed
 			var kbForm = form as IKeyboardEnabledForm;
 			if (kbForm != null)
@@ -246,6 +243,8 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			_log.Debug("Setting active form");
 			_activeForm = form;
+			_log.Debug("Nulling _nextForm");
+			_nextForm = null;
 			_log.Info("Running application with new form");
 			_activeFormClosed = false;
 			Application.Run(_activeForm);
@@ -338,12 +337,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Info("Stopping Razer interface");
 			RazerManager.Stop();
 #endif
-
-			if (SteamClient != null)
-			{
-				_log.Info("Disposing steam client");
-				SteamClient.Dispose();
-			}
 
 			_log.Info("### APPLICATION EXIT ###");
 
