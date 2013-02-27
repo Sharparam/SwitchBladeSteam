@@ -280,7 +280,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				_activeForm.Close();
 		}
 
-		private static void ClearCurrentForm()
+		private static void ClearCurrentForm(bool erase = false)
 		{
 			_log.Debug(">> ClearCurrentForm()");
 
@@ -289,7 +289,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 #if RAZER_ENABLED
 			_log.Info("Stopping render on touchpad");
-			_razerManager.GetTouchpad().StopRender(false);
+			_razerManager.GetTouchpad().StopRender(erase);
 #endif
 			if (_activeForm.Visible)
 			{
@@ -409,6 +409,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< OfflineKeyPressed()");
 		}
 
+		private static void QuitKeyPressed(object sender, EventArgs e)
+		{
+			_log.Debug(">> QuitKeyPressed()");
+			ClearCurrentForm(true);
+			_log.Debug("<< QuitKeyPressed()");
+		}
+
 #if DEBUG
 		public static void DebugHomeButton()
 		{
@@ -436,6 +443,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug(">> DebugOfflineButton()");
 			GoOffline();
 			_log.Debug("<< DebugOfflineButton()");
+		}
+
+		public static void DebugQuitButton()
+		{
+			_log.Debug(">> DebugQuitButton()");
+			ClearCurrentForm(true);
+			_log.Debug("<< DebugQuitButton()");
 		}
 
 		public static void ShowRenderStats()
