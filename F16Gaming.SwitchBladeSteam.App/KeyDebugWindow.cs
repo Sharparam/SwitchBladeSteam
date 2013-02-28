@@ -29,6 +29,7 @@
 
 using System;
 using System.Windows.Forms;
+using F16Gaming.SwitchBladeSteam.App.Properties;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
@@ -37,6 +38,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 		public KeyDebugWindow()
 		{
 			InitializeComponent();
+			HomeButton.MouseDown += HomeButtonMouseDown;
+			HomeButton.MouseUp += HomeButtonMouseUp;
+			FriendsButton.MouseDown += FriendsButtonMouseDown;
+			FriendsButton.MouseUp += FriendsButtonMouseUp;
+			OnlineButton.MouseDown += OnlineButtonMouseDown;
+			OnlineButton.MouseUp += OnlineButtonMouseUp;
+			OfflineButton.MouseDown += OfflineButtonMouseDown;
+			OfflineButton.MouseUp += OfflineButtonMouseUp;
 		}
 
 		private void HomeButtonClick(object sender, EventArgs e)
@@ -46,11 +55,31 @@ namespace F16Gaming.SwitchBladeSteam.App
 #endif
 		}
 
+		private void HomeButtonMouseDown(object sender, EventArgs e)
+		{
+			HomeButton.Image = Resources.dk_home_down;
+		}
+
+		private void HomeButtonMouseUp(object sender, EventArgs e)
+		{
+			HomeButton.Image = Resources.dk_home;
+		}
+
 		private void FriendsButtonClick(object sender, EventArgs e)
 		{
 #if DEBUG
 			Program.DebugFriendsButton();
 #endif
+		}
+
+		private void FriendsButtonMouseDown(object sender, EventArgs e)
+		{
+			FriendsButton.Image = Resources.dk_friends_down;
+		}
+
+		private void FriendsButtonMouseUp(object sender, EventArgs e)
+		{
+			FriendsButton.Image = Resources.dk_friends;
 		}
 
 		private void OnlineButtonClick(object sender, EventArgs e)
@@ -60,11 +89,31 @@ namespace F16Gaming.SwitchBladeSteam.App
 #endif
 		}
 
+		private void OnlineButtonMouseDown(object sender, EventArgs e)
+		{
+			OnlineButton.Image = Resources.dk_appear_online_down;
+		}
+
+		private void OnlineButtonMouseUp(object sender, EventArgs e)
+		{
+			OnlineButton.Image = Resources.dk_appear_online;
+		}
+
 		private void OfflineButtonClick(object sender, EventArgs e)
 		{
 #if DEBUG
 			Program.DebugOfflineButton();
 #endif
+		}
+
+		private void OfflineButtonMouseDown(object sender, EventArgs e)
+		{
+			OfflineButton.Image = Resources.dk_appear_offline_down;
+		}
+
+		private void OfflineButtonMouseUp(object sender, EventArgs e)
+		{
+			OfflineButton.Image = Resources.dk_appear_offline;
 		}
 	}
 }

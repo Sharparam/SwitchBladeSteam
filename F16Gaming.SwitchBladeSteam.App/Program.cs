@@ -46,16 +46,11 @@ using LogManager = F16Gaming.SwitchBladeSteam.Logging.LogManager;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	internal class DynamicKeyOptions
+	internal struct DynamicKeyOptions
 	{
-		public readonly string Image;
-		public readonly DynamicKeyPressedEventHandler Callback;
-
-		internal DynamicKeyOptions(string image, DynamicKeyPressedEventHandler callback)
-		{
-			Image = image;
-			Callback = callback;
-		}
+		public string Image;
+		public string DownImage;
+		public DynamicKeyPressedEventHandler Callback;
 	}
 
 	public static class Program
@@ -120,10 +115,38 @@ namespace F16Gaming.SwitchBladeSteam.App
 #if RAZER_ENABLED
 			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
 			{
-				{RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions(@"res\images\dk_home.png", HomeKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions(@"res\images\dk_friends.png", FriendKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK6, new DynamicKeyOptions(@"res\images\dk_appear_online.png", OnlineKeyPressed)},
-				{RazerAPI.RZDYNAMICKEY.DK7, new DynamicKeyOptions(@"res\images\dk_appear_offline.png", OfflineKeyPressed)}
+				{
+					RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions
+					{
+						Image = @"res\images\dk_home.png",
+						DownImage = @"res\images\dk_home_down.png",
+						Callback = HomeKeyPressed
+					}
+				},
+				{
+					RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions
+					{
+						Image = @"res\images\dk_friends.png",
+						DownImage = @"res\images\dk_friends_down.png",
+						Callback = FriendKeyPressed
+					}
+				},
+				{
+					RazerAPI.RZDYNAMICKEY.DK6, new DynamicKeyOptions
+					{	
+						Image = @"res\images\dk_appear_online.png",
+						DownImage = @"res\images\dk_appear_online_down.png",
+						Callback = OnlineKeyPressed
+					}
+				},
+				{
+					RazerAPI.RZDYNAMICKEY.DK7, new DynamicKeyOptions
+					{
+						Image = @"res\images\dk_appear_offline.png",
+						DownImage = @"res\images\dk_appear_offline_down.png",
+						Callback = OfflineKeyPressed
+					}
+				}
 			};
 
 			try
@@ -155,7 +178,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Info("Enabling dynamic keys");
 			
 			foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
-				_razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image);
+				_razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image, pair.Value.DownImage);
 #else
 			MessageBox.Show(
 				"RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",

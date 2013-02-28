@@ -141,7 +141,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\F16Gaming.SwitchBladeSteam.Steam\F16Gaming.SwitchBladeSteam.Steam.csproj">
       <Project>{afe60a20-6e47-41e4-92f8-80b7eaabf03c}</Project>
@@ -155,6 +154,9 @@
       <Project>{1a204257-fe82-4bbe-9ed4-40694821c31f}</Project>
       <Name>Steam4NET</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

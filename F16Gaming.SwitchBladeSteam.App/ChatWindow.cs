@@ -72,11 +72,11 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		private void EntryBoxKeyDown(object sender, KeyEventArgs e)
 		{
-			_log.Debug(">> EntryBoxKeyDown([sender], [e])");
+			//_log.Debug(">> EntryBoxKeyDown([sender], [e])");
 			if (e.KeyCode != Keys.Enter || string.IsNullOrEmpty(EntryBox.Text))
 			{
 				EntryBox.Invalidate();
-				_log.Debug("<< EntryBoxKeyDown()");
+				//_log.Debug("<< EntryBoxKeyDown()");
 				return;
 			}
 
@@ -86,15 +86,15 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_friend.SendMessage(message + "\0");
 			EntryBox.Clear();
 			EntryBox.Invalidate();
-			_log.Debug("<< EntryBoxKeyDown()");
+			//_log.Debug("<< EntryBoxKeyDown()");
 		}
 
 		private void EntryBoxTextChanged(object sender, EventArgs e)
 		{
-			_log.Debug(">> EntryBoxTextChanged([sender], [e])");
+			//_log.Debug(">> EntryBoxTextChanged([sender], [e])");
 			EntryBox.Text = EntryBox.Text.TrimStart('\n', '\r', ' ');
 			EntryBox.Invalidate();
-			_log.Debug("<< EntryBoxTextChanged()");
+			//_log.Debug("<< EntryBoxTextChanged()");
 		}
 
 		private void WriteChatMessage(CSteamID sender, string message)
