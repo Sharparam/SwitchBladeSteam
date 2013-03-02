@@ -29,11 +29,14 @@
 
 using System;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Logging;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
+using F16Gaming.SwitchBladeSteam.Razer.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
@@ -45,7 +48,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private readonly TimeSpan _updateInterval = new TimeSpan(0, 0, 30);
 		private DateTime _lastUpdate;
 
-		public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.ALL; } }
+		private bool _handlingGesture;
+		private int _touchSelected = -1;
+		private int _lastY = -1;
+		private int _yChange;
+
+		private readonly int _yScrollDetectAmount;
+
+		public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.PRESS; } }
 
 		public FriendsWindow()
 		{
@@ -62,7 +72,24 @@ namespace F16Gaming.SwitchBladeSteam.App
 				Program.SteamFriends.FriendsUpdated += FriendsUpdated;
 			}
 
+			// TEMPORARY TESTING VALUE FILE
+			if (File.Exists("scroll_value"))
+			{
+				_yScrollDetectAmount = int.Parse(File.ReadAllText("scroll_value"));
+			}
+			else
+			{
+				_yScrollDetectAmount = 15;
+				File.WriteAllText("scroll_value", _yScrollDetectAmount.ToString(CultureInfo.InvariantCulture));
+			}
+
 			_log.Debug("<< FriendsWindow()");
+		}
+
+		private void FriendsWindowLoad(object sender, EventArgs e)
+		{
+			WinAPI.EnableScrollBar(FriendList.Handle, WinAPI.SB_BOTH, WinAPI.ESB_DISABLE_BOTH);
+			WinAPI.ShowScrollBar(FriendList.Handle, WinAPI.SB_BOTH, false);
 		}
 
 		private void FriendsUpdated(object sender, EventArgs e)
@@ -97,7 +124,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("Retrieving online friends");
 			var friends = Program.SteamFriends.Friends.Where(f => f.Online);
 			_log.Debug("Creating ImageList to hold avatars");
-			var avatars = new ImageList { ImageSize = new Size(64, 64), ColorDepth = ColorDepth.Depth32Bit };
+			var avatars = new ImageList { ImageSize = new Size(96, 96), ColorDepth = ColorDepth.Depth32Bit };
 			FriendList.SmallImageList = avatars;
 			_log.Debug("Populating friend and avatar list");
 			foreach (var friend in friends)
@@ -110,13 +137,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< UpdateFriendList()");
 		}
 
-		private void FriendListSelectedIndexChanged(object sender, EventArgs e)
+		private void ChatWithSelected()
 		{
-			_log.Debug(">> FriendListSelectedIndexChanged([sender], [e])");
+			_log.Debug(">> ChatWithSelected()");
 			if (FriendList.SelectedItems.Count < 1)
 			{
 				_log.Debug("Not a valid selection (count < 1), aborting");
-				_log.Debug("<< FriendListSelectedIndexChanged()");
+				_log.Debug("<< ChatWithSelected()");
 				return;
 			}
 
@@ -125,18 +152,25 @@ namespace F16Gaming.SwitchBladeSteam.App
 			if (item == null)
 			{
 				_log.Debug("Not a valid selection (item is null), aborting");
-				_log.Debug("<< FriendListSelectedIndexChanged()");
+				_log.Debug("<< ChatWithSelected()");
 				return;
 			}
 
-			var friendId = (CSteamID) item.Tag;
+			var friendId = (CSteamID)item.Tag;
 
 			_log.DebugFormat("User selected friend: {0}", friendId.Render());
 
 			_log.Debug("Queueing the chatwindow form");
 			Program.QueueForm(new ChatWindow(friendId));
 			Close();
-			_log.Debug("<< FriendListSelectedIndexChanged()");
+			_log.Debug("<< ChatWithSelected()");
+		}
+
+		private void FriendListDoubleClick(object sender, EventArgs e)
+		{
+			_log.Debug(">> FriendListDoubleClick([sender], [e])");
+			//ChatWithSelected();
+			_log.Debug("<< FriendListDoubleClick()");
 		}
 
 		private void FriendsWindowFormClosing(object sender, FormClosingEventArgs e)
@@ -148,6 +182,115 @@ namespace F16Gaming.SwitchBladeSteam.App
 				Program.SteamFriends.FriendsUpdated -= FriendsUpdated;
 			}
 			_log.Debug("<< FriendsWindowFormClosing()");
+		}
+
+		private void FriendList_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			_log.Debug("Selected index changed!");
+		}
+
+		private void FriendList_Click(object sender, EventArgs e)
+		{
+			_log.Debug("Click!");
+		}
+
+		private void FriendList_MouseClick(object sender, MouseEventArgs e)
+		{
+			_log.Debug("MouseClick!");
+		}
+
+		private void FriendList_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			_log.Debug("MouseDoubleClick!");
+		}
+
+		public void HandleGesture(object sender, GestureEventArgs e)
+		{
+			// Do not log gestures, it gets VERY SPAMMY
+
+			if (_handlingGesture || e.Gesture != RazerAPI.RZGESTURE.PRESS)
+				return;
+
+			//_log.Debug(">> HandleGesture([e])");
+			var param = e.Parameter;
+
+			//_log.DebugFormat("param == {0}", param);
+
+			int y = e.Y;
+
+			if (param == 1) // Active
+			{
+				if (FriendList.SelectedIndices.Count > 0)
+				{
+					_touchSelected = FriendList.SelectedIndices[0];
+				}
+
+				if (_lastY == -1) // This is the first press event
+				{
+					_lastY = y;
+					_yChange = 0;
+				}
+
+				_yChange += (_lastY - y);
+
+				if (_yChange >= _yScrollDetectAmount) // Scroll up
+				{
+					_log.DebugFormat("_yChange == {0} - Scrolling up", _yChange);
+
+					try
+					{
+						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallDecrement, IntPtr.Zero);
+						FriendList.Invalidate();
+					}
+					catch (ObjectDisposedException)
+					{
+						_log.Warn("Scroll action failed because ListView is disposed, aborting...");
+					}
+					finally
+					{
+						_yChange = 0;
+					}
+				}
+				else if (_yChange <= -_yScrollDetectAmount) // Scroll down
+				{
+					_log.DebugFormat("_yChange == {0} - Scrolling down", _yChange);
+
+					try
+					{
+						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallIncrement, IntPtr.Zero);
+						FriendList.Invalidate();
+					}
+					catch (ObjectDisposedException)
+					{
+						_log.Warn("Scroll action failed because ListView is disposed, aborting...");
+					}
+					finally
+					{
+						_yChange = 0;	
+					}
+				}
+			}
+			else if (param == 0) // End of press
+			{
+				_log.Debug("End of press");
+				int selected = -1;
+				_log.DebugFormat("_lastY - y == {0}", _lastY - y);
+
+				if (FriendList.SelectedIndices.Count > 0)
+					selected = FriendList.SelectedIndices[0];
+
+				if (selected == _touchSelected &&
+					(y >= (_lastY - (_yScrollDetectAmount / 2)) && y <= (_lastY + (_yScrollDetectAmount / 2)))) // Friend pressed
+					ChatWithSelected();
+
+				_touchSelected = selected;
+				_yChange = 0;
+			}
+
+			_lastY = y;
+
+			_handlingGesture = false;
+			//_log.Debug("<< HandleGesture()");
 		}
 	}
 }

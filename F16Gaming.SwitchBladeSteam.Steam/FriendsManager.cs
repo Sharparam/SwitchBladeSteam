@@ -27,10 +27,10 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
-using F16Gaming.SwitchBladeSteam.Steam.Extensions;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.Steam
@@ -48,6 +48,9 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		private Friend[] _friends;
 
 		private int _friendCount;
+
+		private DateTime _lastUpdate;
+		private static readonly TimeSpan UpdateInterval = new TimeSpan(0, 0, 10);
 
 		public ReadOnlyCollection<Friend> Friends;
 
@@ -75,6 +78,15 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 		public void UpdateFriends()
 		{
 			_log.Debug(">> UpdateFriends()");
+
+			var now = DateTime.Now;
+			if ((now - _lastUpdate) < UpdateInterval)
+			{
+				_log.Debug("Less than _updateInterval since last update, aborting");
+				_log.Debug("<< UpdateFriends()");
+				return;
+			}
+
 			var oldFriends = _friends == null ? null : (Friend[]) _friends.Clone();
 			var newFriendCount = _steamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
 			if (_friends == null || newFriendCount != _friendCount)
@@ -88,13 +100,14 @@ namespace F16Gaming.SwitchBladeSteam.Steam
 				var friend = _steamFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
 				Friend oldFriend = oldFriends == null ? null : oldFriends.FirstOrDefault(f => f.SteamID == friend);
 				_friends[i] = new Friend(_steamFriends, friend, oldFriend == null ? null :  oldFriend.ChatHistory.ToList());
-				var avatar = _steamFriends.GetMediumFriendAvatar(_friends[i].SteamID);
+				var avatar = _steamFriends.GetLargeFriendAvatar(_friends[i].SteamID);
 				if (avatar != null)
 					_friends[i].Avatar = avatar;
 			}
 
 			Friends = new ReadOnlyCollection<Friend>(_friends.ToList());
 			OnFriendsUpdated();
+			_lastUpdate = now;
 			_log.Debug("<< UpdateFriends()");
 		}
 

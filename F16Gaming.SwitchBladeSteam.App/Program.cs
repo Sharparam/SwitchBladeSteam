@@ -240,12 +240,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			if (gestureForm == null)
 			{
 				_log.Debug("Form is not gesture enabled, resetting gestures");
-				touchpad.DisableOSGesture(RazerAPI.RZGESTURE.ALL);
+				touchpad.DisableGesture(RazerAPI.RZGESTURE.ALL);
 			}
 			else
 			{
-				_log.Debug("Form is gesture enabled, setting gestures to be forwarded");
-				touchpad.EnableOSGesture(gestureForm.EnabledGestures);
+				_log.Debug("Form is gesture enabled, setting gestures to be captured");
+				touchpad.EnableGesture(gestureForm.EnabledGestures);
+				touchpad.Gesture += gestureForm.HandleGesture;
 			}
 #endif
 
@@ -319,6 +320,21 @@ namespace F16Gaming.SwitchBladeSteam.App
 				_log.Debug("Active form is still visible, closing...");
 				_activeForm.Closing -= ActiveFormClosing;
 				_activeForm.Closed -= ActiveFormClosed;
+
+#if RAZER_ENABLED
+				try
+				{
+					var gestureForm = _activeForm as IGestureEnabledForm;
+					if (gestureForm != null)
+						_razerManager.GetTouchpad().Gesture -= gestureForm.HandleGesture;
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
+					                MessageBoxButtons.OK, MessageBoxIcon.Stop);
+				}
+#endif
+
 				_activeFormClosed = true;
 				CloseCurrentForm();
 			}
@@ -330,8 +346,22 @@ namespace F16Gaming.SwitchBladeSteam.App
 		{
 			_log.Debug(">> ActiveFormClosing([sender], [e])");
 			_activeForm.Closing -= ActiveFormClosing;
+
 #if RAZER_ENABLED
-			_razerManager.GetTouchpad().StopRender(false);
+			var touchpad = _razerManager.GetTouchpad();
+			try
+			{
+				var gestureForm = _activeForm as IGestureEnabledForm;
+				if (gestureForm != null)
+					touchpad.Gesture -= gestureForm.HandleGesture;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
+									MessageBoxButtons.OK, MessageBoxIcon.Stop);
+			}
+
+			touchpad.StopRender(false);
 #endif
 			_log.Debug("<< ActiveFormClosing()");
 		}

@@ -47,6 +47,9 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		private RazerAPI.RZGESTURE _activeGestures;
 		private RazerAPI.RZGESTURE _activeOSGestures;
 
+		private bool _allGestureEnabled;
+		private bool _allOSGestureEnabled;
+
 		private static RazerAPI.TouchpadGestureCallbackFunctionDelegate _gestureCallback;
 
 		/// <summary>
@@ -213,30 +216,46 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			if (gesture == RazerAPI.RZGESTURE.ALL)
 			{
 				newGestures = gesture;
+				enabled = !enabled;
 			}
 			else if (gesture == RazerAPI.RZGESTURE.NONE)
 			{
 				if (_activeGestures == RazerAPI.RZGESTURE.NONE)
+				{
+					_log.Debug("Active gestures already set to none, aborting.");
+					_log.Debug("<< SetGesture()");
 					return;
+				}
 				if (!enabled)
 				{
 					// Request to "disable no gesture"?
 					// Then just enable all, since that's the same
+					_log.Debug("Requested to set none disabled, calling set all enabled instead");
 					SetGesture(RazerAPI.RZGESTURE.ALL, true);
+					_log.Debug("<< SetGesture()");
 					return;
 				}
 				newGestures = gesture;
 			}
 			else if (enabled)
 			{
-				if (_activeGestures.Has(gesture) || _activeGestures == RazerAPI.RZGESTURE.ALL)
+				if (_activeGestures.Has(gesture) && !(_activeGestures == RazerAPI.RZGESTURE.ALL && !_allGestureEnabled))
+				{
+					_log.Debug("Active gestures already have requested value");
+					_log.DebugFormat("_activeGestures == {0}", _activeGestures);
+					_log.DebugFormat("_allGestureEnabled == {0}", _allGestureEnabled);
 					return;
+				}
 				newGestures = _activeOSGestures.Include(gesture);
 			}
 			else
 			{
 				if (!_activeGestures.Has(gesture))
+				{
+					_log.DebugFormat("Request to disable gesture already disabled: {0}", gesture);
+					_log.DebugFormat("_activeGestures == {0}", _activeGestures);
 					return;
+				}
 				newGestures = _activeOSGestures.Remove(gesture);
 			}
 
@@ -248,19 +267,28 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			if (HRESULT.RZSB_FAILED(hResult))
 				RazerManager.NativeCallFailure("RzSBGestureSetNotification", hResult);
 
+			hResult = RazerAPI.RzSBGestureSetCallback(_gestureCallback);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBGestureSetCallback", hResult);
+
 			_activeGestures = newGestures;
+			_allGestureEnabled = _activeGestures == RazerAPI.RZGESTURE.ALL && !enabled;
 
 			_log.Debug("<< SetGesture()");
 		}
 
 		public void EnableGesture(RazerAPI.RZGESTURE gesture)
 		{
+			_log.DebugFormat(">> EnableGesture({0})", gesture);
 			SetGesture(gesture, true);
+			_log.Debug("<< EnableGesture()");
 		}
 
 		public void DisableGesture(RazerAPI.RZGESTURE gesture)
 		{
+			_log.DebugFormat(">> DisableGesture({0})", gesture);
 			SetGesture(gesture, false);
+			_log.Debug("<< DisableGesture()");
 		}
 
 		public void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enabled)
@@ -291,7 +319,7 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			}
 			else if (enabled)
 			{
-				if (_activeOSGestures.Has(gesture) || _activeOSGestures == RazerAPI.RZGESTURE.ALL)
+				if (_activeOSGestures.Has(gesture) || !(_activeOSGestures == RazerAPI.RZGESTURE.ALL && !_allOSGestureEnabled))
 					return;
 				newGestures = _activeOSGestures.Include(gesture);
 			}
@@ -302,11 +330,16 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				newGestures = _activeOSGestures.Remove(gesture);
 			}
 
-			var hResult = RazerAPI.RzSBGestureSetOSNotification(newGestures, enabled);
+			var hResult = RazerAPI.RzSBGestureEnable(newGestures, enabled);
+			if (HRESULT.RZSB_FAILED(hResult))
+				RazerManager.NativeCallFailure("RzSBGestureEnable", hResult);
+
+			hResult = RazerAPI.RzSBGestureSetOSNotification(newGestures, enabled);
 			if (HRESULT.RZSB_FAILED(hResult))
 				RazerManager.NativeCallFailure("RzSBGestureSetOSNotification", hResult);
 
 			_activeOSGestures = newGestures;
+			_allOSGestureEnabled = _activeGestures == RazerAPI.RZGESTURE.ALL && !enabled;
 			_log.Debug("<< SetOSGesture()");
 		}
 
@@ -326,8 +359,12 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 
 		private HRESULT HandleTouchpadGesture(RazerAPI.RZGESTURE gesture, uint dwParameters, ushort wXPos, ushort wYPos, ushort wZPos)
 		{
+			// Do not log gesture events, it gets VERY SPAMMY
+
+			//_log.DebugFormat(">> HandleTouchpadGesture({0}, {1}, {2}, {3}, {4})", gesture, dwParameters, wXPos, wYPos, wZPos);
 			var result = HRESULT.RZSB_OK;
 			OnGesture(gesture, dwParameters, wXPos, wYPos, wZPos);
+			//_log.Debug("<< HandleTouchpadGesture()");
 			return result;
 		}
 	}

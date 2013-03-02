@@ -34,5 +34,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 	internal interface IGestureEnabledForm
 	{
 		RazerAPI.RZGESTURE EnabledGestures { get; }
+
+		void HandleGesture(object sender, Razer.Events.GestureEventArgs e);
 	}
 }

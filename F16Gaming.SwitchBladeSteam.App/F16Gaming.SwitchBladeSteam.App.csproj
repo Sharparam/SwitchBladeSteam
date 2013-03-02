@@ -23,7 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -45,7 +45,7 @@
     <DefineConstants>TRACE;RAZER_ENABLED</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -193,6 +193,8 @@
   </Target>
   <PropertyGroup>
     <PreBuildEvent>mkdir "$(TargetDir)res"
-xcopy "$(SolutionDir)res" "$(TargetDir)res" /S /Q /Y</PreBuildEvent>
+xcopy /S /Q /Y "$(SolutionDir)res" "$(TargetDir)res"
+copy /Y "$(SolutionDir)LICENSE" "$(TargetDir)"
+copy /Y "$(SolutionDir)README.md" "$(TargetDir)"</PreBuildEvent>
   </PropertyGroup>
 </Project>

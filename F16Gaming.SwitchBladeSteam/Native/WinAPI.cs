@@ -46,10 +46,36 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		[DllImport("kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
 		public static extern int FreeConsole();
 
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool ShowScrollBar(IntPtr hWnd, int wBar, [MarshalAs(UnmanagedType.Bool)] bool bShow);
+
+		[DllImport("user32.dll")]
+		public static extern bool EnableScrollBar(IntPtr hWnd, uint wSBflags, uint wArrows);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto)]
+		public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
+
 		// Constants
 
 		public const int STD_OUTPUT_HANDLE = -11;
 		public const int CODE_PAGE = 437;
+
+		public const int SB_HORZ = 0;
+		public const int SB_VERT = 1;
+		public const int SB_CTL = 2;
+		public const int SB_BOTH = 3;
+
+		public const uint ESB_ENABLE_BOTH = 0;
+		public const uint ESB_DISABLE_BOTH = 3;
+		public const uint ESB_DISABLE_LEFT = 1;
+		public const uint ESB_DISABLE_RIGHT = 2;
+		public const uint ESB_DISABLE_UP = 1;
+		public const uint ESB_DISABLE_DOWN = 2;
+		public const uint ESB_DISABLE_LTUP = 1;
+		public const uint ESB_DISABLE_RTDN = 2;
+
+		public const int WM_VSCROLL = 0x115;
 // ReSharper restore InconsistentNaming
 	}
 }

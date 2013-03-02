@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Logging;
+using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
 using F16Gaming.SwitchBladeSteam.Steam;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
@@ -39,10 +40,12 @@ using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public partial class ChatWindow : Form, IKeyboardEnabledForm
+	public partial class ChatWindow : Form, IKeyboardEnabledForm //, IGestureEnabledForm
 	{
 		private readonly log4net.ILog _log;
 		private Friend _friend;
+
+		//public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.PRESS | RazerAPI.RZGESTURE.TAP; } }
 
 		public ChatWindow(CSteamID friendId)
 		{
