@@ -33,6 +33,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
@@ -91,6 +93,23 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Info("### APPLICATION START ###");
 
 			LogManager.ClearOldLogs();
+
+			_log.Info("Detecting components...");
+			foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()))
+			{
+				var ext = Path.GetExtension(file);
+				if (string.IsNullOrEmpty(ext))
+					continue;
+				ext = ext.Substring(1);
+				if (ext == "dll" || ext == "exe")
+				{
+					var version = AssemblyName.GetAssemblyName(file).Version.ToString();
+					var name = Path.GetFileNameWithoutExtension(file);
+					_log.InfoFormat("{0} v{1}", name, version);
+				}
+			}
+			_log.Debug("Done!");
+
 #if DEBUG
 			DebugMode = true;
 #else
@@ -196,9 +215,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 #if RAZER_ENABLED
 			_log.Debug("Setting handle on switchblade touchpad");
 			var touchpad = _razerManager.GetTouchpad();
+			var gestureForm = form as IGestureEnabledForm;
 			try
 			{
-				touchpad.SetHandle(form.Handle);
+				// Only translate gestures if the form is not implementing
+				// its own gesture handler
+				touchpad.SetHandle(form.Handle, gestureForm == null);
 			}
 			catch (ObjectDisposedException ex)
 			{
@@ -207,6 +229,15 @@ namespace F16Gaming.SwitchBladeSteam.App
 				_log.Warn("Attempting to recover by showing main window");
 				ShowForm(new MainWindow("Failed to complete the requested action."));
 				return;
+			}
+
+			// Forward gestures, if needed
+			if (gestureForm != null)
+			{
+				_log.Debug("Form is gesture enabled, setting gestures to be captured");
+				touchpad.DisableGesture(RazerAPI.RZGESTURE.ALL);
+				touchpad.EnableGesture(gestureForm.EnabledGestures);
+				touchpad.Gesture += gestureForm.HandleGesture;
 			}
 
 			// Add controls, if needed
@@ -227,26 +258,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 					var kbControls = new KeyboardControl[numCtrls];
 					for (int i = 0; i < numCtrls; i++)
 					{
-						kbControls[i] = new KeyboardControl(controls[i].Handle);
+						kbControls[i] = new KeyboardControl(controls[i].Handle, false);
 					}
 					_log.Debug("Calling SetKeyboardEnabledControls on touchpad object");
 					touchpad.SetKeyboardEnabledControls(kbControls);
 					_log.Debug("Done! Controls have been registered for keyboard interaction!");
 				}
-			}
-
-			// Forward gestures, if needed
-			var gestureForm = form as IGestureEnabledForm;
-			if (gestureForm == null)
-			{
-				_log.Debug("Form is not gesture enabled, resetting gestures");
-				touchpad.DisableGesture(RazerAPI.RZGESTURE.ALL);
-			}
-			else
-			{
-				_log.Debug("Form is gesture enabled, setting gestures to be captured");
-				touchpad.EnableGesture(gestureForm.EnabledGestures);
-				touchpad.Gesture += gestureForm.HandleGesture;
 			}
 #endif
 

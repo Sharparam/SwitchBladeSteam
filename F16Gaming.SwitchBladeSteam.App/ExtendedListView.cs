@@ -1,4 +1,4 @@
-﻿/* ITouchpad.cs
+﻿/* ExtendedListView.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -28,37 +28,27 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Native;
-using F16Gaming.SwitchBladeSteam.Razer.Events;
-using F16Gaming.SwitchBladeSteam.Razer.Structs;
 
-namespace F16Gaming.SwitchBladeSteam.Razer
+namespace F16Gaming.SwitchBladeSteam.App
 {
-	public interface ITouchpad
+	public class ExtendedListView : ListView
 	{
-		event GestureEventHandler Gesture;
+		public event EventHandler Scroll;
 
-		IntPtr CurrentHandle { get; }
-		string CurrentImage { get; }
-		string DisabledImage { get; }
+		private void OnScroll()
+		{
+			var func = Scroll;
+			if (func != null)
+				func(this, null);
+		}
 
-		void SetHandle(IntPtr handle, bool translateGestures = true);
-		void SetImage(string image);
-		void ClearImage();
-		RenderStats GetRenderStats();
-		void ResetRenderStats();
-		void SetKeyboardEnabledControls(IEnumerable<KeyboardControl> controls, bool reset);
-		void StopAll();
-		void StopRender(bool erase, bool force);
-
-		void SetGesture(RazerAPI.RZGESTURE gesture, bool enabled);
-		void EnableGesture(RazerAPI.RZGESTURE gesture);
-		void DisableGesture(RazerAPI.RZGESTURE gesture);
-
-		void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enabled);
-		void EnableOSGesture(RazerAPI.RZGESTURE gesture);
-		void DisableOSGesture(RazerAPI.RZGESTURE gesture);
-
+		protected override void WndProc(ref Message m)
+		{
+			base.WndProc(ref m);
+			if (m.Msg == WinAPI.WM_HSCROLL || m.Msg == WinAPI.WM_VSCROLL)
+				OnScroll();
+		}
 	}
 }

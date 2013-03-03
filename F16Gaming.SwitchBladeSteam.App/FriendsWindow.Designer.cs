@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.FriendList = new System.Windows.Forms.ListView();
+			this.FriendList = new F16Gaming.SwitchBladeSteam.App.ExtendedListView();
 			this.NameHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.StatusHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.SuspendLayout();
@@ -52,11 +52,8 @@
 			this.FriendList.TabIndex = 2;
 			this.FriendList.UseCompatibleStateImageBehavior = false;
 			this.FriendList.View = System.Windows.Forms.View.Details;
-			this.FriendList.SelectedIndexChanged += new System.EventHandler(this.FriendList_SelectedIndexChanged);
-			this.FriendList.Click += new System.EventHandler(this.FriendList_Click);
 			this.FriendList.DoubleClick += new System.EventHandler(this.FriendListDoubleClick);
-			this.FriendList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.FriendList_MouseClick);
-			this.FriendList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.FriendList_MouseDoubleClick);
+			this.FriendList.Scroll += new System.EventHandler(this.FriendListScroll);
 			// 
 			// NameHeader
 			// 
@@ -89,7 +86,7 @@
 
 		#endregion
 
-		private System.Windows.Forms.ListView FriendList;
+		private F16Gaming.SwitchBladeSteam.App.ExtendedListView FriendList;
 		private System.Windows.Forms.ColumnHeader NameHeader;
 		private System.Windows.Forms.ColumnHeader StatusHeader;
 	}

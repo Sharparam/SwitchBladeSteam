@@ -49,9 +49,10 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private DateTime _lastUpdate;
 
 		private bool _handlingGesture;
-		private int _touchSelected = -1;
 		private int _lastY = -1;
 		private int _yChange;
+		private int _lastPressParam;
+		private int _lastPressStartY;
 
 		private readonly int _yScrollDetectAmount;
 
@@ -88,8 +89,10 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 		private void FriendsWindowLoad(object sender, EventArgs e)
 		{
+#if !DEBUG && RAZER_ENABLED
 			WinAPI.EnableScrollBar(FriendList.Handle, WinAPI.SB_BOTH, WinAPI.ESB_DISABLE_BOTH);
 			WinAPI.ShowScrollBar(FriendList.Handle, WinAPI.SB_BOTH, false);
+#endif
 		}
 
 		private void FriendsUpdated(object sender, EventArgs e)
@@ -137,6 +140,16 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< UpdateFriendList()");
 		}
 
+		private void StartChat(CSteamID id)
+		{
+			_log.DebugFormat(">> StartChat({0})", id.Render());
+			_log.Debug("Queueing the chatwindow form");
+			Program.QueueForm(new ChatWindow(id));
+			Close();
+			_log.Debug("<< StartChat()");
+		}
+
+#if DEBUG
 		private void ChatWithSelected()
 		{
 			_log.Debug(">> ChatWithSelected()");
@@ -156,21 +169,41 @@ namespace F16Gaming.SwitchBladeSteam.App
 				return;
 			}
 
-			var friendId = (CSteamID)item.Tag;
+			var friendId = (CSteamID) item.Tag;
 
 			_log.DebugFormat("User selected friend: {0}", friendId.Render());
 
-			_log.Debug("Queueing the chatwindow form");
-			Program.QueueForm(new ChatWindow(friendId));
-			Close();
+			StartChat(friendId);
 			_log.Debug("<< ChatWithSelected()");
+		}
+#endif
+
+		private ListViewItem GetListItemUnderCursor()
+		{
+			_log.Debug(">> GetListItemUnderCursor()");
+			var cursorPos = Cursor.Position;
+			_log.DebugFormat("Cursor X,Y == {0},{1}", cursorPos.X, cursorPos.Y);
+			Point localPoint = FriendList.PointToClient(cursorPos);
+			_log.DebugFormat("localPoint X,Y == {0},{1}", localPoint.X, localPoint.Y);
+			_log.Debug("<< GetListItemUnderCursor()");
+			return FriendList.GetItemAt(localPoint.X, localPoint.Y);
 		}
 
 		private void FriendListDoubleClick(object sender, EventArgs e)
 		{
+#if DEBUG
 			_log.Debug(">> FriendListDoubleClick([sender], [e])");
-			//ChatWithSelected();
+			ChatWithSelected();
 			_log.Debug("<< FriendListDoubleClick()");
+#endif
+		}
+
+		private void FriendListScroll(object sender, EventArgs e)
+		{
+			_log.Debug(">> FriendListScroll([sender], [e])");
+			FriendList.Invalidate(true);
+			_lastPressStartY = -1;
+			_log.Debug("<< FriendListScroll()");
 		}
 
 		private void FriendsWindowFormClosing(object sender, FormClosingEventArgs e)
@@ -182,26 +215,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 				Program.SteamFriends.FriendsUpdated -= FriendsUpdated;
 			}
 			_log.Debug("<< FriendsWindowFormClosing()");
-		}
-
-		private void FriendList_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			_log.Debug("Selected index changed!");
-		}
-
-		private void FriendList_Click(object sender, EventArgs e)
-		{
-			_log.Debug("Click!");
-		}
-
-		private void FriendList_MouseClick(object sender, MouseEventArgs e)
-		{
-			_log.Debug("MouseClick!");
-		}
-
-		private void FriendList_MouseDoubleClick(object sender, MouseEventArgs e)
-		{
-			_log.Debug("MouseDoubleClick!");
 		}
 
 		public void HandleGesture(object sender, GestureEventArgs e)
@@ -220,16 +233,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			if (param == 1) // Active
 			{
-				if (FriendList.SelectedIndices.Count > 0)
-				{
-					_touchSelected = FriendList.SelectedIndices[0];
-				}
-
 				if (_lastY == -1) // This is the first press event
 				{
 					_lastY = y;
 					_yChange = 0;
 				}
+
+				if (_lastPressParam == 0)
+					_lastPressStartY = y;
 
 				_yChange += (_lastY - y);
 
@@ -239,8 +250,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 					try
 					{
-						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallDecrement, IntPtr.Zero);
-						FriendList.Invalidate();
+						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallIncrement, IntPtr.Zero);
 					}
 					catch (ObjectDisposedException)
 					{
@@ -257,8 +267,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 					try
 					{
-						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallIncrement, IntPtr.Zero);
-						FriendList.Invalidate();
+						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallDecrement, IntPtr.Zero);
 					}
 					catch (ObjectDisposedException)
 					{
@@ -273,21 +282,31 @@ namespace F16Gaming.SwitchBladeSteam.App
 			else if (param == 0) // End of press
 			{
 				_log.Debug("End of press");
-				int selected = -1;
-				_log.DebugFormat("_lastY - y == {0}", _lastY - y);
 
-				if (FriendList.SelectedIndices.Count > 0)
-					selected = FriendList.SelectedIndices[0];
+				if (_lastPressStartY >= 0)
+				{
+					var lowerLimit = _lastPressStartY - (_yScrollDetectAmount / 2);
+					var upperLimit = _lastPressStartY + (_yScrollDetectAmount / 2);
 
-				if (selected == _touchSelected &&
-					(y >= (_lastY - (_yScrollDetectAmount / 2)) && y <= (_lastY + (_yScrollDetectAmount / 2)))) // Friend pressed
-					ChatWithSelected();
+					if (y >= lowerLimit && y <= upperLimit) // Friend pressed
+					{
+						_log.Debug("Friend pressed!");
+						var selected = FriendList.GetItemAt(e.X, y);
+						if (selected != null)
+						{
+							_log.Debug("Valid selection, starting chat...");
+							StartChat((CSteamID)selected.Tag);
+						}
+						else
+							_log.Debug("Not a valid selection");
+					}
+				}
 
-				_touchSelected = selected;
 				_yChange = 0;
 			}
 
 			_lastY = y;
+			_lastPressParam = (int) param;
 
 			_handlingGesture = false;
 			//_log.Debug("<< HandleGesture()");

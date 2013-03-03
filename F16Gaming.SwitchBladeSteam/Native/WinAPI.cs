@@ -34,7 +34,7 @@ namespace F16Gaming.SwitchBladeSteam.Native
 {
 	public static class WinAPI
 	{
-// ReSharper disable InconsistentNaming
+		// ReSharper disable InconsistentNaming
 		// Functions
 
 		[DllImport("kernel32.dll", EntryPoint = "GetStdHandle", SetLastError = true, CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
@@ -75,7 +75,8 @@ namespace F16Gaming.SwitchBladeSteam.Native
 		public const uint ESB_DISABLE_LTUP = 1;
 		public const uint ESB_DISABLE_RTDN = 2;
 
+		public const int WM_HSCROLL = 0x114;
 		public const int WM_VSCROLL = 0x115;
-// ReSharper restore InconsistentNaming
+		// ReSharper restore InconsistentNaming
 	}
 }

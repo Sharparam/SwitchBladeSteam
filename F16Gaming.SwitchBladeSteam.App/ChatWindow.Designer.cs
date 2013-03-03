@@ -59,6 +59,7 @@
 			this.EntryBox.TabIndex = 1;
 			this.EntryBox.TextChanged += new System.EventHandler(this.EntryBoxTextChanged);
 			this.EntryBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EntryBoxKeyDown);
+			this.EntryBox.Leave += new System.EventHandler(this.EntryBoxLeave);
 			// 
 			// ChatHistory
 			// 
@@ -74,6 +75,7 @@
 			this.ChatHistory.Size = new System.Drawing.Size(800, 380);
 			this.ChatHistory.TabIndex = 2;
 			this.ChatHistory.Text = "";
+			this.ChatHistory.TextChanged += new System.EventHandler(this.ChatHistoryTextChanged);
 			// 
 			// ChatWindow
 			// 

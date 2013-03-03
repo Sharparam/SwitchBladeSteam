@@ -91,18 +91,18 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 				func(this, new GestureEventArgs(gesture, parameter, x, y, z));
 		}
 
-		public void SetHandle(IntPtr handle)
+		public void SetHandle(IntPtr handle, bool translateGestures = true)
 		{
 			_log.Debug(">> SetHandle([handle])");
 			StopRender(false);
 
-			var hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
+			var hResult = RazerAPI.RzSBWinRenderStart(handle, translateGestures, Constants.DebugEnabled);
 			if (hResult == HRESULT.RZSB_ALREADY_STARTED)
 			{
 				_log.Warn("WinRender already started, attempting to force render stop and try again...");
 				StopRender(false, true);
 				_log.Info("Attempting to start WinRender again...");
-				hResult = RazerAPI.RzSBWinRenderStart(handle, true, Constants.DebugEnabled);
+				hResult = RazerAPI.RzSBWinRenderStart(handle, translateGestures, Constants.DebugEnabled);
 			}
 
 			if (HRESULT.RZSB_FAILED(hResult))

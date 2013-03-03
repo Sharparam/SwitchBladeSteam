@@ -34,18 +34,19 @@ using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Logging;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
+using F16Gaming.SwitchBladeSteam.Razer.Events;
 using F16Gaming.SwitchBladeSteam.Steam;
 using F16Gaming.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public partial class ChatWindow : Form, IKeyboardEnabledForm //, IGestureEnabledForm
+	public partial class ChatWindow : Form , IKeyboardEnabledForm //, IGestureEnabledForm
 	{
 		private readonly log4net.ILog _log;
 		private Friend _friend;
 
-		//public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.PRESS | RazerAPI.RZGESTURE.TAP; } }
+		public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.PRESS; } }
 
 		public ChatWindow(CSteamID friendId)
 		{
@@ -73,6 +74,28 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< ChatWindow()");
 		}
 
+		private void SendMessage()
+		{
+			_log.Debug(">> SendMessage()");
+			var message = EntryBox.Text;
+			if (string.IsNullOrEmpty(message))
+			{
+				_log.Debug("Message empty, aborting");
+				_log.Debug("<< SendMessage()");
+				return;
+			}
+			_friend.SendMessage(message + "\0");
+			EntryBox.Clear();
+			EntryBox.Invalidate();
+			//ChatTitle.Focus();
+			_log.Debug("<< SendMessage()");
+		}
+
+		private void ChatHistoryTextChanged(object sender, EventArgs e)
+		{
+			ChatHistory.Invalidate(true);
+		}
+
 		private void EntryBoxKeyDown(object sender, KeyEventArgs e)
 		{
 			//_log.Debug(">> EntryBoxKeyDown([sender], [e])");
@@ -85,10 +108,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 
 			_log.Debug("Enter key pressed, sending message");
 
-			var message = EntryBox.Text;
-			_friend.SendMessage(message + "\0");
-			EntryBox.Clear();
-			EntryBox.Invalidate();
+			SendMessage();
 			//_log.Debug("<< EntryBoxKeyDown()");
 		}
 
@@ -98,6 +118,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			EntryBox.Text = EntryBox.Text.TrimStart('\n', '\r', ' ');
 			EntryBox.Invalidate();
 			//_log.Debug("<< EntryBoxTextChanged()");
+		}
+
+		private void EntryBoxLeave(object sender, EventArgs e)
+		{
+			_log.Debug(">> EntryBoxLeave()");
+			SendMessage();
+			_log.Debug("<< EntryBoxLeave()");
 		}
 
 		private void WriteChatMessage(CSteamID sender, string message)
@@ -173,6 +200,17 @@ namespace F16Gaming.SwitchBladeSteam.App
 		public IEnumerable<Control> GetKeyboardEnabledControls()
 		{
 			return new List<Control> {EntryBox};
+		}
+
+		public void HandleGesture(object sender, GestureEventArgs e)
+		{
+			if (e.Gesture != RazerAPI.RZGESTURE.PRESS || e.Parameter != 0)
+				return;
+
+			if (e.Y >= EntryBox.Location.Y)
+				EntryBox.Focus();
+			else
+				ChatTitle.Focus(); // Defocus the entry box
 		}
 	}
 }
