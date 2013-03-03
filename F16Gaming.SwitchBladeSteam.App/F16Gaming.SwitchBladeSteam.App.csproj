@@ -80,6 +80,7 @@
     <Compile Include="FriendsWindow.Designer.cs">
       <DependentUpon>FriendsWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="IDynamicKeyEnabledForm.cs" />
     <Compile Include="IGestureEnabledForm.cs" />
     <Compile Include="IKeyboardEnabledForm.cs" />
     <Compile Include="KeyDebugWindow.cs">
@@ -158,9 +159,7 @@
       <Name>Steam4NET</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

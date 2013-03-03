@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="DynamicKeySettings.cs" />
     <Compile Include="Extensions\EnumerationExtensions.cs" />
     <Compile Include="Helpers\IO.cs" />
     <Compile Include="Helpers\Threading.cs" />

@@ -46,6 +46,12 @@ namespace F16Gaming.SwitchBladeSteam.App
 			OnlineButton.MouseUp += OnlineButtonMouseUp;
 			OfflineButton.MouseDown += OfflineButtonMouseDown;
 			OfflineButton.MouseUp += OfflineButtonMouseUp;
+			UpButton.MouseDown += UpButtonMouseDown;
+			UpButton.MouseUp += UpButtonMouseUp;
+			DownButton.MouseDown += DownButtonMouseDown;
+			DownButton.MouseUp += DownButtonMouseUp;
+			ChatButton.MouseDown += ChatButtonMouseDown;
+			ChatButton.MouseUp += ChatButtonMouseUp;
 		}
 
 		private void HomeButtonClick(object sender, EventArgs e)
@@ -114,6 +120,57 @@ namespace F16Gaming.SwitchBladeSteam.App
 		private void OfflineButtonMouseUp(object sender, EventArgs e)
 		{
 			OfflineButton.Image = Resources.dk_appear_offline;
+		}
+
+		private void UpButtonClick(object sender, EventArgs e)
+		{
+#if DEBUG
+			Program.DebugUpButton();
+#endif
+		}
+
+		private void UpButtonMouseDown(object sender, EventArgs e)
+		{
+			UpButton.Image = Resources.dk_up_down;
+		}
+
+		private void UpButtonMouseUp(object sender, EventArgs e)
+		{
+			UpButton.Image = Resources.dk_up;
+		}
+
+		private void DownButtonClick(object sender, EventArgs e)
+		{
+#if DEBUG
+			Program.DebugDownButton();
+#endif
+		}
+
+		private void DownButtonMouseDown(object sender, EventArgs e)
+		{
+			DownButton.Image = Resources.dk_down_down;
+		}
+
+		private void DownButtonMouseUp(object sender, EventArgs e)
+		{
+			DownButton.Image = Resources.dk_down;
+		}
+
+		private void ChatButtonClick(object sender, EventArgs e)
+		{
+#if DEBUG
+			Program.DebugChatButton();
+#endif
+		}
+
+		private void ChatButtonMouseDown(object sender, EventArgs e)
+		{
+			ChatButton.Image = Resources.dk_chat_down;
+		}
+
+		private void ChatButtonMouseUp(object sender, EventArgs e)
+		{
+			ChatButton.Image = Resources.dk_chat;
 		}
 	}
 }

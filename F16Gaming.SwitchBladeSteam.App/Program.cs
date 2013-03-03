@@ -265,6 +265,18 @@ namespace F16Gaming.SwitchBladeSteam.App
 					_log.Debug("Done! Controls have been registered for keyboard interaction!");
 				}
 			}
+
+			// Enable additional dynamic keys, if needed
+			var keyForm = form as IDynamicKeyEnabledForm;
+			if (keyForm != null)
+			{
+				_log.Debug("Form has additional dynamic keys defined, enabling additional dynamic keys");
+				var keys = keyForm.DynamicKeys;
+				foreach (var settings in keys)
+				{
+					_razerManager.EnableDynamicKey(settings.Key, settings.Handler, settings.UpImage, settings.DownImage);
+				}
+			}
 #endif
 
 			_log.Debug("Registering closing event");
@@ -350,6 +362,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 					MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
 					                MessageBoxButtons.OK, MessageBoxIcon.Stop);
 				}
+
+				var keyForm = _activeForm as IDynamicKeyEnabledForm;
+				if (keyForm != null)
+				{
+					var keys = keyForm.DynamicKeys;
+					foreach (var settings in keys)
+						_razerManager.DisableDynamicKey(settings.Key);
+				}
 #endif
 
 				_activeFormClosed = true;
@@ -376,6 +396,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 			{
 				MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
 									MessageBoxButtons.OK, MessageBoxIcon.Stop);
+			}
+
+			var keyForm = _activeForm as IDynamicKeyEnabledForm;
+			if (keyForm != null)
+			{
+				var keys = keyForm.DynamicKeys;
+				foreach (var settings in keys)
+					_razerManager.DisableDynamicKey(settings.Key);
 			}
 
 			touchpad.StopRender(false);
@@ -513,6 +541,33 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug(">> DebugOfflineButton()");
 			GoOffline();
 			_log.Debug("<< DebugOfflineButton()");
+		}
+
+		public static void DebugUpButton()
+		{
+			_log.Debug(">> DebugUpbutton()");
+			var form = _activeForm as FriendsWindow;
+			if (form != null)
+				form.MoveSelectionUp();
+			_log.Debug("<< DebugUpButton()");
+		}
+
+		public static void DebugDownButton()
+		{
+			_log.Debug(">> DebugDownButton()");
+			var form = _activeForm as FriendsWindow;
+			if (form != null)
+				form.MoveSelectionDown();
+			_log.Debug("<< DebugDownButton()");
+		}
+
+		public static void DebugChatButton()
+		{
+			_log.Debug(">> DebugChatButton()");
+			var form = _activeForm as FriendsWindow;
+			if (form != null)
+				form.DebugChatWithSelected();
+			_log.Debug("<< DebugChatButton()");
 		}
 
 		public static void DebugQuitButton()

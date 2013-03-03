@@ -103,6 +103,46 @@ namespace F16Gaming.SwitchBladeSteam.App.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap dk_chat {
+            get {
+                object obj = ResourceManager.GetObject("dk_chat", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap dk_chat_down {
+            get {
+                object obj = ResourceManager.GetObject("dk_chat_down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap dk_down {
+            get {
+                object obj = ResourceManager.GetObject("dk_down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap dk_down_down {
+            get {
+                object obj = ResourceManager.GetObject("dk_down_down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap dk_friends {
             get {
                 object obj = ResourceManager.GetObject("dk_friends", resourceCulture);
@@ -143,9 +183,9 @@ namespace F16Gaming.SwitchBladeSteam.App.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap dk_next_chat {
+        internal static System.Drawing.Bitmap dk_up {
             get {
-                object obj = ResourceManager.GetObject("dk_next_chat", resourceCulture);
+                object obj = ResourceManager.GetObject("dk_up", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,9 +193,9 @@ namespace F16Gaming.SwitchBladeSteam.App.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap dk_prev_chat {
+        internal static System.Drawing.Bitmap dk_up_down {
             get {
-                object obj = ResourceManager.GetObject("dk_prev_chat", resourceCulture);
+                object obj = ResourceManager.GetObject("dk_up_down", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

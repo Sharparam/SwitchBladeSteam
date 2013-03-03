@@ -36,8 +36,6 @@ using log4net;
 
 namespace F16Gaming.SwitchBladeSteam.Razer
 {
-	public delegate void DynamicKeyCallbackDelegate();
-
 	/// <summary>
 	/// Represents a dynamic key on the SwitchBlade device
 	/// </summary>
@@ -162,6 +160,11 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 			_log.DebugFormat(">> SetDownImage({0})", image);
 			SetImage(image, RazerAPI.RZDKSTATE.DOWN);
 			_log.Debug("<< SetDownImage()");
+		}
+
+		public void Disable()
+		{
+			SetImage(Constants.DisabledDynamicKeyImage);
 		}
 	}
 }

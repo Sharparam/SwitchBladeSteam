@@ -28,35 +28,29 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using F16Gaming.SwitchBladeSteam.Logging;
 using F16Gaming.SwitchBladeSteam.Native;
 using F16Gaming.SwitchBladeSteam.Razer;
-using F16Gaming.SwitchBladeSteam.Razer.Events;
 using Steam4NET;
 
 namespace F16Gaming.SwitchBladeSteam.App
 {
-	public partial class FriendsWindow : Form, IGestureEnabledForm
+	public partial class FriendsWindow : Form, IDynamicKeyEnabledForm
 	{
 		private readonly log4net.ILog _log;
+
+		private readonly List<DynamicKeySettings> _dynamicKeys = new List<DynamicKeySettings>();
 
 		private readonly TimeSpan _updateInterval = new TimeSpan(0, 0, 30);
 		private DateTime _lastUpdate;
 
-		private bool _handlingGesture;
-		private int _lastY = -1;
-		private int _yChange;
-		private int _lastPressParam;
-		private int _lastPressStartY;
+		private int _selectedIndex;
 
-		private readonly int _yScrollDetectAmount;
-
-		public RazerAPI.RZGESTURE EnabledGestures { get { return RazerAPI.RZGESTURE.PRESS; } }
+		public IEnumerable<DynamicKeySettings> DynamicKeys { get { return _dynamicKeys; } } 
 
 		public FriendsWindow()
 		{
@@ -73,16 +67,24 @@ namespace F16Gaming.SwitchBladeSteam.App
 				Program.SteamFriends.FriendsUpdated += FriendsUpdated;
 			}
 
-			// TEMPORARY TESTING VALUE FILE
-			if (File.Exists("scroll_value"))
+			_dynamicKeys = new List<DynamicKeySettings>
 			{
-				_yScrollDetectAmount = int.Parse(File.ReadAllText("scroll_value"));
-			}
-			else
-			{
-				_yScrollDetectAmount = 15;
-				File.WriteAllText("scroll_value", _yScrollDetectAmount.ToString(CultureInfo.InvariantCulture));
-			}
+				new DynamicKeySettings(
+					RazerAPI.RZDYNAMICKEY.DK10,
+					Helpers.IO.GetAbsolutePath(@"res\images\dk_up.png"),
+					Helpers.IO.GetAbsolutePath(@"res\images\dk_up_down.png"),
+					(o, e) => MoveSelectionUp()),
+				new DynamicKeySettings(
+					RazerAPI.RZDYNAMICKEY.DK5,
+					Helpers.IO.GetAbsolutePath(@"res\images\dk_down.png"),
+					Helpers.IO.GetAbsolutePath(@"res\images\dk_down_down.png"),
+					(o, e) => MoveSelectionDown()),
+				new DynamicKeySettings(
+					RazerAPI.RZDYNAMICKEY.DK4,
+					Helpers.IO.GetAbsolutePath(@"res\images\dk_chat.png"),
+					Helpers.IO.GetAbsolutePath(@"res\images\dk_chat_down.png"),
+					(o, e) => ChatWithSelected())
+			};
 
 			_log.Debug("<< FriendsWindow()");
 		}
@@ -135,6 +137,7 @@ namespace F16Gaming.SwitchBladeSteam.App
 				avatars.Images.Add(friend.GetName(), friend.Avatar);
 				FriendList.Items.Add(new ListViewItem(new[] { friend.GetName(), friend.GetStateText() }) { Tag = friend.SteamID, ImageKey = friend.GetName() });
 			}
+			MoveSelection(0);
 			_log.Debug("Friend list updated!");
 			_lastUpdate = DateTime.Now;
 			_log.Debug("<< UpdateFriendList()");
@@ -149,7 +152,6 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< StartChat()");
 		}
 
-#if DEBUG
 		private void ChatWithSelected()
 		{
 			_log.Debug(">> ChatWithSelected()");
@@ -176,18 +178,13 @@ namespace F16Gaming.SwitchBladeSteam.App
 			StartChat(friendId);
 			_log.Debug("<< ChatWithSelected()");
 		}
-#endif
 
-		private ListViewItem GetListItemUnderCursor()
+#if DEBUG
+		public void DebugChatWithSelected()
 		{
-			_log.Debug(">> GetListItemUnderCursor()");
-			var cursorPos = Cursor.Position;
-			_log.DebugFormat("Cursor X,Y == {0},{1}", cursorPos.X, cursorPos.Y);
-			Point localPoint = FriendList.PointToClient(cursorPos);
-			_log.DebugFormat("localPoint X,Y == {0},{1}", localPoint.X, localPoint.Y);
-			_log.Debug("<< GetListItemUnderCursor()");
-			return FriendList.GetItemAt(localPoint.X, localPoint.Y);
+			ChatWithSelected();
 		}
+#endif
 
 		private void FriendListDoubleClick(object sender, EventArgs e)
 		{
@@ -198,12 +195,14 @@ namespace F16Gaming.SwitchBladeSteam.App
 #endif
 		}
 
-		private void FriendListScroll(object sender, EventArgs e)
+		private void FriendListSelectedIndexChanged(object sender, EventArgs e)
 		{
-			_log.Debug(">> FriendListScroll([sender], [e])");
 			FriendList.Invalidate(true);
-			_lastPressStartY = -1;
-			_log.Debug("<< FriendListScroll()");
+		}
+
+		private void FriendListEnter(object sender, EventArgs e)
+		{
+			FriendList.Invalidate(true);
 		}
 
 		private void FriendsWindowFormClosing(object sender, FormClosingEventArgs e)
@@ -217,99 +216,58 @@ namespace F16Gaming.SwitchBladeSteam.App
 			_log.Debug("<< FriendsWindowFormClosing()");
 		}
 
-		public void HandleGesture(object sender, GestureEventArgs e)
+		private void MoveSelection(int change)
 		{
-			// Do not log gestures, it gets VERY SPAMMY
-
-			if (_handlingGesture || e.Gesture != RazerAPI.RZGESTURE.PRESS)
-				return;
-
-			//_log.Debug(">> HandleGesture([e])");
-			var param = e.Parameter;
-
-			//_log.DebugFormat("param == {0}", param);
-
-			int y = e.Y;
-
-			if (param == 1) // Active
+			_log.DebugFormat(">> Move({0})", change);
+			try
 			{
-				if (_lastY == -1) // This is the first press event
+				if (FriendList.Items.Count <= 0)
+					return;
+
+				int newIndex = _selectedIndex + change;
+
+				if (newIndex < 0)
+					newIndex = 0;
+				else if (newIndex >= FriendList.Items.Count)
+					newIndex = FriendList.Items.Count - 1;
+
+				var oldItem = FriendList.Items[_selectedIndex];
+				if (oldItem != null)
 				{
-					_lastY = y;
-					_yChange = 0;
+					oldItem.Focused = false;
+					oldItem.Selected = false;
 				}
 
-				if (_lastPressParam == 0)
-					_lastPressStartY = y;
-
-				_yChange += (_lastY - y);
-
-				if (_yChange >= _yScrollDetectAmount) // Scroll up
+				var newItem = FriendList.Items[newIndex];
+				if (newItem != null)
 				{
-					_log.DebugFormat("_yChange == {0} - Scrolling up", _yChange);
-
-					try
-					{
-						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallIncrement, IntPtr.Zero);
-					}
-					catch (ObjectDisposedException)
-					{
-						_log.Warn("Scroll action failed because ListView is disposed, aborting...");
-					}
-					finally
-					{
-						_yChange = 0;
-					}
+					newItem.Selected = true;
+					newItem.Focused = true;
 				}
-				else if (_yChange <= -_yScrollDetectAmount) // Scroll down
-				{
-					_log.DebugFormat("_yChange == {0} - Scrolling down", _yChange);
 
-					try
-					{
-						WinAPI.SendMessage(FriendList.Handle, WinAPI.WM_VSCROLL, (IntPtr) ScrollEventType.SmallDecrement, IntPtr.Zero);
-					}
-					catch (ObjectDisposedException)
-					{
-						_log.Warn("Scroll action failed because ListView is disposed, aborting...");
-					}
-					finally
-					{
-						_yChange = 0;	
-					}
-				}
+				FriendList.Select();
+				FriendList.Focus();
+				FriendList.EnsureVisible(newIndex);
+
+				_selectedIndex = newIndex;
+
+				FriendList.Invalidate(true);
 			}
-			else if (param == 0) // End of press
+			catch (ObjectDisposedException)
 			{
-				_log.Debug("End of press");
-
-				if (_lastPressStartY >= 0)
-				{
-					var lowerLimit = _lastPressStartY - (_yScrollDetectAmount / 2);
-					var upperLimit = _lastPressStartY + (_yScrollDetectAmount / 2);
-
-					if (y >= lowerLimit && y <= upperLimit) // Friend pressed
-					{
-						_log.Debug("Friend pressed!");
-						var selected = FriendList.GetItemAt(e.X, y);
-						if (selected != null)
-						{
-							_log.Debug("Valid selection, starting chat...");
-							StartChat((CSteamID)selected.Tag);
-						}
-						else
-							_log.Debug("Not a valid selection");
-					}
-				}
-
-				_yChange = 0;
+				_log.Warn("Move called when FriendList was disposed, aborting");
 			}
+			_log.Debug("<< Move()");
+		}
 
-			_lastY = y;
-			_lastPressParam = (int) param;
+		public void MoveSelectionUp()
+		{
+			MoveSelection(-1);
+		}
 
-			_handlingGesture = false;
-			//_log.Debug("<< HandleGesture()");
+		public void MoveSelectionDown()
+		{
+			MoveSelection(1);
 		}
 	}
 }

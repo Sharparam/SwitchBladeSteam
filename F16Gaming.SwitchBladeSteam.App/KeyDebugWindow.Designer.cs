@@ -28,35 +28,26 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.NextButton = new System.Windows.Forms.Button();
-			this.PrevButton = new System.Windows.Forms.Button();
+			this.UpButton = new System.Windows.Forms.Button();
 			this.OfflineButton = new System.Windows.Forms.Button();
 			this.OnlineButton = new System.Windows.Forms.Button();
 			this.FriendsButton = new System.Windows.Forms.Button();
 			this.HomeButton = new System.Windows.Forms.Button();
+			this.DownButton = new System.Windows.Forms.Button();
+			this.ChatButton = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
-			// NextButton
+			// UpButton
 			// 
-			this.NextButton.FlatAppearance.BorderSize = 0;
-			this.NextButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.NextButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_next_chat;
-			this.NextButton.Location = new System.Drawing.Point(133, 254);
-			this.NextButton.Name = "NextButton";
-			this.NextButton.Size = new System.Drawing.Size(115, 115);
-			this.NextButton.TabIndex = 5;
-			this.NextButton.UseVisualStyleBackColor = true;
-			// 
-			// PrevButton
-			// 
-			this.PrevButton.FlatAppearance.BorderSize = 0;
-			this.PrevButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.PrevButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_prev_chat;
-			this.PrevButton.Location = new System.Drawing.Point(12, 254);
-			this.PrevButton.Name = "PrevButton";
-			this.PrevButton.Size = new System.Drawing.Size(115, 115);
-			this.PrevButton.TabIndex = 4;
-			this.PrevButton.UseVisualStyleBackColor = true;
+			this.UpButton.FlatAppearance.BorderSize = 0;
+			this.UpButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.UpButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_up;
+			this.UpButton.Location = new System.Drawing.Point(12, 254);
+			this.UpButton.Name = "UpButton";
+			this.UpButton.Size = new System.Drawing.Size(115, 115);
+			this.UpButton.TabIndex = 4;
+			this.UpButton.UseVisualStyleBackColor = true;
+			this.UpButton.Click += new System.EventHandler(this.UpButtonClick);
 			// 
 			// OfflineButton
 			// 
@@ -106,14 +97,39 @@
 			this.HomeButton.UseVisualStyleBackColor = true;
 			this.HomeButton.Click += new System.EventHandler(this.HomeButtonClick);
 			// 
+			// DownButton
+			// 
+			this.DownButton.FlatAppearance.BorderSize = 0;
+			this.DownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.DownButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_down;
+			this.DownButton.Location = new System.Drawing.Point(133, 254);
+			this.DownButton.Name = "DownButton";
+			this.DownButton.Size = new System.Drawing.Size(115, 115);
+			this.DownButton.TabIndex = 5;
+			this.DownButton.UseVisualStyleBackColor = true;
+			this.DownButton.Click += new System.EventHandler(this.DownButtonClick);
+			// 
+			// ChatButton
+			// 
+			this.ChatButton.FlatAppearance.BorderSize = 0;
+			this.ChatButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.ChatButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_chat;
+			this.ChatButton.Location = new System.Drawing.Point(12, 375);
+			this.ChatButton.Name = "ChatButton";
+			this.ChatButton.Size = new System.Drawing.Size(115, 115);
+			this.ChatButton.TabIndex = 6;
+			this.ChatButton.UseVisualStyleBackColor = true;
+			this.ChatButton.Click += new System.EventHandler(this.ChatButtonClick);
+			// 
 			// KeyDebugWindow
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.BackColor = System.Drawing.Color.Black;
-			this.ClientSize = new System.Drawing.Size(262, 383);
+			this.ClientSize = new System.Drawing.Size(262, 534);
 			this.ControlBox = false;
-			this.Controls.Add(this.NextButton);
-			this.Controls.Add(this.PrevButton);
+			this.Controls.Add(this.ChatButton);
+			this.Controls.Add(this.DownButton);
+			this.Controls.Add(this.UpButton);
 			this.Controls.Add(this.OfflineButton);
 			this.Controls.Add(this.OnlineButton);
 			this.Controls.Add(this.FriendsButton);
@@ -134,7 +150,8 @@
 		private System.Windows.Forms.Button FriendsButton;
 		private System.Windows.Forms.Button OnlineButton;
 		private System.Windows.Forms.Button OfflineButton;
-		private System.Windows.Forms.Button PrevButton;
-		private System.Windows.Forms.Button NextButton;
+		private System.Windows.Forms.Button UpButton;
+		private System.Windows.Forms.Button DownButton;
+		private System.Windows.Forms.Button ChatButton;
 	}
 }

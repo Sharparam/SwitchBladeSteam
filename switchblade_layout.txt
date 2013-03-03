@@ -1,14 +1,16 @@
 
 SwitchBlade layout
 
+DK_4, DK_5 and DK_10 are enabled on FriendsWindow only.
+
 ┌─────────┬─────────┬─────────┬─────────┬─────────┐
 │   DK_6  │   DK_7  │   DK_8  │   DK_9  │  DK_10  │
 │         │         │         │         │         │
-│  Online │ Offline │   Next  │ Previous│ Shutdown│
+│  Online │ Offline │         │         │ List Up │
 ├─────────┼─────────┼─────────┼─────────┼─────────┤
 │   DK_1  │   DK_2  │   DK_3  │   DK_4  │   DK_5  │
 │         │         │         │         │         │
-│   Home  │ Friends │         │         │         │
+│   Home  │ Friends │         │StartChat│List Down│
 └─────────┴─────────┴─────────┴─────────┴─────────┘
 ┌─────────────────────────────────────────────────┐
 │                                                 │

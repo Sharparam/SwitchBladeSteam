@@ -1,4 +1,4 @@
-﻿/* Constants.cs
+﻿/* IDynamicKeyEnabledForm.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,18 +27,12 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-namespace F16Gaming.SwitchBladeSteam
-{
-	public static class Constants
-	{
-#if DEBUG
-		public const bool DebugEnabled = true;
-#else
-		public const bool DebugEnabled = false;
-#endif
+using System.Collections.Generic;
 
-		public const string BlankTouchpadImage = @"res\images\tp_blank.png";
-		public const string DisabledTouchpadImage = @"res\images\tp_aero.png";
-		public const string DisabledDynamicKeyImage = @"res\images\dk_disabled.png";
+namespace F16Gaming.SwitchBladeSteam.App
+{
+	public interface IDynamicKeyEnabledForm
+	{
+		IEnumerable<DynamicKeySettings> DynamicKeys { get; }
 	}
 }

@@ -1,4 +1,4 @@
-﻿/* Constants.cs
+﻿/* DynamicKeySettings.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,18 +27,31 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
+using F16Gaming.SwitchBladeSteam.Native;
+using F16Gaming.SwitchBladeSteam.Razer.Events;
+
 namespace F16Gaming.SwitchBladeSteam
 {
-	public static class Constants
+	public struct DynamicKeySettings
 	{
-#if DEBUG
-		public const bool DebugEnabled = true;
-#else
-		public const bool DebugEnabled = false;
-#endif
+		public readonly RazerAPI.RZDYNAMICKEY Key;
+		public readonly string UpImage;
+		public readonly string DownImage;
+		public readonly DynamicKeyPressedEventHandler Handler;
 
-		public const string BlankTouchpadImage = @"res\images\tp_blank.png";
-		public const string DisabledTouchpadImage = @"res\images\tp_aero.png";
-		public const string DisabledDynamicKeyImage = @"res\images\dk_disabled.png";
+		public DynamicKeySettings(RazerAPI.RZDYNAMICKEY key, string image, DynamicKeyPressedEventHandler handler)
+			: this(key, image, image, handler)
+		{
+			
+		}
+
+		public DynamicKeySettings(RazerAPI.RZDYNAMICKEY key, string upImage, string downImage,
+		                          DynamicKeyPressedEventHandler handler)
+		{
+			Key = key;
+			UpImage = upImage;
+			DownImage = downImage;
+			Handler = handler;
+		}
 	}
 }

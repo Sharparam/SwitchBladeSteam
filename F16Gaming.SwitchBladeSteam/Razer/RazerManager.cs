@@ -232,7 +232,11 @@ namespace F16Gaming.SwitchBladeSteam.Razer
 		public void DisableDynamicKey(RazerAPI.RZDYNAMICKEY key)
 		{
 			_log.DebugFormat(">> DisableDynamicKey({0})", key);
-			_dynamicKeys[(int)key - 1] = null;
+			var index = (int) key - 1;
+			var dk = _dynamicKeys[index];
+			if (dk != null)
+				dk.Disable();
+			_dynamicKeys[index] = null;
 			_log.Debug("<< DisableDynamicKey()");
 		}
 
