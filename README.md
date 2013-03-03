@@ -13,7 +13,7 @@ Contributing
 
 Contributors are very welcome! If you got code fixes, please [submit a pull request](https://github.com/Sharparam/SwitchBladeSteam/pull/new/master) here on GitHub.
 
-If you want to join the development team, please contact [F16Gaming](https://github.com/Sharparam) on GitHub.
+If you want to join the development team, please contact [Sharparam](https://github.com/Sharparam) on GitHub.
 
 All authors and contributors are listed in the **AUTHORS** file.
 
