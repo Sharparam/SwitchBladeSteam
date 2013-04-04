@@ -1,4 +1,4 @@
-F16Gaming.SwitchBladeSteam
+Sharparam.SwitchBladeSteam
 ==========================
 
 A Steam client for the SwitchBlade UI
@@ -35,7 +35,7 @@ This project is in no way endorsed, sponsored or approved by Valve and/or Razer.
 Dependencies
 ------------
 
-F16Gaming.SwitchBladeSteam depends on the SwitchBlade UI SDK (SwitchBladeSDK32.dll), Steam4NET2 (provided) and log4net (provided).
+Sharparam.SwitchBladeSteam depends on the SwitchBlade UI SDK (SwitchBladeSDK32.dll), Steam4NET2 (provided) and log4net (provided).
 
 SwitchBlade UI SDK is provided by Razer and [can be obtained from their website](http://www.razerzone.com/switchblade-ui/developers).
 
