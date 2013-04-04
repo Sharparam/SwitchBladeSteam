@@ -7,8 +7,8 @@
     <ProjectGuid>{2C411DDE-EA1E-4A15-9720-5776C9E94FDB}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>F16Gaming.SwitchBladeSteam.App</RootNamespace>
-    <AssemblyName>F16Gaming.SwitchBladeSteam.App</AssemblyName>
+    <RootNamespace>Sharparam.SwitchBladeSteam.App</RootNamespace>
+    <AssemblyName>Sharparam.SwitchBladeSteam.App</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -146,13 +146,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam.Steam\F16Gaming.SwitchBladeSteam.Steam.csproj">
+    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam.Steam\Sharparam.SwitchBladeSteam.Steam.csproj">
       <Project>{afe60a20-6e47-41e4-92f8-80b7eaabf03c}</Project>
-      <Name>F16Gaming.SwitchBladeSteam.Steam</Name>
+      <Name>Sharparam.SwitchBladeSteam.Steam</Name>
     </ProjectReference>
-    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam\F16Gaming.SwitchBladeSteam.csproj">
+    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam\Sharparam.SwitchBladeSteam.csproj">
       <Project>{2c390908-d634-4450-9804-71d4929dd392}</Project>
-      <Name>F16Gaming.SwitchBladeSteam</Name>
+      <Name>Sharparam.SwitchBladeSteam</Name>
     </ProjectReference>
     <ProjectReference Include="..\Steam4NET2\Steam4NET.csproj">
       <Project>{1a204257-fe82-4bbe-9ed4-40694821c31f}</Project>
@@ -163,7 +163,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UseGlobalSettings="False" />
+      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

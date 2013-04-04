@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AFE60A20-6E47-41E4-92F8-80B7EAABF03C}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{F42106ED-5812-4398-B7E2-391FA5273944}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>F16Gaming.SwitchBladeSteam.Steam</RootNamespace>
-    <AssemblyName>F16Gaming.SwitchBladeSteam.Steam</AssemblyName>
+    <RootNamespace>Sharparam.SwitchBladeSteam.Console</RootNamespace>
+    <AssemblyName>Sharparam.SwitchBladeSteam.Console</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,17 +21,17 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %28Razer Enabled%29|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -52,12 +52,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\libs\log4net\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -65,37 +61,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChatMessage.cs" />
-    <Compile Include="Client.cs" />
-    <Compile Include="Events\ChatMessage.cs" />
-    <Compile Include="Events\FriendsUpdated.cs" />
-    <Compile Include="Extensions\ISteamFriends013Extensions.cs" />
-    <Compile Include="Friend.cs" />
-    <Compile Include="FriendsManager.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SteamException.cs" />
-    <Compile Include="SteamFriends.cs" />
-    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Enums\" />
-    <Folder Include="Helpers\" />
-    <Folder Include="Tools\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam\F16Gaming.SwitchBladeSteam.csproj">
-      <Project>{2c390908-d634-4450-9804-71d4929dd392}</Project>
-      <Name>F16Gaming.SwitchBladeSteam</Name>
+    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam.Steam\Sharparam.SwitchBladeSteam.Steam.csproj">
+      <Project>{afe60a20-6e47-41e4-92f8-80b7eaabf03c}</Project>
+      <Name>Sharparam.SwitchBladeSteam.Steam</Name>
     </ProjectReference>
     <ProjectReference Include="..\Steam4NET2\Steam4NET.csproj">
       <Project>{1a204257-fe82-4bbe-9ed4-40694821c31f}</Project>
       <Name>Steam4NET</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UseGlobalSettings="False" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

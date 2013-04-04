@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("F16Gaming.SwitchBladeSteam.Console")]
+[assembly: AssemblyTitle("Sharparam.SwitchBladeSteam.Console")]
 [assembly: AssemblyDescription("Console interface for testing SwitchBladeSteam [DEPRECATED]")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("F16Gaming")]
-[assembly: AssemblyProduct("F16Gaming.SwitchBladeSteam.Console")]
+[assembly: AssemblyProduct("Sharparam.SwitchBladeSteam.Console")]
 [assembly: AssemblyCopyright("Copyright © 2013 by Adam Hellberg")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

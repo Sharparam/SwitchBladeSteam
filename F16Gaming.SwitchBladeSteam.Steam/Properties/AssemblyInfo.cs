@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("F16Gaming.SwitchBladeSteam.Steam")]
+[assembly: AssemblyTitle("Sharparam.SwitchBladeSteam.Steam")]
 [assembly: AssemblyDescription("Steam library for SBS components.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("F16Gaming")]
-[assembly: AssemblyProduct("F16Gaming.SwitchBladeSteam.Steam")]
+[assembly: AssemblyProduct("Sharparam.SwitchBladeSteam.Steam")]
 [assembly: AssemblyCopyright("Copyright © 2013 by Adam Hellberg")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("F16Gaming.SwitchBladeSteam.App")]
+[assembly: AssemblyTitle("Sharparam.SwitchBladeSteam.App")]
 [assembly: AssemblyDescription("UI Application for SwitchBladeSteam that also interfaces with the SwitchBlade UI system.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("F16Gaming")]
-[assembly: AssemblyProduct("F16Gaming.SwitchBladeSteam.App")]
+[assembly: AssemblyProduct("Sharparam.SwitchBladeSteam.App")]
 [assembly: AssemblyCopyright("Copyright © 2013 by Adam Hellberg")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.137.0702")]
-[assembly: AssemblyFileVersion("1.0.137.0702")]
+[assembly: AssemblyVersion("1.0.138.0809")]
+[assembly: AssemblyFileVersion("1.0.138.0809")]

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace F16Gaming.SwitchBladeSteam.App.Properties {
+namespace Sharparam.SwitchBladeSteam.App.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace F16Gaming.SwitchBladeSteam.App.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("F16Gaming.SwitchBladeSteam.App.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Sharparam.SwitchBladeSteam.App.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
