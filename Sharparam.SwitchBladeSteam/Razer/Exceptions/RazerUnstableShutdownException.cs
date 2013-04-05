@@ -27,14 +27,14 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Exceptions
+namespace Sharparam.SwitchBladeSteam.Razer.Exceptions
 {
-	public class RazerUnstableShutdownException : RazerException
-	{
-		internal RazerUnstableShutdownException()
-			: base("The application did not properly call RzSBStop() on the last shutdown.")
-		{
-			
-		}
-	}
+    public class RazerUnstableShutdownException : RazerException
+    {
+        internal RazerUnstableShutdownException()
+            : base("The application did not properly call RzSBStop() on the last shutdown.")
+        {
+            
+        }
+    }
 }

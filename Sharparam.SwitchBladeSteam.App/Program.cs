@@ -30,562 +30,561 @@
 #define STEAM
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using F16Gaming.SwitchBladeSteam.Native;
-using F16Gaming.SwitchBladeSteam.Razer;
-using F16Gaming.SwitchBladeSteam.Razer.Events;
-using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
-using F16Gaming.SwitchBladeSteam.Razer.Structs;
-using F16Gaming.SwitchBladeSteam.Steam;
+using Sharparam.SwitchBladeSteam.Helpers;
+using Sharparam.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Razer;
+using Sharparam.SwitchBladeSteam.Razer.Events;
+using Sharparam.SwitchBladeSteam.Steam;
 using Steam4NET;
 using log4net;
-using LogManager = F16Gaming.SwitchBladeSteam.Logging.LogManager;
+using LogManager = Sharparam.SwitchBladeSteam.Logging.LogManager;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace Sharparam.SwitchBladeSteam.App
 {
-	internal struct DynamicKeyOptions
-	{
-		public string Image;
-		public string DownImage;
-		public DynamicKeyPressedEventHandler Callback;
-	}
+    internal struct DynamicKeyOptions
+    {
+        public string Image;
+        public string DownImage;
+        public DynamicKeyPressedEventHandler Callback;
+    }
 
-	public static class Program
-	{
-		private static ILog _log;
+    public static class Program
+    {
+        private static ILog _log;
 
-		private static Form _activeForm;
-		private static Form _nextForm;
-		private static bool _activeFormClosed;
+        private static Form _activeForm;
+        private static Form _nextForm;
+        private static bool _activeFormClosed;
 
 #if DEBUG
-		private static Form _keyDebugWindow;
+        private static Form _keyDebugWindow;
 #endif
 
 #if RAZER_ENABLED
-		private static RazerManager _razerManager;
+        private static RazerManager _razerManager;
 
-		private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
+        private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
 #endif
 
-		internal static bool DebugMode { get; private set; }
+        internal static bool DebugMode { get; private set; }
 
-		internal static Client SteamClient;
-		internal static FriendsManager SteamFriends;
+        internal static Client SteamClient;
+        internal static FriendsManager SteamFriends;
 
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[MTAThread]
-		static void Main(string[] args)
-		{
-			Helpers.Threading.SetCurrentThreadName("Main");
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [MTAThread]
+        static void Main(string[] args)
+        {
+            Threading.SetCurrentThreadName("Main");
 
-			LogManager.SetupConsole();
+            LogManager.SetupConsole();
 
-			_log = LogManager.GetLogger(typeof (Program));
+            _log = LogManager.GetLogger(typeof (Program));
 
-			_log.Info("### APPLICATION START ###");
+            _log.Info("### APPLICATION START ###");
 
-			LogManager.ClearOldLogs();
+            LogManager.ClearOldLogs();
 
-			_log.Info("Detecting components...");
-			foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()))
-			{
-				var ext = Path.GetExtension(file);
-				if (string.IsNullOrEmpty(ext))
-					continue;
-				ext = ext.Substring(1);
-				if (ext == "dll" || ext == "exe")
-				{
-					var version = AssemblyName.GetAssemblyName(file).Version.ToString();
-					var name = Path.GetFileNameWithoutExtension(file);
-					_log.InfoFormat("{0} v{1}", name, version);
-				}
-			}
-			_log.Debug("Done!");
+            _log.Info("Detecting components...");
+            foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()))
+            {
+                var ext = Path.GetExtension(file);
+                if (string.IsNullOrEmpty(ext))
+                    continue;
+                ext = ext.Substring(1);
+                if (ext == "dll" || ext == "exe")
+                {
+                    var version = AssemblyName.GetAssemblyName(file).Version.ToString();
+                    var name = Path.GetFileNameWithoutExtension(file);
+                    _log.InfoFormat("{0} v{1}", name, version);
+                }
+            }
+            _log.Debug("Done!");
 
 #if DEBUG
-			DebugMode = true;
+            DebugMode = true;
 #else
-			if (Debugger.IsAttached)
-				DebugMode = true;
-			else if (args.Length > 0)
-				DebugMode = args[0] == "debug";
+            if (Debugger.IsAttached)
+                DebugMode = true;
+            else if (args.Length > 0)
+                DebugMode = args[0] == "debug";
 #endif
 
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
 
 #if STEAM
-			_log.Info("Initializing steam objects");
-			SteamClient = SteamManager.Client;
-			SteamFriends = SteamManager.FriendsManager;
+            _log.Info("Initializing steam objects");
+            SteamClient = SteamManager.Client;
+            SteamFriends = SteamManager.FriendsManager;
 #else
-			MessageBox.Show("Steam is not enabled in this build, steam features will be disabled.", "Steam Disabled",
-			                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Steam is not enabled in this build, steam features will be disabled.", "Steam Disabled",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
 #endif
 
 #if RAZER_ENABLED
-			_dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
-			{
-				{
-					RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions
-					{
-						Image = @"res\images\dk_home.png",
-						DownImage = @"res\images\dk_home_down.png",
-						Callback = HomeKeyPressed
-					}
-				},
-				{
-					RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions
-					{
-						Image = @"res\images\dk_friends.png",
-						DownImage = @"res\images\dk_friends_down.png",
-						Callback = FriendKeyPressed
-					}
-				},
-				{
-					RazerAPI.RZDYNAMICKEY.DK6, new DynamicKeyOptions
-					{	
-						Image = @"res\images\dk_appear_online.png",
-						DownImage = @"res\images\dk_appear_online_down.png",
-						Callback = OnlineKeyPressed
-					}
-				},
-				{
-					RazerAPI.RZDYNAMICKEY.DK7, new DynamicKeyOptions
-					{
-						Image = @"res\images\dk_appear_offline.png",
-						DownImage = @"res\images\dk_appear_offline_down.png",
-						Callback = OfflineKeyPressed
-					}
-				}
-			};
+            _dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
+            {
+                {
+                    RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions
+                    {
+                        Image = @"res\images\dk_home.png",
+                        DownImage = @"res\images\dk_home_down.png",
+                        Callback = HomeKeyPressed
+                    }
+                },
+                {
+                    RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions
+                    {
+                        Image = @"res\images\dk_friends.png",
+                        DownImage = @"res\images\dk_friends_down.png",
+                        Callback = FriendKeyPressed
+                    }
+                },
+                {
+                    RazerAPI.RZDYNAMICKEY.DK6, new DynamicKeyOptions
+                    {	
+                        Image = @"res\images\dk_appear_online.png",
+                        DownImage = @"res\images\dk_appear_online_down.png",
+                        Callback = OnlineKeyPressed
+                    }
+                },
+                {
+                    RazerAPI.RZDYNAMICKEY.DK7, new DynamicKeyOptions
+                    {
+                        Image = @"res\images\dk_appear_offline.png",
+                        DownImage = @"res\images\dk_appear_offline_down.png",
+                        Callback = OfflineKeyPressed
+                    }
+                }
+            };
 
-			try
-			{
-				_log.Info("Initializing razer manager");
-				_razerManager = new RazerManager();
-			}
-			catch (RazerUnstableShutdownException)
-			{
-				var result = MessageBox.Show("Application was not shut down properly on the last run."
-					+ "\n\nIn order for the application to be able to start, it needs to call RzSBStop."
-					+ "\n\nIf you have restarted your computer since you last launched this application, you can disregard this message and choose \"No\"."
-					+ "\n\nDo you want to call RzSBStop? You will need to restart this application regardless of choice.",
-					"Unsafe Application Shutdown", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-				if (result == DialogResult.Yes)
-					RazerManager.Stop();
+            try
+            {
+                _log.Info("Initializing razer manager");
+                _razerManager = new RazerManager();
+            }
+            catch (RazerUnstableShutdownException)
+            {
+                var result = MessageBox.Show("Application was not shut down properly on the last run."
+                    + "\n\nIn order for the application to be able to start, it needs to call RzSBStop."
+                    + "\n\nIf you have restarted your computer since you last launched this application, you can disregard this message and choose \"No\"."
+                    + "\n\nDo you want to call RzSBStop? You will need to restart this application regardless of choice.",
+                    "Unsafe Application Shutdown", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                    RazerManager.Stop();
 
-				RazerManager.DeleteControlFile();
+                RazerManager.DeleteControlFile();
 
-				Environment.Exit(0);
-			}
+                Environment.Exit(0);
+            }
 
-			_log.Debug("Razer manager initialized!");
+            _log.Debug("Razer manager initialized!");
 
-			_log.Info("Registering app event callback");
-			_razerManager.AppEvent += OnAppEvent;
-			_log.Debug("App event callback registered!");
-			
-			_log.Info("Enabling dynamic keys");
-			
-			foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
-				_razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image, pair.Value.DownImage);
+            _log.Info("Registering app event callback");
+            _razerManager.AppEvent += OnAppEvent;
+            _log.Debug("App event callback registered!");
+            
+            _log.Info("Enabling dynamic keys");
+            
+            foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
+                _razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image, pair.Value.DownImage);
 #else
-			MessageBox.Show(
-				"RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",
-				"RAZER_ENABLED undefined", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(
+                "RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",
+                "RAZER_ENABLED undefined", MessageBoxButtons.OK, MessageBoxIcon.Information);
 #endif
-			ShowForm(new MainWindow());
+            ShowForm(new MainWindow());
 
-			_log.Error("Reached end of Main(), unexpected behaviour. Please report to developer.");
-		}
+            _log.Error("Reached end of Main(), unexpected behaviour. Please report to developer.");
+        }
 
-		private static void ShowForm(Form form)
-		{
-			_log.Debug(">> ShowForm([form])");
+        private static void ShowForm(Form form)
+        {
+            _log.Debug(">> ShowForm([form])");
 
 #if RAZER_ENABLED
-			_log.Debug("Setting handle on switchblade touchpad");
-			var touchpad = _razerManager.GetTouchpad();
-			var gestureForm = form as IGestureEnabledForm;
-			try
-			{
-				// Only translate gestures if the form is not implementing
-				// its own gesture handler
-				touchpad.SetHandle(form.Handle, gestureForm == null);
-			}
-			catch (ObjectDisposedException ex)
-			{
-				_log.ErrorFormat("ShowForm: touchpad.SetHandle failed [ObjectDisposedException]: {0}", ex.Message);
-				_log.Error("Exception detail:", ex);
-				_log.Warn("Attempting to recover by showing main window");
-				ShowForm(new MainWindow("Failed to complete the requested action."));
-				return;
-			}
+            _log.Debug("Setting handle on switchblade touchpad");
+            var touchpad = _razerManager.GetTouchpad();
+            var gestureForm = form as IGestureEnabledForm;
+            try
+            {
+                // Only translate gestures if the form is not implementing
+                // its own gesture handler
+                touchpad.SetHandle(form.Handle, gestureForm == null);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _log.ErrorFormat("ShowForm: touchpad.SetHandle failed [ObjectDisposedException]: {0}", ex.Message);
+                _log.Error("Exception detail:", ex);
+                _log.Warn("Attempting to recover by showing main window");
+                ShowForm(new MainWindow("Failed to complete the requested action."));
+                return;
+            }
 
-			// Forward gestures, if needed
-			if (gestureForm != null)
-			{
-				_log.Debug("Form is gesture enabled, setting gestures to be captured");
-				touchpad.DisableGesture(RazerAPI.RZGESTURE.ALL);
-				touchpad.EnableGesture(gestureForm.EnabledGestures);
-				touchpad.Gesture += gestureForm.HandleGesture;
-			}
+            // Forward gestures, if needed
+            if (gestureForm != null)
+            {
+                _log.Debug("Form is gesture enabled, setting gestures to be captured");
+                touchpad.DisableGesture(RazerAPI.RZGESTURE.ALL);
+                touchpad.EnableGesture(gestureForm.EnabledGestures);
+                touchpad.Gesture += gestureForm.HandleGesture;
+            }
 
-			// Add controls, if needed
-			var kbForm = form as IKeyboardEnabledForm;
-			if (kbForm != null)
-			{
-				_log.Debug("Form is keyboard enabled, obtaining control handles to set active keyboard controls");
-				var controls = kbForm.GetKeyboardEnabledControls() as List<Control>;
-				if (controls == null) // GetKeyboardEnabledControls should never return null, but just in case
-				{
-					// According to docs, Razer's API will fall back to registering _everything_ as keyboard interactive
-					_log.Error("GetKeyboardEnabledControls returned null! Keyboard support will NOT work as expected!");
-				}
-				else
-				{
-					var numCtrls = controls.Count;
-					_log.DebugFormat("{0} controls will be registered", numCtrls);
-					var kbControls = new KeyboardControl[numCtrls];
-					for (int i = 0; i < numCtrls; i++)
-					{
-						kbControls[i] = new KeyboardControl(controls[i].Handle, false);
-					}
-					_log.Debug("Calling SetKeyboardEnabledControls on touchpad object");
-					touchpad.SetKeyboardEnabledControls(kbControls);
-					_log.Debug("Done! Controls have been registered for keyboard interaction!");
-				}
-			}
+            // Add controls, if needed
+            var kbForm = form as IKeyboardEnabledForm;
+            if (kbForm != null)
+            {
+                _log.Debug("Form is keyboard enabled, obtaining control handles to set active keyboard controls");
+                var controls = kbForm.GetKeyboardEnabledControls() as List<Control>;
+                if (controls == null) // GetKeyboardEnabledControls should never return null, but just in case
+                {
+                    // According to docs, Razer's API will fall back to registering _everything_ as keyboard interactive
+                    _log.Error("GetKeyboardEnabledControls returned null! Keyboard support will NOT work as expected!");
+                }
+                else
+                {
+                    var numCtrls = controls.Count;
+                    _log.DebugFormat("{0} controls will be registered", numCtrls);
+                    var kbControls = new KeyboardControl[numCtrls];
+                    for (int i = 0; i < numCtrls; i++)
+                    {
+                        kbControls[i] = new KeyboardControl(controls[i].Handle, false);
+                    }
+                    _log.Debug("Calling SetKeyboardEnabledControls on touchpad object");
+                    touchpad.SetKeyboardEnabledControls(kbControls);
+                    _log.Debug("Done! Controls have been registered for keyboard interaction!");
+                }
+            }
 
-			// Enable additional dynamic keys, if needed
-			var keyForm = form as IDynamicKeyEnabledForm;
-			if (keyForm != null)
-			{
-				_log.Debug("Form has additional dynamic keys defined, enabling additional dynamic keys");
-				var keys = keyForm.DynamicKeys;
-				foreach (var settings in keys)
-				{
-					_razerManager.EnableDynamicKey(settings.Key, settings.Handler, settings.UpImage, settings.DownImage);
-				}
-			}
+            // Enable additional dynamic keys, if needed
+            var keyForm = form as IDynamicKeyEnabledForm;
+            if (keyForm != null)
+            {
+                _log.Debug("Form has additional dynamic keys defined, enabling additional dynamic keys");
+                var keys = keyForm.DynamicKeys;
+                foreach (var settings in keys)
+                {
+                    _razerManager.EnableDynamicKey(settings.Key, settings.Handler, settings.UpImage, settings.DownImage);
+                }
+            }
 #endif
 
-			_log.Debug("Registering closing event");
-			form.Closing += ActiveFormClosing;
-			_log.Debug("Registering closed event");
-			form.Closed += ActiveFormClosed;
+            _log.Debug("Registering closing event");
+            form.Closing += ActiveFormClosing;
+            _log.Debug("Registering closed event");
+            form.Closed += ActiveFormClosed;
 
 #if DEBUG
-			_log.Debug("Creating debug window");
-			_keyDebugWindow = new KeyDebugWindow
-			{
-				StartPosition = FormStartPosition.Manual,
-				Location = new Point(Screen.PrimaryScreen.WorkingArea.Width / 2 + form.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - form.Height / 2)
-			};
-			_keyDebugWindow.Show();
+            _log.Debug("Creating debug window");
+            _keyDebugWindow = new KeyDebugWindow
+            {
+                StartPosition = FormStartPosition.Manual,
+                Location = new Point(Screen.PrimaryScreen.WorkingArea.Width / 2 + form.Width / 2, Screen.PrimaryScreen.WorkingArea.Height / 2 - form.Height / 2)
+            };
+            _keyDebugWindow.Show();
 #endif
 
-			_log.Debug("Setting active form");
-			_activeForm = form;
-			_log.Debug("Nulling _nextForm");
-			_nextForm = null;
-			_log.Info("Running application with new form");
-			_activeFormClosed = false;
-			Application.Run(_activeForm);
+            _log.Debug("Setting active form");
+            _activeForm = form;
+            _log.Debug("Nulling _nextForm");
+            _nextForm = null;
+            _log.Info("Running application with new form");
+            _activeFormClosed = false;
+            Application.Run(_activeForm);
 
-			if (_nextForm != null)
-			{
-				_log.Info("Loading next form");
-				ClearCurrentForm();
-				_log.Debug("Showing next form");
-				ShowForm(_nextForm);
-				return;
-			}
+            if (_nextForm != null)
+            {
+                _log.Info("Loading next form");
+                ClearCurrentForm();
+                _log.Debug("Showing next form");
+                ShowForm(_nextForm);
+                return;
+            }
 
-			_log.Info("No next form was set, application will exit.");
+            _log.Info("No next form was set, application will exit.");
 
-			Exit();
+            Exit();
 
-			_log.Debug("<< ShowForm() [UNEXPECTED BEHAVIOUR]");
-		}
+            _log.Debug("<< ShowForm() [UNEXPECTED BEHAVIOUR]");
+        }
 
-		public static void QueueForm(Form form)
-		{
-			_log.Debug(">> QueueForm([form])");
-			_nextForm = form;
-			_log.Debug("<< QueueForm()");
-		}
+        public static void QueueForm(Form form)
+        {
+            _log.Debug(">> QueueForm([form])");
+            _nextForm = form;
+            _log.Debug("<< QueueForm()");
+        }
 
-		private static void CloseCurrentForm()
-		{
-			if (_activeForm.InvokeRequired)
-				_activeForm.Invoke((VoidDelegate)(() => _activeForm.Close()));
-			else
-				_activeForm.Close();
-		}
+        private static void CloseCurrentForm()
+        {
+            if (_activeForm.InvokeRequired)
+                _activeForm.Invoke((VoidDelegate)(() => _activeForm.Close()));
+            else
+                _activeForm.Close();
+        }
 
-		private static void ClearCurrentForm(bool erase = false)
-		{
-			_log.Debug(">> ClearCurrentForm()");
+        private static void ClearCurrentForm(bool erase = false)
+        {
+            _log.Debug(">> ClearCurrentForm()");
 
-			if (_activeForm == null || _activeForm.IsDisposed || _activeFormClosed)
-				return;
+            if (_activeForm == null || _activeForm.IsDisposed || _activeFormClosed)
+                return;
 
 #if RAZER_ENABLED
-			_log.Info("Stopping render on touchpad");
-			_razerManager.GetTouchpad().StopRender(erase);
+            _log.Info("Stopping render on touchpad");
+            _razerManager.GetTouchpad().StopRender(erase);
 #endif
-			if (_activeForm.Visible)
-			{
-				_log.Debug("Active form is still visible, closing...");
-				_activeForm.Closing -= ActiveFormClosing;
-				_activeForm.Closed -= ActiveFormClosed;
+            if (_activeForm.Visible)
+            {
+                _log.Debug("Active form is still visible, closing...");
+                _activeForm.Closing -= ActiveFormClosing;
+                _activeForm.Closed -= ActiveFormClosed;
 
 #if RAZER_ENABLED
-				try
-				{
-					var gestureForm = _activeForm as IGestureEnabledForm;
-					if (gestureForm != null)
-						_razerManager.GetTouchpad().Gesture -= gestureForm.HandleGesture;
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
-					                MessageBoxButtons.OK, MessageBoxIcon.Stop);
-				}
+                try
+                {
+                    var gestureForm = _activeForm as IGestureEnabledForm;
+                    if (gestureForm != null)
+                        _razerManager.GetTouchpad().Gesture -= gestureForm.HandleGesture;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                }
 
-				var keyForm = _activeForm as IDynamicKeyEnabledForm;
-				if (keyForm != null)
-				{
-					var keys = keyForm.DynamicKeys;
-					foreach (var settings in keys)
-						_razerManager.DisableDynamicKey(settings.Key);
-				}
+                var keyForm = _activeForm as IDynamicKeyEnabledForm;
+                if (keyForm != null)
+                {
+                    var keys = keyForm.DynamicKeys;
+                    foreach (var settings in keys)
+                        _razerManager.DisableDynamicKey(settings.Key);
+                }
 #endif
 
-				_activeFormClosed = true;
-				CloseCurrentForm();
-			}
+                _activeFormClosed = true;
+                CloseCurrentForm();
+            }
 
-			_log.Debug("<< ClearCurrentForm()");
-		}
+            _log.Debug("<< ClearCurrentForm()");
+        }
 
-		private static void ActiveFormClosing(object sender, EventArgs e)
-		{
-			_log.Debug(">> ActiveFormClosing([sender], [e])");
-			_activeForm.Closing -= ActiveFormClosing;
+        private static void ActiveFormClosing(object sender, EventArgs e)
+        {
+            _log.Debug(">> ActiveFormClosing([sender], [e])");
+            _activeForm.Closing -= ActiveFormClosing;
 
 #if RAZER_ENABLED
-			var touchpad = _razerManager.GetTouchpad();
-			try
-			{
-				var gestureForm = _activeForm as IGestureEnabledForm;
-				if (gestureForm != null)
-					touchpad.Gesture -= gestureForm.HandleGesture;
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
-									MessageBoxButtons.OK, MessageBoxIcon.Stop);
-			}
+            var touchpad = _razerManager.GetTouchpad();
+            try
+            {
+                var gestureForm = _activeForm as IGestureEnabledForm;
+                if (gestureForm != null)
+                    touchpad.Gesture -= gestureForm.HandleGesture;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Stop);
+            }
 
-			var keyForm = _activeForm as IDynamicKeyEnabledForm;
-			if (keyForm != null)
-			{
-				var keys = keyForm.DynamicKeys;
-				foreach (var settings in keys)
-					_razerManager.DisableDynamicKey(settings.Key);
-			}
+            var keyForm = _activeForm as IDynamicKeyEnabledForm;
+            if (keyForm != null)
+            {
+                var keys = keyForm.DynamicKeys;
+                foreach (var settings in keys)
+                    _razerManager.DisableDynamicKey(settings.Key);
+            }
 
-			touchpad.StopRender(false);
+            touchpad.StopRender(false);
 #endif
-			_log.Debug("<< ActiveFormClosing()");
-		}
+            _log.Debug("<< ActiveFormClosing()");
+        }
 
-		private static void ActiveFormClosed(object sender, EventArgs e)
-		{
-			_log.Debug(">> ActiveFormClosed([sender], [args])");
-			_activeForm.Closed -= ActiveFormClosed;
-			ClearCurrentForm();
-			_log.Debug("<< ActiveFormClosed()");
-		}
+        private static void ActiveFormClosed(object sender, EventArgs e)
+        {
+            _log.Debug(">> ActiveFormClosed([sender], [args])");
+            _activeForm.Closed -= ActiveFormClosed;
+            ClearCurrentForm();
+            _log.Debug("<< ActiveFormClosed()");
+        }
 
-		public static void Exit()
-		{
-			_log.Debug(">> Exit()");
+        public static void Exit()
+        {
+            _log.Debug(">> Exit()");
 
 #if RAZER_ENABLED
-			if (_activeForm != null)
-			{
-				_log.Info("Active form is not null, stopping render");
-				var touchpad = _razerManager.GetTouchpad();
-				if (touchpad != null)
-					touchpad.StopRender();
-			}
+            if (_activeForm != null)
+            {
+                _log.Info("Active form is not null, stopping render");
+                var touchpad = _razerManager.GetTouchpad();
+                if (touchpad != null)
+                    touchpad.StopRender();
+            }
 
-			_log.Info("Stopping Razer interface");
-			RazerManager.Stop();
+            _log.Info("Stopping Razer interface");
+            RazerManager.Stop();
 #endif
 
-			_log.Info("### APPLICATION EXIT ###");
+            _log.Info("### APPLICATION EXIT ###");
 
-			Environment.Exit(0);
-		}
+            Environment.Exit(0);
+        }
 
-		private static void OnAppEvent(object sender, AppEventEventArgs e)
-		{
-			if (e.Type != RazerAPI.RZSDKAPPEVENTTYPE.APPMODE || e.Mode != RazerAPI.RZSDKAPPEVENTMODE.APPLET ||
-			    e.ProcessID == Process.GetCurrentProcess().Id)
-				return;
+        private static void OnAppEvent(object sender, AppEventEventArgs e)
+        {
+            if ((e.Type != RazerAPI.AppEventType.Deactivated && e.Type != RazerAPI.AppEventType.Close && e.Type != RazerAPI.AppEventType.Exit) ||
+                e.Mode != RazerAPI.AppEventMode.Applet ||
+                e.ProcessID == Process.GetCurrentProcess().Id)
+                return;
 
-			_log.Info("Process ownership changed, shutting down.");
-			Exit();
-		}
+            _log.Info("Process ownership changed, shutting down.");
+            Exit();
+        }
 
-		private static void ShowHome()
-		{
-			if (_activeForm is MainWindow)
-				return;
+        private static void ShowHome()
+        {
+            if (_activeForm is MainWindow)
+                return;
 
-			QueueForm(new MainWindow());
-			CloseCurrentForm();
-		}
+            QueueForm(new MainWindow());
+            CloseCurrentForm();
+        }
 
-		private static void ShowFriends()
-		{
-			if (_activeForm is FriendsWindow)
-				return;
+        private static void ShowFriends()
+        {
+            if (_activeForm is FriendsWindow)
+                return;
 
-			QueueForm(new FriendsWindow());
-			CloseCurrentForm();
-		}
+            QueueForm(new FriendsWindow());
+            CloseCurrentForm();
+        }
 
-		private static void GoOnline()
-		{
-			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOnline);
-		}
+        private static void GoOnline()
+        {
+            SteamClient.SetMyState(EPersonaState.k_EPersonaStateOnline);
+        }
 
-		private static void GoOffline()
-		{
-			SteamClient.SetMyState(EPersonaState.k_EPersonaStateOffline);
-		}
+        private static void GoOffline()
+        {
+            SteamClient.SetMyState(EPersonaState.k_EPersonaStateOffline);
+        }
 
-		private static void HomeKeyPressed(object sender, EventArgs e)
-		{
-			_log.Debug(">> HomeKeyPressed()");
-			ShowHome();
-			_log.Debug("<< HomeKeyPressed()");
-		}
+        private static void HomeKeyPressed(object sender, EventArgs e)
+        {
+            _log.Debug(">> HomeKeyPressed()");
+            ShowHome();
+            _log.Debug("<< HomeKeyPressed()");
+        }
 
-		private static void FriendKeyPressed(object sender, EventArgs e)
-		{
-			_log.Debug(">> FriendKeyPressed()");
-			ShowFriends();
-			_log.Debug("<< FriendKeyPressed()");
-		}
+        private static void FriendKeyPressed(object sender, EventArgs e)
+        {
+            _log.Debug(">> FriendKeyPressed()");
+            ShowFriends();
+            _log.Debug("<< FriendKeyPressed()");
+        }
 
-		private static void OnlineKeyPressed(object sender, EventArgs e)
-		{
-			_log.Debug(">> OnlineKeyPressed()");
-			GoOnline();
-			_log.Debug("<< OnlineKeyPressed()");
-		}
+        private static void OnlineKeyPressed(object sender, EventArgs e)
+        {
+            _log.Debug(">> OnlineKeyPressed()");
+            GoOnline();
+            _log.Debug("<< OnlineKeyPressed()");
+        }
 
-		private static void OfflineKeyPressed(object sender, EventArgs e)
-		{
-			_log.Debug(">> OfflineKeyPressed()");
-			GoOffline();
-			_log.Debug("<< OfflineKeyPressed()");
-		}
+        private static void OfflineKeyPressed(object sender, EventArgs e)
+        {
+            _log.Debug(">> OfflineKeyPressed()");
+            GoOffline();
+            _log.Debug("<< OfflineKeyPressed()");
+        }
 
-		private static void QuitKeyPressed(object sender, EventArgs e)
-		{
-			_log.Debug(">> QuitKeyPressed()");
-			ClearCurrentForm(true);
-			_log.Debug("<< QuitKeyPressed()");
-		}
+        private static void QuitKeyPressed(object sender, EventArgs e)
+        {
+            _log.Debug(">> QuitKeyPressed()");
+            ClearCurrentForm(true);
+            _log.Debug("<< QuitKeyPressed()");
+        }
 
 #if DEBUG
-		public static void DebugHomeButton()
-		{
-			_log.Debug(">> DebugHomeButton()");
-			ShowHome();
-			_log.Debug("<< DebugHomeButton()");
-		}
+        public static void DebugHomeButton()
+        {
+            _log.Debug(">> DebugHomeButton()");
+            ShowHome();
+            _log.Debug("<< DebugHomeButton()");
+        }
 
-		public static void DebugFriendsButton()
-		{
-			_log.Debug(">> DebugFriendsButton()");
-			ShowFriends();
-			_log.Debug("<< DebugFriendsButton()");
-		}
+        public static void DebugFriendsButton()
+        {
+            _log.Debug(">> DebugFriendsButton()");
+            ShowFriends();
+            _log.Debug("<< DebugFriendsButton()");
+        }
 
-		public static void DebugOnlineButton()
-		{
-			_log.Debug(">> DebugOnlineButton()");
-			GoOnline();
-			_log.Debug("<< DebugOnlineButton()");
-		}
+        public static void DebugOnlineButton()
+        {
+            _log.Debug(">> DebugOnlineButton()");
+            GoOnline();
+            _log.Debug("<< DebugOnlineButton()");
+        }
 
-		public static void DebugOfflineButton()
-		{
-			_log.Debug(">> DebugOfflineButton()");
-			GoOffline();
-			_log.Debug("<< DebugOfflineButton()");
-		}
+        public static void DebugOfflineButton()
+        {
+            _log.Debug(">> DebugOfflineButton()");
+            GoOffline();
+            _log.Debug("<< DebugOfflineButton()");
+        }
 
-		public static void DebugUpButton()
-		{
-			_log.Debug(">> DebugUpbutton()");
-			var form = _activeForm as FriendsWindow;
-			if (form != null)
-				form.MoveSelectionUp();
-			_log.Debug("<< DebugUpButton()");
-		}
+        public static void DebugUpButton()
+        {
+            _log.Debug(">> DebugUpbutton()");
+            var form = _activeForm as FriendsWindow;
+            if (form != null)
+                form.MoveSelectionUp();
+            _log.Debug("<< DebugUpButton()");
+        }
 
-		public static void DebugDownButton()
-		{
-			_log.Debug(">> DebugDownButton()");
-			var form = _activeForm as FriendsWindow;
-			if (form != null)
-				form.MoveSelectionDown();
-			_log.Debug("<< DebugDownButton()");
-		}
+        public static void DebugDownButton()
+        {
+            _log.Debug(">> DebugDownButton()");
+            var form = _activeForm as FriendsWindow;
+            if (form != null)
+                form.MoveSelectionDown();
+            _log.Debug("<< DebugDownButton()");
+        }
 
-		public static void DebugChatButton()
-		{
-			_log.Debug(">> DebugChatButton()");
-			var form = _activeForm as FriendsWindow;
-			if (form != null)
-				form.DebugChatWithSelected();
-			_log.Debug("<< DebugChatButton()");
-		}
+        public static void DebugChatButton()
+        {
+            _log.Debug(">> DebugChatButton()");
+            var form = _activeForm as FriendsWindow;
+            if (form != null)
+                form.DebugChatWithSelected();
+            _log.Debug("<< DebugChatButton()");
+        }
 
-		public static void DebugQuitButton()
-		{
-			_log.Debug(">> DebugQuitButton()");
-			ClearCurrentForm(true);
-			_log.Debug("<< DebugQuitButton()");
-		}
+        public static void DebugQuitButton()
+        {
+            _log.Debug(">> DebugQuitButton()");
+            ClearCurrentForm(true);
+            _log.Debug("<< DebugQuitButton()");
+        }
 
-		public static void ShowRenderStats()
-		{
+        public static void ShowRenderStats()
+        {
 #if RAZER_ENABLED
-			var stats = _razerManager.GetTouchpad().GetRenderStats();
-			var statsText = string.Format("Count: {0}\nMax Time: {1}\nLast Time: {2}\nAverage Time: {3}",
-										  stats.Count, stats.MaxTime, stats.LastTime, stats.AverageTime);
-			MessageBox.Show(statsText, "Render Stats", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var stats = _razerManager.GetTouchpad().GetRenderStats();
+            var statsText = string.Format("Count: {0}\nMax Time: {1}\nLast Time: {2}\nAverage Time: {3}",
+                                          stats.Count, stats.MaxTime, stats.LastTime, stats.AverageTime);
+            MessageBox.Show(statsText, "Render Stats", MessageBoxButtons.OK, MessageBoxIcon.Information);
 #endif
-		}
+        }
 #endif
-	}
+    }
 }

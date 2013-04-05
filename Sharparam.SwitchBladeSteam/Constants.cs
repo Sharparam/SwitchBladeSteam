@@ -27,18 +27,17 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-namespace F16Gaming.SwitchBladeSteam
+namespace Sharparam.SwitchBladeSteam
 {
-	public static class Constants
-	{
+    public static class Constants
+    {
 #if DEBUG
-		public const bool DebugEnabled = true;
+        public const bool DebugEnabled = true;
 #else
-		public const bool DebugEnabled = false;
+        public const bool DebugEnabled = false;
 #endif
 
-		public const string BlankTouchpadImage = @"res\images\tp_blank.png";
-		public const string DisabledTouchpadImage = @"res\images\tp_aero.png";
-		public const string DisabledDynamicKeyImage = @"res\images\dk_disabled.png";
-	}
+        public const string BlankTouchpadImage = @"res\images\tp_blank.png";
+        public const string DisabledDynamicKeyImage = @"res\images\dk_disabled.png";
+    }
 }

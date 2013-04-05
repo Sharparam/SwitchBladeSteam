@@ -27,17 +27,17 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-namespace F16Gaming.SwitchBladeSteam.Steam.Events
+namespace Sharparam.SwitchBladeSteam.Steam.Events
 {
-	public class ChatMessageEventArgs
-	{
-		public readonly ChatMessage Message;
+    public class ChatMessageEventArgs
+    {
+        public readonly ChatMessage Message;
 
-		internal ChatMessageEventArgs(ChatMessage message)
-		{
-			Message = message;
-		}
-	}
+        internal ChatMessageEventArgs(ChatMessage message)
+        {
+            Message = message;
+        }
+    }
 
-	public delegate void ChatMessageReceivedEventHandler(object sender, ChatMessageEventArgs e);
+    public delegate void ChatMessageReceivedEventHandler(object sender, ChatMessageEventArgs e);
 }

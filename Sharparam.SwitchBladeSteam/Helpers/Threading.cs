@@ -29,14 +29,14 @@
 
 using System.Threading;
 
-namespace F16Gaming.SwitchBladeSteam.Helpers
+namespace Sharparam.SwitchBladeSteam.Helpers
 {
-	public static class Threading
-	{
-		public static void SetCurrentThreadName(string name)
-		{
-			if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
-				Thread.CurrentThread.Name = name;
-		}
-	}
+    public static class Threading
+    {
+        public static void SetCurrentThreadName(string name)
+        {
+            if (string.IsNullOrEmpty(Thread.CurrentThread.Name))
+                Thread.CurrentThread.Name = name;
+        }
+    }
 }

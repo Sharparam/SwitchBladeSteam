@@ -29,13 +29,13 @@
 
 using System;
 
-namespace F16Gaming.SwitchBladeSteam.Steam
+namespace Sharparam.SwitchBladeSteam.Steam
 {
-	public class SteamException : Exception
-	{
-		internal SteamException(string message, Exception innerException = null) : base(message, innerException)
-		{
-			
-		}
-	}
+    public class SteamException : Exception
+    {
+        internal SteamException(string message, Exception innerException = null) : base(message, innerException)
+        {
+            
+        }
+    }
 }

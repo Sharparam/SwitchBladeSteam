@@ -30,36 +30,36 @@
 using System;
 using System.Windows.Forms;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace Sharparam.SwitchBladeSteam.App
 {
-	public partial class MainWindow : Form
-	{
-		public MainWindow()
-		{
-			InitializeComponent();
+    public partial class MainWindow : Form
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
 
-			if (!Program.DebugMode)
-			{
-				DebugExitButton.Visible = false;
-				ShowStatsButton.Visible = false;
-			}
-		}
+            if (!Program.DebugMode)
+            {
+                DebugExitButton.Visible = false;
+                ShowStatsButton.Visible = false;
+            }
+        }
 
-		public MainWindow(string error) : this()
-		{
-			ErrorLabel.Text = error;
-		}
+        public MainWindow(string error) : this()
+        {
+            ErrorLabel.Text = error;
+        }
 
-		private void DebugExitButtonClick(object sender, EventArgs e)
-		{
-			Close();
-		}
+        private void DebugExitButtonClick(object sender, EventArgs e)
+        {
+            Close();
+        }
 
-		private void ShowStatsButtonClick(object sender, EventArgs e)
-		{
+        private void ShowStatsButtonClick(object sender, EventArgs e)
+        {
 #if DEBUG && RAZER_ENABLED
-			Program.ShowRenderStats();
+            Program.ShowRenderStats();
 #endif
-		}
-	}
+        }
+    }
 }

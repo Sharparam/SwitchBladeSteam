@@ -29,36 +29,33 @@
 
 using System;
 using System.Collections.Generic;
-using F16Gaming.SwitchBladeSteam.Native;
-using F16Gaming.SwitchBladeSteam.Razer.Events;
-using F16Gaming.SwitchBladeSteam.Razer.Structs;
+using Sharparam.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Razer.Events;
+using Sharparam.SwitchBladeSteam.Razer.Structs;
 
-namespace F16Gaming.SwitchBladeSteam.Razer
+namespace Sharparam.SwitchBladeSteam.Razer
 {
-	public interface ITouchpad
-	{
-		event GestureEventHandler Gesture;
+    public interface ITouchpad
+    {
+        event GestureEventHandler Gesture;
 
-		IntPtr CurrentHandle { get; }
-		string CurrentImage { get; }
-		string DisabledImage { get; }
+        IntPtr CurrentHandle { get; }
+        string CurrentImage { get; }
 
-		void SetHandle(IntPtr handle, bool translateGestures = true);
-		void SetImage(string image);
-		void ClearImage();
-		RenderStats GetRenderStats();
-		void ResetRenderStats();
-		void SetKeyboardEnabledControls(IEnumerable<KeyboardControl> controls, bool reset);
-		void StopAll();
-		void StopRender(bool erase, bool force);
+        void SetHandle(IntPtr handle, bool translateGestures = true);
+        void SetImage(string image);
+        void ClearImage();
+        void SetKeyboardEnabledControls(IEnumerable<KeyboardControl> controls, bool reset);
+        void StopAll();
+        void StopRender(bool erase, bool force);
 
-		void SetGesture(RazerAPI.RZGESTURE gesture, bool enabled);
-		void EnableGesture(RazerAPI.RZGESTURE gesture);
-		void DisableGesture(RazerAPI.RZGESTURE gesture);
+        void SetGesture(RazerAPI.GestureType gestureType, bool enabled);
+        void EnableGesture(RazerAPI.GestureType gestureType);
+        void DisableGesture(RazerAPI.GestureType gestureType);
 
-		void SetOSGesture(RazerAPI.RZGESTURE gesture, bool enabled);
-		void EnableOSGesture(RazerAPI.RZGESTURE gesture);
-		void DisableOSGesture(RazerAPI.RZGESTURE gesture);
+        void SetOSGesture(RazerAPI.GestureType gestureType, bool enabled);
+        void EnableOSGesture(RazerAPI.GestureType gestureType);
+        void DisableOSGesture(RazerAPI.GestureType gestureType);
 
-	}
+    }
 }

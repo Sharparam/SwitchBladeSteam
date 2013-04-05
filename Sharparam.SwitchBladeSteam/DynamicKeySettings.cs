@@ -27,31 +27,31 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using F16Gaming.SwitchBladeSteam.Native;
-using F16Gaming.SwitchBladeSteam.Razer.Events;
+using Sharparam.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Razer.Events;
 
-namespace F16Gaming.SwitchBladeSteam
+namespace Sharparam.SwitchBladeSteam
 {
-	public struct DynamicKeySettings
-	{
-		public readonly RazerAPI.RZDYNAMICKEY Key;
-		public readonly string UpImage;
-		public readonly string DownImage;
-		public readonly DynamicKeyPressedEventHandler Handler;
+    public struct DynamicKeySettings
+    {
+        public readonly RazerAPI.DynamicKeyType KeyType;
+        public readonly string UpImage;
+        public readonly string DownImage;
+        public readonly DynamicKeyPressedEventHandler Handler;
 
-		public DynamicKeySettings(RazerAPI.RZDYNAMICKEY key, string image, DynamicKeyPressedEventHandler handler)
-			: this(key, image, image, handler)
-		{
-			
-		}
+        public DynamicKeySettings(RazerAPI.DynamicKeyType keyType, string image, DynamicKeyPressedEventHandler handler)
+            : this(keyType, image, image, handler)
+        {
+            
+        }
 
-		public DynamicKeySettings(RazerAPI.RZDYNAMICKEY key, string upImage, string downImage,
-		                          DynamicKeyPressedEventHandler handler)
-		{
-			Key = key;
-			UpImage = upImage;
-			DownImage = downImage;
-			Handler = handler;
-		}
-	}
+        public DynamicKeySettings(RazerAPI.DynamicKeyType keyType, string upImage, string downImage,
+                                  DynamicKeyPressedEventHandler handler)
+        {
+            KeyType = keyType;
+            UpImage = upImage;
+            DownImage = downImage;
+            Handler = handler;
+        }
+    }
 }

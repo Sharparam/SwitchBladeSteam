@@ -29,18 +29,18 @@
 
 using Steam4NET;
 
-namespace F16Gaming.SwitchBladeSteam.Steam.Extensions
+namespace Sharparam.SwitchBladeSteam.Steam.Extensions
 {
-	public static class ISteamFriends013Extensions
-	{
-		public static int GetFriendCount(this ISteamFriends013 steamFriends, EFriendFlags flags)
-		{
-			return steamFriends.GetFriendCount((int) flags);
-		}
+    public static class ISteamFriends013Extensions
+    {
+        public static int GetFriendCount(this ISteamFriends013 steamFriends, EFriendFlags flags)
+        {
+            return steamFriends.GetFriendCount((int) flags);
+        }
 
-		public static CSteamID GetFriendByIndex(this ISteamFriends013 steamFriends, int index, EFriendFlags flags)
-		{
-			return steamFriends.GetFriendByIndex(index, (int) flags);
-		}
-	}
+        public static CSteamID GetFriendByIndex(this ISteamFriends013 steamFriends, int index, EFriendFlags flags)
+        {
+            return steamFriends.GetFriendByIndex(index, (int) flags);
+        }
+    }
 }

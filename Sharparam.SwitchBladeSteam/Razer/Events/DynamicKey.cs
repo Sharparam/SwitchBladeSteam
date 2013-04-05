@@ -28,23 +28,23 @@
  */
 
 using System;
-using F16Gaming.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Events
+namespace Sharparam.SwitchBladeSteam.Razer.Events
 {
-	public class DynamicKeyEventArgs : EventArgs
-	{
-		public readonly RazerAPI.RZDYNAMICKEY Key;
-		public readonly RazerAPI.RZDKSTATE State;
+    public class DynamicKeyEventArgs : EventArgs
+    {
+        public readonly RazerAPI.DynamicKeyType KeyType;
+        public readonly RazerAPI.DynamicKeyState State;
 
-		internal DynamicKeyEventArgs(RazerAPI.RZDYNAMICKEY key, RazerAPI.RZDKSTATE state)
-		{
-			Key = key;
-			State = state;
-		}
-	}
+        internal DynamicKeyEventArgs(RazerAPI.DynamicKeyType keyType, RazerAPI.DynamicKeyState state)
+        {
+            KeyType = keyType;
+            State = state;
+        }
+    }
 
-	public delegate void DynamicKeyEventHandler(object sender, DynamicKeyEventArgs e);
+    public delegate void DynamicKeyEventHandler(object sender, DynamicKeyEventArgs e);
 
-	public delegate void DynamicKeyPressedEventHandler(object sender, EventArgs e);
+    public delegate void DynamicKeyPressedEventHandler(object sender, EventArgs e);
 }

@@ -28,143 +28,144 @@
  */
 
 using System;
-
-using F16Gaming.SwitchBladeSteam.Native;
-using F16Gaming.SwitchBladeSteam.Razer.Events;
-using F16Gaming.SwitchBladeSteam.Razer.Exceptions;
+using Sharparam.SwitchBladeSteam.Helpers;
+using Sharparam.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Razer.Events;
+using Sharparam.SwitchBladeSteam.Razer.Exceptions;
 using log4net;
+using LogManager = Sharparam.SwitchBladeSteam.Logging.LogManager;
 
-namespace F16Gaming.SwitchBladeSteam.Razer
+namespace Sharparam.SwitchBladeSteam.Razer
 {
-	/// <summary>
-	/// Represents a dynamic key on the SwitchBlade device
-	/// </summary>
-	public class DynamicKey
-	{
-		public event DynamicKeyPressedEventHandler KeyPressed;
+    /// <summary>
+    /// Represents a dynamic key on the SwitchBlade device
+    /// </summary>
+    public class DynamicKey
+    {
+        public event DynamicKeyPressedEventHandler KeyPressed;
 
-		private readonly ILog _log;
+        private readonly ILog _log;
 
-		public RazerAPI.RZDYNAMICKEY Key { get; private set; }
-		public RazerAPI.RZDKSTATE State { get; private set; }
-		public RazerAPI.RZDKSTATE PreviousState { get; private set; }
-		public string UpImage { get; private set; }
-		public string DownImage { get; private set; }
-		public bool SingleImage { get { return UpImage == DownImage; } }
+        public RazerAPI.DynamicKeyType KeyType { get; private set; }
+        public RazerAPI.DynamicKeyState State { get; private set; }
+        public RazerAPI.DynamicKeyState PreviousState { get; private set; }
+        public string UpImage { get; private set; }
+        public string DownImage { get; private set; }
+        public bool SingleImage { get { return UpImage == DownImage; } }
 
-		internal DynamicKey(RazerAPI.RZDYNAMICKEY key, string upImage, string downImage = null, DynamicKeyPressedEventHandler callback = null)
-		{
-			_log = Logging.LogManager.GetLogger(this);
+        internal DynamicKey(RazerAPI.DynamicKeyType keyType, string upImage, string downImage = null, DynamicKeyPressedEventHandler callback = null)
+        {
+            _log = LogManager.GetLogger(this);
 
-			_log.DebugFormat(">> DynamicKey({0}, \"{1}\", {2})", key, upImage, downImage == null ? "null" : "\"" + downImage + "\"");
+            _log.DebugFormat(">> DynamicKey({0}, \"{1}\", {2})", keyType, upImage, downImage == null ? "null" : "\"" + downImage + "\"");
 
-			if (string.IsNullOrEmpty(upImage))
-				throw new ArgumentException("Can't be null or empty", "upImage");
+            if (string.IsNullOrEmpty(upImage))
+                throw new ArgumentException("Can't be null or empty", "upImage");
 
-			if (string.IsNullOrEmpty(downImage))
-			{
-				_log.Debug("downImage is null, setting to value of upImage");
-				downImage = upImage;
-			}
+            if (string.IsNullOrEmpty(downImage))
+            {
+                _log.Debug("downImage is null, setting to value of upImage");
+                downImage = upImage;
+            }
 
-			_log.Debug("Setting default states");
-			State = RazerAPI.RZDKSTATE.UNDEFINED;
-			PreviousState = RazerAPI.RZDKSTATE.UNDEFINED;
-			UpImage = upImage;
-			DownImage = downImage;
-			Key = key;
+            _log.Debug("Setting default states");
+            State = RazerAPI.DynamicKeyState.None;
+            PreviousState = RazerAPI.DynamicKeyState.None;
+            UpImage = upImage;
+            DownImage = downImage;
+            KeyType = keyType;
 
-			_log.Debug("Setting images");
-			SetUpImage(UpImage);
-			SetDownImage(DownImage);
+            _log.Debug("Setting images");
+            SetUpImage(UpImage);
+            SetDownImage(DownImage);
 
-			if (callback != null)
-			{
-				_log.Debug("Setting callback");
-				KeyPressed += callback;
-			}
+            if (callback != null)
+            {
+                _log.Debug("Setting callback");
+                KeyPressed += callback;
+            }
 
-			_log.Debug("<< DynamicKey()");
-		}
+            _log.Debug("<< DynamicKey()");
+        }
 
-		private void OnKeyPressed()
-		{
-			var func = KeyPressed;
-			if (func == null)
-				return;
+        private void OnKeyPressed()
+        {
+            var func = KeyPressed;
+            if (func == null)
+                return;
 
-			try
-			{
-				func(this, null);
-			}
-			catch (ObjectDisposedException ex)
-			{
-				_log.ErrorFormat("OnKeyPressed: ObjectDisposedException: {0}", ex.Message);
-			}
-		}
+            try
+            {
+                func(this, null);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                _log.ErrorFormat("OnKeyPressed: ObjectDisposedException: {0}", ex.Message);
+            }
+        }
 
-		internal void UpdateState(RazerAPI.RZDKSTATE state)
-		{
-			_log.DebugFormat(">> UpdateState({0})", state);
-			PreviousState = State;
-			State = state;
-			if (State == RazerAPI.RZDKSTATE.DOWN && PreviousState == RazerAPI.RZDKSTATE.UP)
-				OnKeyPressed();
-			_log.Debug("<< UpdateState()");
-		}
+        internal void UpdateState(RazerAPI.DynamicKeyState state)
+        {
+            _log.DebugFormat(">> UpdateState({0})", state);
+            PreviousState = State;
+            State = state;
+            if (State == RazerAPI.DynamicKeyState.Down && PreviousState == RazerAPI.DynamicKeyState.Up)
+                OnKeyPressed();
+            _log.Debug("<< UpdateState()");
+        }
 
-		[Obsolete("UpdateState now handles setting the previous state")]
-		internal void UpdatePreviousState(RazerAPI.RZDKSTATE state)
-		{
-			_log.DebugFormat(">> UpdatePreviousState({0})", state);
-			PreviousState = state;
-			_log.Debug("<< UpdatePreviousState()");
-		}
+        [Obsolete("UpdateState now handles setting the previous state")]
+        internal void UpdatePreviousState(RazerAPI.DynamicKeyState state)
+        {
+            _log.DebugFormat(">> UpdatePreviousState({0})", state);
+            PreviousState = state;
+            _log.Debug("<< UpdatePreviousState()");
+        }
 
-		public void SetImage(string image)
-		{
-			_log.DebugFormat(">> SetImage({0})", image);
-			SetUpImage(image);
-			SetDownImage(image);
-			_log.Debug("<< SetImage()");
-		}
+        public void SetImage(string image)
+        {
+            _log.DebugFormat(">> SetImage({0})", image);
+            SetUpImage(image);
+            SetDownImage(image);
+            _log.Debug("<< SetImage()");
+        }
 
-		public void SetImage(string image, RazerAPI.RZDKSTATE state)
-		{
-			_log.DebugFormat(">> SetImage({0}, {1})", image, state);
+        public void SetImage(string image, RazerAPI.DynamicKeyState state)
+        {
+            _log.DebugFormat(">> SetImage({0}, {1})", image, state);
 
-			if (state != RazerAPI.RZDKSTATE.UP && state != RazerAPI.RZDKSTATE.DOWN)
-				throw new ArgumentException("State can only be up or down", "state");
+            if (state != RazerAPI.DynamicKeyState.Up && state != RazerAPI.DynamicKeyState.Down)
+                throw new ArgumentException("State can only be up or down", "state");
 
-			var hResult = RazerAPI.RzSBSetImageDynamicKey(Key, state, Helpers.IO.GetAbsolutePath(image));
-			if (!HRESULT.RZSB_SUCCESS(hResult))
-				throw new RazerNativeException(hResult);
+            var hResult = RazerAPI.RzSBSetImageDynamicKey(KeyType, state, IO.GetAbsolutePath(image));
+            if (!HRESULT.RZSB_SUCCESS(hResult))
+                throw new RazerNativeException(hResult);
 
-			if (state == RazerAPI.RZDKSTATE.UP)
-				UpImage = image;
-			else
-				DownImage = image;
+            if (state == RazerAPI.DynamicKeyState.Up)
+                UpImage = image;
+            else
+                DownImage = image;
 
-			_log.Debug("<< SetImage()");
-		}
+            _log.Debug("<< SetImage()");
+        }
 
-		public void SetUpImage(string image)
-		{
-			_log.DebugFormat(">> SetUpImage({0})", image);
-			SetImage(image, RazerAPI.RZDKSTATE.UP);
-			_log.Debug("<< SetUpImage()");
-		}
+        public void SetUpImage(string image)
+        {
+            _log.DebugFormat(">> SetUpImage({0})", image);
+            SetImage(image, RazerAPI.DynamicKeyState.Up);
+            _log.Debug("<< SetUpImage()");
+        }
 
-		public void SetDownImage(string image)
-		{
-			_log.DebugFormat(">> SetDownImage({0})", image);
-			SetImage(image, RazerAPI.RZDKSTATE.DOWN);
-			_log.Debug("<< SetDownImage()");
-		}
+        public void SetDownImage(string image)
+        {
+            _log.DebugFormat(">> SetDownImage({0})", image);
+            SetImage(image, RazerAPI.DynamicKeyState.Down);
+            _log.Debug("<< SetDownImage()");
+        }
 
-		public void Disable()
-		{
-			SetImage(Constants.DisabledDynamicKeyImage);
-		}
-	}
+        public void Disable()
+        {
+            SetImage(Constants.DisabledDynamicKeyImage);
+        }
+    }
 }

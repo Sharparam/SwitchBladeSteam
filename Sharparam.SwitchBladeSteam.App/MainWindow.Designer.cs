@@ -1,4 +1,4 @@
-﻿namespace F16Gaming.SwitchBladeSteam.App
+﻿namespace Sharparam.SwitchBladeSteam.App
 {
 	partial class MainWindow
 	{
@@ -72,7 +72,7 @@
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.BackColor = System.Drawing.Color.Black;
-			this.BackgroundImage = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.tp_splash;
+			this.BackgroundImage = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.tp_splash;
 			this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.ClientSize = new System.Drawing.Size(800, 480);
 			this.ControlBox = false;

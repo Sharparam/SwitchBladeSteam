@@ -29,10 +29,10 @@
 
 using System.Collections.Generic;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace Sharparam.SwitchBladeSteam.App
 {
-	public interface IDynamicKeyEnabledForm
-	{
-		IEnumerable<DynamicKeySettings> DynamicKeys { get; }
-	}
+    public interface IDynamicKeyEnabledForm
+    {
+        IEnumerable<DynamicKeySettings> DynamicKeys { get; }
+    }
 }

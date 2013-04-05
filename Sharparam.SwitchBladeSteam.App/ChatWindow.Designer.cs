@@ -1,4 +1,4 @@
-﻿namespace F16Gaming.SwitchBladeSteam.App
+﻿namespace Sharparam.SwitchBladeSteam.App
 {
 	partial class ChatWindow
 	{
@@ -82,7 +82,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.Black;
-			this.BackgroundImage = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.tp_splash;
+			this.BackgroundImage = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.tp_splash;
 			this.ClientSize = new System.Drawing.Size(800, 480);
 			this.Controls.Add(this.ChatHistory);
 			this.Controls.Add(this.EntryBox);

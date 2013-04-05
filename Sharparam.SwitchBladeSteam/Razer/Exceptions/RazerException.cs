@@ -29,13 +29,13 @@
 
 using System;
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Exceptions
+namespace Sharparam.SwitchBladeSteam.Razer.Exceptions
 {
-	public class RazerException : Exception
-	{
-		internal RazerException(string message = null, Exception innerException = null) : base(message, innerException)
-		{
-			
-		}
-	}
+    public class RazerException : Exception
+    {
+        internal RazerException(string message = null, Exception innerException = null) : base(message, innerException)
+        {
+            
+        }
+    }
 }

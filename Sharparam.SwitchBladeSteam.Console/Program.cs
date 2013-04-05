@@ -29,26 +29,26 @@
 
 using System;
 using System.Linq;
-using F16Gaming.SwitchBladeSteam.Steam;
+using Sharparam.SwitchBladeSteam.Steam;
 using Steam4NET;
 
-namespace F16Gaming.SwitchBladeSteam.Console
+namespace Sharparam.SwitchBladeSteam.Console
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			System.Console.ReadLine();
-			var start = DateTime.Now;
-			var client = new Client();
-			foreach (var friend in client.FriendsManager.Friends.Where(f => f.GetState() != EPersonaState.k_EPersonaStateOffline))
-			{
-				System.Console.WriteLine("{0} - {1} ({2}) [{3}]", friend.GetName(), friend.GetNickname(), friend.GetStateText(), friend.GetState());
-			}
-			var end = DateTime.Now;
-			System.Console.WriteLine("Execution time: {0}ms", (end - start).TotalMilliseconds);
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            System.Console.ReadLine();
+            var start = DateTime.Now;
+            var client = new Client();
+            foreach (var friend in client.FriendsManager.Friends.Where(f => f.GetState() != EPersonaState.k_EPersonaStateOffline))
+            {
+                System.Console.WriteLine("{0} - {1} ({2}) [{3}]", friend.GetName(), friend.GetNickname(), friend.GetStateText(), friend.GetState());
+            }
+            var end = DateTime.Now;
+            System.Console.WriteLine("Execution time: {0}ms", (end - start).TotalMilliseconds);
 
-			System.Console.ReadLine();
-		}
-	}
+            System.Console.ReadLine();
+        }
+    }
 }

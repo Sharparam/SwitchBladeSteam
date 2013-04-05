@@ -29,21 +29,21 @@
 
 using Steam4NET;
 
-namespace F16Gaming.SwitchBladeSteam.Steam
+namespace Sharparam.SwitchBladeSteam.Steam
 {
-	public struct ChatMessage
-	{
-		public readonly CSteamID Sender;
-		public readonly CSteamID Receiver;
-		public readonly EChatEntryType Type;
-		public readonly string Message;
+    public struct ChatMessage
+    {
+        public readonly CSteamID Sender;
+        public readonly CSteamID Receiver;
+        public readonly EChatEntryType Type;
+        public readonly string Message;
 
-		internal ChatMessage(CSteamID sender, CSteamID receiver, EChatEntryType type, string message)
-		{
-			Sender = sender;
-			Receiver = receiver;
-			Type = type;
-			Message = message;
-		}
-	}
+        internal ChatMessage(CSteamID sender, CSteamID receiver, EChatEntryType type, string message)
+        {
+            Sender = sender;
+            Receiver = receiver;
+            Type = type;
+            Message = message;
+        }
+    }
 }

@@ -29,17 +29,17 @@
 
 using System;
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Structs
+namespace Sharparam.SwitchBladeSteam.Razer.Structs
 {
-	public struct KeyboardControl
-	{
-		public IntPtr Handle;
-		public bool ReleaseOnEnter;
+    public struct KeyboardControl
+    {
+        public IntPtr Handle;
+        public bool ReleaseOnEnter;
 
-		public KeyboardControl(IntPtr handle, bool releaseOnEnter = true)
-		{
-			Handle = handle;
-			ReleaseOnEnter = releaseOnEnter;
-		}
-	}
+        public KeyboardControl(IntPtr handle, bool releaseOnEnter = true)
+        {
+            Handle = handle;
+            ReleaseOnEnter = releaseOnEnter;
+        }
+    }
 }

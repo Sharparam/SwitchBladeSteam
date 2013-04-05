@@ -27,35 +27,35 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using F16Gaming.SwitchBladeSteam.Steam;
+using Sharparam.SwitchBladeSteam.Steam;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace Sharparam.SwitchBladeSteam.App
 {
-	public static class SteamManager
-	{
-		private static Client _client;
-		private static FriendsManager _friendsManager;
+    public static class SteamManager
+    {
+        private static Client _client;
+        private static FriendsManager _friendsManager;
 
-		public static Client Client { get { return CreateClient(); } }
-		public static FriendsManager FriendsManager { get { return CreateFriendsManager(); } }
+        public static Client Client { get { return CreateClient(); } }
+        public static FriendsManager FriendsManager { get { return CreateFriendsManager(); } }
 
-		private static Client CreateClient()
-		{
-			if (_client != null)
-				return _client;
+        private static Client CreateClient()
+        {
+            if (_client != null)
+                return _client;
 
-			_client = new Client();
-			return _client;
-		}
+            _client = new Client();
+            return _client;
+        }
 
-		private static FriendsManager CreateFriendsManager()
-		{
-			if (_friendsManager != null)
-				return _friendsManager;
+        private static FriendsManager CreateFriendsManager()
+        {
+            if (_friendsManager != null)
+                return _friendsManager;
 
-			var client = CreateClient();
-			_friendsManager = client.FriendsManager;
-			return _friendsManager;
-		}
-	}
+            var client = CreateClient();
+            _friendsManager = client.FriendsManager;
+            return _friendsManager;
+        }
+    }
 }

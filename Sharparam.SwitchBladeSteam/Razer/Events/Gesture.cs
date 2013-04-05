@@ -28,27 +28,27 @@
  */
 
 using System;
-using F16Gaming.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Events
+namespace Sharparam.SwitchBladeSteam.Razer.Events
 {
-	public class GestureEventArgs : EventArgs
-	{
-		public readonly RazerAPI.RZGESTURE Gesture;
-		public readonly uint Parameter;
-		public readonly ushort X;
-		public readonly ushort Y;
-		public readonly ushort Z;
+    public class GestureEventArgs : EventArgs
+    {
+        public readonly RazerAPI.GestureType GestureType;
+        public readonly uint Parameter;
+        public readonly ushort X;
+        public readonly ushort Y;
+        public readonly ushort Z;
 
-		internal GestureEventArgs(RazerAPI.RZGESTURE gesture, uint parameter, ushort x, ushort y, ushort z)
-		{
-			Gesture = gesture;
-			Parameter = parameter;
-			X = x;
-			Y = y;
-			Z = z;
-		}
-	}
+        internal GestureEventArgs(RazerAPI.GestureType gestureType, uint parameter, ushort x, ushort y, ushort z)
+        {
+            GestureType = gestureType;
+            Parameter = parameter;
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
 
-	public delegate void GestureEventHandler(object sender, GestureEventArgs e);
+    public delegate void GestureEventHandler(object sender, GestureEventArgs e);
 }

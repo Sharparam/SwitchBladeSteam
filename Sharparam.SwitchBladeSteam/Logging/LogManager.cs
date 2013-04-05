@@ -30,114 +30,114 @@
 using System;
 using System.IO;
 using System.Linq;
+using Sharparam.SwitchBladeSteam.Native;
 using log4net;
 using log4net.Config;
 
 #if DEBUG
 using System.Text;
-using F16Gaming.SwitchBladeSteam.Native;
 using Microsoft.Win32.SafeHandles;
 #endif
 
-namespace F16Gaming.SwitchBladeSteam.Logging
+namespace Sharparam.SwitchBladeSteam.Logging
 {
-	public static class LogManager
-	{
-		private static bool _loaded;
-		private static bool _consoleLoaded;
+    public static class LogManager
+    {
+        private static bool _loaded;
+        private static bool _consoleLoaded;
 
-		public static void LoadConfig(string file = null)
-		{
-			if (file == null)
-			{
-				if (File.Exists(AppDomain.CurrentDomain.FriendlyName + ".config"))
-					XmlConfigurator.Configure();
-				else
-					BasicConfigurator.Configure();
-			}
-			else
-			{
-				if (File.Exists(file))
-					XmlConfigurator.Configure(new FileInfo(file));
-				else
-				{
-					LoadConfig();
-					return;
-				}
-			}
+        public static void LoadConfig(string file = null)
+        {
+            if (file == null)
+            {
+                if (File.Exists(AppDomain.CurrentDomain.FriendlyName + ".config"))
+                    XmlConfigurator.Configure();
+                else
+                    BasicConfigurator.Configure();
+            }
+            else
+            {
+                if (File.Exists(file))
+                    XmlConfigurator.Configure(new FileInfo(file));
+                else
+                {
+                    LoadConfig();
+                    return;
+                }
+            }
 
-			_loaded = true;
-		}
+            _loaded = true;
+        }
 
-		public static ILog GetLogger(object sender)
-		{
-			if (!_loaded)
-				LoadConfig();
+        public static ILog GetLogger(object sender)
+        {
+            if (!_loaded)
+                LoadConfig();
 
-			return log4net.LogManager.GetLogger(sender.GetType().ToString() == "System.RuntimeType" ? (Type) sender : sender.GetType());
-		}
+            return log4net.LogManager.GetLogger(sender.GetType().ToString() == "System.RuntimeType" ? (Type) sender : sender.GetType());
+        }
 
-		public static void SetupConsole()
-		{
+        public static void SetupConsole()
+        {
 #if DEBUG
-			if (System.Diagnostics.Debugger.IsAttached)
-				return;
+            if (System.Diagnostics.Debugger.IsAttached)
+                return;
 
-			WinAPI.AllocConsole();
-			var stdHandle = WinAPI.GetStdHandle(WinAPI.STD_OUTPUT_HANDLE);
-			var safeFileHandle = new SafeFileHandle(stdHandle, true);
-			var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
-			var encoding = Encoding.GetEncoding(WinAPI.CODE_PAGE);
-			var stdOut = new StreamWriter(fileStream, encoding) {AutoFlush = true};
-			Console.SetOut(stdOut);
-			_consoleLoaded = true;
+            WinAPI.AllocConsole();
+            var stdHandle = WinAPI.GetStdHandle(WinAPI.STD_OUTPUT_HANDLE);
+            var safeFileHandle = new SafeFileHandle(stdHandle, true);
+            var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
+            var encoding = Encoding.GetEncoding(WinAPI.CODE_PAGE);
+            var stdOut = new StreamWriter(fileStream, encoding) {AutoFlush = true};
+            Console.SetOut(stdOut);
+            _consoleLoaded = true;
 #endif
-		}
+        }
 
-		public static void DestroyConsole()
-		{
+        public static void DestroyConsole()
+        {
 #if DEBUG
-			if (_consoleLoaded)
-				WinAPI.FreeConsole();
+            if (_consoleLoaded)
+                WinAPI.FreeConsole();
 #endif
-		}
+        }
 
-		public static void ClearOldLogs(int daysOld = 7, string logsDir = "logs")
-		{
-			var log = GetLogger(typeof (LogManager));
+        public static void ClearOldLogs(int daysOld = 7, string logsDir = "logs")
+        {
+            var log = GetLogger(typeof (LogManager));
 
-			log.InfoFormat(">> ClearOldLogs({0}, \"{1}\")", daysOld, logsDir);
+            log.InfoFormat(">> ClearOldLogs({0}, \"{1}\")", daysOld, logsDir);
 
-			if (!Directory.Exists(logsDir))
-			{
-				log.InfoFormat("Directory {0} not found, no logs to clear", logsDir);
-				log.Info("<< ClearOldLogs()");
-				return;
-			}
+            if (!Directory.Exists(logsDir))
+            {
+                log.InfoFormat("Directory {0} not found, no logs to clear", logsDir);
+                log.Info("<< ClearOldLogs()");
+                return;
+            }
 
-			var now = DateTime.Now;
-			var max = new TimeSpan(daysOld, 0, 0, 0);
-			var count = 0;
-			foreach (var file in from file in Directory.GetFiles(logsDir)
-				let modTime = File.GetLastAccessTime(file)
-				let age = now.Subtract(modTime)
-				where age > max
-				select file)
-			{
-				try
-				{
-					File.Delete(file);
-					log.InfoFormat("Deleted old log file: {0}", file);
-					count++;
-				}
-				catch (IOException ex)
-				{
-					log.WarnFormat("Failed to delete log file: {0} ({1})", file, ex.Message);
-				}
-			}
+            var now = DateTime.Now;
+            var max = new TimeSpan(daysOld, 0, 0, 0);
+            var count = 0;
+            foreach (var file in from file in Directory.GetFiles(logsDir)
+                let modTime = File.GetLastAccessTime(file)
+                let age = now.Subtract(modTime)
+                where age > max
+                select file)
+            {
+                try
+                {
+                    File.Delete(file);
+                    log.InfoFormat("Deleted old log file: {0}", file);
+                    count++;
+                }
+                catch (IOException ex)
+                {
+                    log.WarnFormat("Failed to delete log file: {0} ({1})", file, ex.Message);
+                }
+            }
 
-			log.InfoFormat("Done! Cleared {0} log files.", count);
-			log.Info("<< ClearOldLogs()");
-		}
-	}
+            log.InfoFormat("Done! Cleared {0} log files.", count);
+            log.Info("<< ClearOldLogs()");
+        }
+    }
 }

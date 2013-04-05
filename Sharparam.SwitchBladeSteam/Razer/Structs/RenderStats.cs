@@ -27,21 +27,21 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Structs
+namespace Sharparam.SwitchBladeSteam.Razer.Structs
 {
-	public struct RenderStats
-	{
-		public uint Count;
-		public uint MaxTime;
-		public uint LastTime;
-		public uint AverageTime;
+    public struct RenderStats
+    {
+        public uint Count;
+        public uint MaxTime;
+        public uint LastTime;
+        public uint AverageTime;
 
-		internal RenderStats(uint count, uint maxTime, uint lastTime, uint averageTime)
-		{
-			Count = count;
-			MaxTime = maxTime;
-			LastTime = lastTime;
-			AverageTime = averageTime;
-		}
-	}
+        internal RenderStats(uint count, uint maxTime, uint lastTime, uint averageTime)
+        {
+            Count = count;
+            MaxTime = maxTime;
+            LastTime = lastTime;
+            AverageTime = averageTime;
+        }
+    }
 }

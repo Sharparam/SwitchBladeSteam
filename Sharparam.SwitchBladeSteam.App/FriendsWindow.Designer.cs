@@ -1,4 +1,4 @@
-﻿namespace F16Gaming.SwitchBladeSteam.App
+﻿namespace Sharparam.SwitchBladeSteam.App
 {
 	partial class FriendsWindow
 	{

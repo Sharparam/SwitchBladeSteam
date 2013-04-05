@@ -27,18 +27,18 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using F16Gaming.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Exceptions
+namespace Sharparam.SwitchBladeSteam.Razer.Exceptions
 {
-	public class RazerNativeException : RazerException
-	{
-		public readonly HRESULT Hresult;
-		
-		internal RazerNativeException(HRESULT hresult)
-			: base(Native.Helpers.GetErrorMessage(hresult), Native.Helpers.GetWin32Exception(hresult))
-		{
-			Hresult = hresult;
-		}
-	}
+    public class RazerNativeException : RazerException
+    {
+        public readonly HRESULT Hresult;
+        
+        internal RazerNativeException(HRESULT hresult)
+            : base(Native.Helpers.GetErrorMessage(hresult), Native.Helpers.GetWin32Exception(hresult))
+        {
+            Hresult = hresult;
+        }
+    }
 }

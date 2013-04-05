@@ -29,13 +29,13 @@
 
 using System.IO;
 
-namespace F16Gaming.SwitchBladeSteam.Helpers
+namespace Sharparam.SwitchBladeSteam.Helpers
 {
-	public static class IO
-	{
-		public static string GetAbsolutePath(string path)
-		{
-			return Path.Combine(Directory.GetCurrentDirectory(), path);
-		}
-	}
+    public static class IO
+    {
+        public static string GetAbsolutePath(string path)
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), path);
+        }
+    }
 }

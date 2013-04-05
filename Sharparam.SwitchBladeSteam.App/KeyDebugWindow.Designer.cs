@@ -1,4 +1,4 @@
-﻿namespace F16Gaming.SwitchBladeSteam.App
+﻿namespace Sharparam.SwitchBladeSteam.App
 {
 	partial class KeyDebugWindow
 	{
@@ -41,7 +41,7 @@
 			// 
 			this.UpButton.FlatAppearance.BorderSize = 0;
 			this.UpButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.UpButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_up;
+			this.UpButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_up;
 			this.UpButton.Location = new System.Drawing.Point(12, 254);
 			this.UpButton.Name = "UpButton";
 			this.UpButton.Size = new System.Drawing.Size(115, 115);
@@ -53,7 +53,7 @@
 			// 
 			this.OfflineButton.FlatAppearance.BorderSize = 0;
 			this.OfflineButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.OfflineButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_appear_offline;
+			this.OfflineButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_appear_offline;
 			this.OfflineButton.Location = new System.Drawing.Point(133, 133);
 			this.OfflineButton.Name = "OfflineButton";
 			this.OfflineButton.Size = new System.Drawing.Size(115, 115);
@@ -65,7 +65,7 @@
 			// 
 			this.OnlineButton.FlatAppearance.BorderSize = 0;
 			this.OnlineButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.OnlineButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_appear_online;
+			this.OnlineButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_appear_online;
 			this.OnlineButton.Location = new System.Drawing.Point(12, 133);
 			this.OnlineButton.Name = "OnlineButton";
 			this.OnlineButton.Size = new System.Drawing.Size(115, 115);
@@ -77,7 +77,7 @@
 			// 
 			this.FriendsButton.FlatAppearance.BorderSize = 0;
 			this.FriendsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.FriendsButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_friends;
+			this.FriendsButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_friends;
 			this.FriendsButton.Location = new System.Drawing.Point(133, 12);
 			this.FriendsButton.Name = "FriendsButton";
 			this.FriendsButton.Size = new System.Drawing.Size(115, 115);
@@ -89,7 +89,7 @@
 			// 
 			this.HomeButton.FlatAppearance.BorderSize = 0;
 			this.HomeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.HomeButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_home;
+			this.HomeButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_home;
 			this.HomeButton.Location = new System.Drawing.Point(12, 12);
 			this.HomeButton.Name = "HomeButton";
 			this.HomeButton.Size = new System.Drawing.Size(115, 115);
@@ -101,7 +101,7 @@
 			// 
 			this.DownButton.FlatAppearance.BorderSize = 0;
 			this.DownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.DownButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_down;
+			this.DownButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_down;
 			this.DownButton.Location = new System.Drawing.Point(133, 254);
 			this.DownButton.Name = "DownButton";
 			this.DownButton.Size = new System.Drawing.Size(115, 115);
@@ -113,7 +113,7 @@
 			// 
 			this.ChatButton.FlatAppearance.BorderSize = 0;
 			this.ChatButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.ChatButton.Image = global::F16Gaming.SwitchBladeSteam.App.Properties.Resources.dk_chat;
+			this.ChatButton.Image = global::Sharparam.SwitchBladeSteam.App.Properties.Resources.dk_chat;
 			this.ChatButton.Location = new System.Drawing.Point(12, 375);
 			this.ChatButton.Name = "ChatButton";
 			this.ChatButton.Size = new System.Drawing.Size(115, 115);

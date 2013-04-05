@@ -27,14 +27,15 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using F16Gaming.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Razer.Events;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace Sharparam.SwitchBladeSteam.App
 {
-	internal interface IGestureEnabledForm
-	{
-		RazerAPI.RZGESTURE EnabledGestures { get; }
+    internal interface IGestureEnabledForm
+    {
+        RazerAPI.GestureType EnabledGesturesType { get; }
 
-		void HandleGesture(object sender, Razer.Events.GestureEventArgs e);
-	}
+        void HandleGesture(object sender, GestureEventArgs e);
+    }
 }

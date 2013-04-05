@@ -29,26 +29,26 @@
 
 using System;
 using System.Windows.Forms;
-using F16Gaming.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.App
+namespace Sharparam.SwitchBladeSteam.App
 {
-	public class ExtendedListView : ListView
-	{
-		public event EventHandler Scroll;
+    public class ExtendedListView : ListView
+    {
+        public event EventHandler Scroll;
 
-		private void OnScroll()
-		{
-			var func = Scroll;
-			if (func != null)
-				func(this, null);
-		}
+        private void OnScroll()
+        {
+            var func = Scroll;
+            if (func != null)
+                func(this, null);
+        }
 
-		protected override void WndProc(ref Message m)
-		{
-			base.WndProc(ref m);
-			if (m.Msg == WinAPI.WM_HSCROLL || m.Msg == WinAPI.WM_VSCROLL)
-				OnScroll();
-		}
-	}
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg == WinAPI.WM_HSCROLL || m.Msg == WinAPI.WM_VSCROLL)
+                OnScroll();
+        }
+    }
 }

@@ -28,23 +28,23 @@
  */
 
 using System;
-using F16Gaming.SwitchBladeSteam.Native;
+using Sharparam.SwitchBladeSteam.Native;
 
-namespace F16Gaming.SwitchBladeSteam.Razer.Events
+namespace Sharparam.SwitchBladeSteam.Razer.Events
 {
-	public class AppEventEventArgs : EventArgs
-	{
-		public readonly RazerAPI.RZSDKAPPEVENTTYPE Type;
-		public readonly RazerAPI.RZSDKAPPEVENTMODE Mode;
-		public readonly uint ProcessID;
+    public class AppEventEventArgs : EventArgs
+    {
+        public readonly RazerAPI.AppEventType Type;
+        public readonly RazerAPI.AppEventMode Mode;
+        public readonly uint ProcessID;
 
-		internal AppEventEventArgs(RazerAPI.RZSDKAPPEVENTTYPE type, RazerAPI.RZSDKAPPEVENTMODE mode, uint processId)
-		{
-			Type = type;
-			Mode = mode;
-			ProcessID = processId;
-		}
-	}
+        internal AppEventEventArgs(RazerAPI.AppEventType type, RazerAPI.AppEventMode mode, uint processId)
+        {
+            Type = type;
+            Mode = mode;
+            ProcessID = processId;
+        }
+    }
 
-	public delegate void AppEventEventHandler(object sender, AppEventEventArgs e);
+    public delegate void AppEventEventHandler(object sender, AppEventEventArgs e);
 }

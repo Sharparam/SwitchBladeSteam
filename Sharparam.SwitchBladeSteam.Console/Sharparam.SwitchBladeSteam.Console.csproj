@@ -65,7 +65,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\F16Gaming.SwitchBladeSteam.Steam\Sharparam.SwitchBladeSteam.Steam.csproj">
+    <ProjectReference Include="..\Sharparam.SwitchBladeSteam.Steam\Sharparam.SwitchBladeSteam.Steam.csproj">
       <Project>{afe60a20-6e47-41e4-92f8-80b7eaabf03c}</Project>
       <Name>Sharparam.SwitchBladeSteam.Steam</Name>
     </ProjectReference>
@@ -80,7 +80,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UseGlobalSettings="False" />
+      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
