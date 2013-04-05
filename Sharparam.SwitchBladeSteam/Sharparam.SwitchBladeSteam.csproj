@@ -56,6 +56,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -81,16 +83,18 @@
     <Compile Include="Razer\Exceptions\RazerException.cs" />
     <Compile Include="Razer\Exceptions\RazerNativeException.cs" />
     <Compile Include="Razer\Exceptions\RazerUnstableShutdownException.cs" />
-    <Compile Include="Razer\ITouchpad.cs" />
     <Compile Include="Razer\Structs\KeyboardControl.cs" />
     <Compile Include="Razer\RazerManager.cs" />
     <Compile Include="Razer\Structs\RenderStats.cs" />
     <Compile Include="Razer\Touchpad.cs" />
+    <Compile Include="TouchpadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UseGlobalSettings="False" />
+      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>

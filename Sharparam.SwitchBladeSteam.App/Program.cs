@@ -30,6 +30,7 @@
 #define STEAM
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -39,6 +40,7 @@ using Sharparam.SwitchBladeSteam.Helpers;
 using Sharparam.SwitchBladeSteam.Native;
 using Sharparam.SwitchBladeSteam.Razer;
 using Sharparam.SwitchBladeSteam.Razer.Events;
+using Sharparam.SwitchBladeSteam.Razer.Exceptions;
 using Sharparam.SwitchBladeSteam.Steam;
 using Steam4NET;
 using log4net;
@@ -68,7 +70,7 @@ namespace Sharparam.SwitchBladeSteam.App
 #if RAZER_ENABLED
         private static RazerManager _razerManager;
 
-        private static Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> _dynamicKeyHandlers;
+        private static Dictionary<RazerAPI.DynamicKeyType, DynamicKeyOptions> _dynamicKeyHandlers;
 #endif
 
         internal static bool DebugMode { get; private set; }
@@ -130,10 +132,10 @@ namespace Sharparam.SwitchBladeSteam.App
 #endif
 
 #if RAZER_ENABLED
-            _dynamicKeyHandlers = new Dictionary<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions>
+            _dynamicKeyHandlers = new Dictionary<RazerAPI.DynamicKeyType, DynamicKeyOptions>
             {
                 {
-                    RazerAPI.RZDYNAMICKEY.DK1, new DynamicKeyOptions
+                    RazerAPI.DynamicKeyType.DK1, new DynamicKeyOptions
                     {
                         Image = @"res\images\dk_home.png",
                         DownImage = @"res\images\dk_home_down.png",
@@ -141,7 +143,7 @@ namespace Sharparam.SwitchBladeSteam.App
                     }
                 },
                 {
-                    RazerAPI.RZDYNAMICKEY.DK2, new DynamicKeyOptions
+                    RazerAPI.DynamicKeyType.DK2, new DynamicKeyOptions
                     {
                         Image = @"res\images\dk_friends.png",
                         DownImage = @"res\images\dk_friends_down.png",
@@ -149,7 +151,7 @@ namespace Sharparam.SwitchBladeSteam.App
                     }
                 },
                 {
-                    RazerAPI.RZDYNAMICKEY.DK6, new DynamicKeyOptions
+                    RazerAPI.DynamicKeyType.DK6, new DynamicKeyOptions
                     {	
                         Image = @"res\images\dk_appear_online.png",
                         DownImage = @"res\images\dk_appear_online_down.png",
@@ -157,7 +159,7 @@ namespace Sharparam.SwitchBladeSteam.App
                     }
                 },
                 {
-                    RazerAPI.RZDYNAMICKEY.DK7, new DynamicKeyOptions
+                    RazerAPI.DynamicKeyType.DK7, new DynamicKeyOptions
                     {
                         Image = @"res\images\dk_appear_offline.png",
                         DownImage = @"res\images\dk_appear_offline_down.png",
@@ -194,14 +196,14 @@ namespace Sharparam.SwitchBladeSteam.App
             
             _log.Info("Enabling dynamic keys");
             
-            foreach (KeyValuePair<RazerAPI.RZDYNAMICKEY, DynamicKeyOptions> pair in _dynamicKeyHandlers)
+            foreach (KeyValuePair<RazerAPI.DynamicKeyType, DynamicKeyOptions> pair in _dynamicKeyHandlers)
                 _razerManager.EnableDynamicKey(pair.Key, pair.Value.Callback, pair.Value.Image, pair.Value.DownImage);
 #else
             MessageBox.Show(
                 "RAZER_ENABLED is not defined, application will not interface with any SwitchBlade capable devices. Running on desktop only.",
                 "RAZER_ENABLED undefined", MessageBoxButtons.OK, MessageBoxIcon.Information);
 #endif
-            ShowForm(new MainWindow());
+            ShowForm(new MainWindow(_razerManager));
 
             _log.Error("Reached end of Main(), unexpected behaviour. Please report to developer.");
         }
@@ -211,57 +213,21 @@ namespace Sharparam.SwitchBladeSteam.App
             _log.Debug(">> ShowForm([form])");
 
 #if RAZER_ENABLED
-            _log.Debug("Setting handle on switchblade touchpad");
+            _log.Debug("Setting form on switchblade touchpad");
             var touchpad = _razerManager.GetTouchpad();
-            var gestureForm = form as IGestureEnabledForm;
             try
             {
                 // Only translate gestures if the form is not implementing
                 // its own gesture handler
-                touchpad.SetHandle(form.Handle, gestureForm == null);
+                touchpad.SetForm(form);
             }
             catch (ObjectDisposedException ex)
             {
-                _log.ErrorFormat("ShowForm: touchpad.SetHandle failed [ObjectDisposedException]: {0}", ex.Message);
+                _log.ErrorFormat("ShowForm: touchpad.SetForm failed [ObjectDisposedException]: {0}", ex.Message);
                 _log.Error("Exception detail:", ex);
                 _log.Warn("Attempting to recover by showing main window");
-                ShowForm(new MainWindow("Failed to complete the requested action."));
+                ShowForm(new MainWindow(_razerManager, "Failed to complete the requested action."));
                 return;
-            }
-
-            // Forward gestures, if needed
-            if (gestureForm != null)
-            {
-                _log.Debug("Form is gesture enabled, setting gestures to be captured");
-                touchpad.DisableGesture(RazerAPI.RZGESTURE.ALL);
-                touchpad.EnableGesture(gestureForm.EnabledGestures);
-                touchpad.Gesture += gestureForm.HandleGesture;
-            }
-
-            // Add controls, if needed
-            var kbForm = form as IKeyboardEnabledForm;
-            if (kbForm != null)
-            {
-                _log.Debug("Form is keyboard enabled, obtaining control handles to set active keyboard controls");
-                var controls = kbForm.GetKeyboardEnabledControls() as List<Control>;
-                if (controls == null) // GetKeyboardEnabledControls should never return null, but just in case
-                {
-                    // According to docs, Razer's API will fall back to registering _everything_ as keyboard interactive
-                    _log.Error("GetKeyboardEnabledControls returned null! Keyboard support will NOT work as expected!");
-                }
-                else
-                {
-                    var numCtrls = controls.Count;
-                    _log.DebugFormat("{0} controls will be registered", numCtrls);
-                    var kbControls = new KeyboardControl[numCtrls];
-                    for (int i = 0; i < numCtrls; i++)
-                    {
-                        kbControls[i] = new KeyboardControl(controls[i].Handle, false);
-                    }
-                    _log.Debug("Calling SetKeyboardEnabledControls on touchpad object");
-                    touchpad.SetKeyboardEnabledControls(kbControls);
-                    _log.Debug("Done! Controls have been registered for keyboard interaction!");
-                }
             }
 
             // Enable additional dynamic keys, if needed
@@ -340,7 +306,7 @@ namespace Sharparam.SwitchBladeSteam.App
 
 #if RAZER_ENABLED
             _log.Info("Stopping render on touchpad");
-            _razerManager.GetTouchpad().StopRender(erase);
+            _razerManager.GetTouchpad().ClearForm();
 #endif
             if (_activeForm.Visible)
             {
@@ -349,18 +315,6 @@ namespace Sharparam.SwitchBladeSteam.App
                 _activeForm.Closed -= ActiveFormClosed;
 
 #if RAZER_ENABLED
-                try
-                {
-                    var gestureForm = _activeForm as IGestureEnabledForm;
-                    if (gestureForm != null)
-                        _razerManager.GetTouchpad().Gesture -= gestureForm.HandleGesture;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                }
-
                 var keyForm = _activeForm as IDynamicKeyEnabledForm;
                 if (keyForm != null)
                 {
@@ -384,17 +338,6 @@ namespace Sharparam.SwitchBladeSteam.App
 
 #if RAZER_ENABLED
             var touchpad = _razerManager.GetTouchpad();
-            try
-            {
-                var gestureForm = _activeForm as IGestureEnabledForm;
-                if (gestureForm != null)
-                    touchpad.Gesture -= gestureForm.HandleGesture;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Exception when unregistering gesture handler: " + ex.GetType() + " (" + ex.Message + ")", "Error",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Stop);
-            }
 
             var keyForm = _activeForm as IDynamicKeyEnabledForm;
             if (keyForm != null)
@@ -404,7 +347,7 @@ namespace Sharparam.SwitchBladeSteam.App
                     _razerManager.DisableDynamicKey(settings.Key);
             }
 
-            touchpad.StopRender(false);
+            touchpad.ClearForm();
 #endif
             _log.Debug("<< ActiveFormClosing()");
         }
@@ -427,7 +370,7 @@ namespace Sharparam.SwitchBladeSteam.App
                 _log.Info("Active form is not null, stopping render");
                 var touchpad = _razerManager.GetTouchpad();
                 if (touchpad != null)
-                    touchpad.StopRender();
+                    touchpad.ClearForm();
             }
 
             _log.Info("Stopping Razer interface");
@@ -455,7 +398,7 @@ namespace Sharparam.SwitchBladeSteam.App
             if (_activeForm is MainWindow)
                 return;
 
-            QueueForm(new MainWindow());
+            QueueForm(new MainWindow(_razerManager));
             CloseCurrentForm();
         }
 
@@ -464,7 +407,7 @@ namespace Sharparam.SwitchBladeSteam.App
             if (_activeForm is FriendsWindow)
                 return;
 
-            QueueForm(new FriendsWindow());
+            QueueForm(new FriendsWindow(_razerManager));
             CloseCurrentForm();
         }
 
@@ -574,16 +517,6 @@ namespace Sharparam.SwitchBladeSteam.App
             _log.Debug(">> DebugQuitButton()");
             ClearCurrentForm(true);
             _log.Debug("<< DebugQuitButton()");
-        }
-
-        public static void ShowRenderStats()
-        {
-#if RAZER_ENABLED
-            var stats = _razerManager.GetTouchpad().GetRenderStats();
-            var statsText = string.Format("Count: {0}\nMax Time: {1}\nLast Time: {2}\nAverage Time: {3}",
-                                          stats.Count, stats.MaxTime, stats.LastTime, stats.AverageTime);
-            MessageBox.Show(statsText, "Render Stats", MessageBoxButtons.OK, MessageBoxIcon.Information);
-#endif
         }
 #endif
     }

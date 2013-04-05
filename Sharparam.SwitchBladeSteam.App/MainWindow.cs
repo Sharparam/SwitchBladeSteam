@@ -29,23 +29,20 @@
 
 using System;
 using System.Windows.Forms;
+using Sharparam.SwitchBladeSteam.Razer;
 
 namespace Sharparam.SwitchBladeSteam.App
 {
-    public partial class MainWindow : Form
+    public partial class MainWindow : TouchpadForm
     {
-        public MainWindow()
+        public MainWindow(RazerManager manager) : base(manager)
         {
             InitializeComponent();
 
-            if (!Program.DebugMode)
-            {
-                DebugExitButton.Visible = false;
-                ShowStatsButton.Visible = false;
-            }
+            DebugExitButton.Visible = Program.DebugMode;
         }
 
-        public MainWindow(string error) : this()
+        public MainWindow(RazerManager manager, string error) : this(manager)
         {
             ErrorLabel.Text = error;
         }
@@ -53,13 +50,6 @@ namespace Sharparam.SwitchBladeSteam.App
         private void DebugExitButtonClick(object sender, EventArgs e)
         {
             Close();
-        }
-
-        private void ShowStatsButtonClick(object sender, EventArgs e)
-        {
-#if DEBUG && RAZER_ENABLED
-            Program.ShowRenderStats();
-#endif
         }
     }
 }

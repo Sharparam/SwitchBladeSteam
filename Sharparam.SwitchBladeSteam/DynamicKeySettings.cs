@@ -34,21 +34,21 @@ namespace Sharparam.SwitchBladeSteam
 {
     public struct DynamicKeySettings
     {
-        public readonly RazerAPI.DynamicKeyType KeyType;
+        public readonly RazerAPI.DynamicKeyType Key;
         public readonly string UpImage;
         public readonly string DownImage;
         public readonly DynamicKeyPressedEventHandler Handler;
 
-        public DynamicKeySettings(RazerAPI.DynamicKeyType keyType, string image, DynamicKeyPressedEventHandler handler)
-            : this(keyType, image, image, handler)
+        public DynamicKeySettings(RazerAPI.DynamicKeyType key, string image, DynamicKeyPressedEventHandler handler)
+            : this(key, image, image, handler)
         {
             
         }
 
-        public DynamicKeySettings(RazerAPI.DynamicKeyType keyType, string upImage, string downImage,
+        public DynamicKeySettings(RazerAPI.DynamicKeyType key, string upImage, string downImage,
                                   DynamicKeyPressedEventHandler handler)
         {
-            KeyType = keyType;
+            Key = key;
             UpImage = upImage;
             DownImage = downImage;
             Handler = handler;

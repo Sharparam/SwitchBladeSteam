@@ -29,18 +29,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Sharparam.SwitchBladeSteam.Extensions;
 using Sharparam.SwitchBladeSteam.Helpers;
 using Sharparam.SwitchBladeSteam.Native;
 using Sharparam.SwitchBladeSteam.Razer.Events;
+using Sharparam.SwitchBladeSteam.Razer.Exceptions;
 using Sharparam.SwitchBladeSteam.Razer.Structs;
 using log4net;
 using LogManager = Sharparam.SwitchBladeSteam.Logging.LogManager;
 
 namespace Sharparam.SwitchBladeSteam.Razer
 {
-    public class Touchpad : ITouchpad
+    public class Touchpad
     {
         public event GestureEventHandler Gesture;
 
@@ -55,9 +60,9 @@ namespace Sharparam.SwitchBladeSteam.Razer
         private static RazerAPI.TouchpadGestureCallbackFunctionDelegate _gestureCallback;
 
         /// <summary>
-        /// Will be set to IntPtr.Zero if no handle associated.
+        /// Will be set to null if no active form.
         /// </summary>
-        public IntPtr CurrentHandle { get; private set; }
+        public Form CurrentForm { get; private set; }
 
         /// <summary>
         /// Current image shown on the Touchpad, null if not using static image.
@@ -84,42 +89,37 @@ namespace Sharparam.SwitchBladeSteam.Razer
                 func(this, new GestureEventArgs(gestureType, parameter, x, y, z));
         }
 
-        public void SetHandle(IntPtr handle, bool translateGestures = true)
+        public void SetForm(Form form)
         {
-            _log.Debug(">> SetHandle([handle])");
-            StopRender(false);
+            _log.Debug(">> SetForm([form])");
 
-            //var hResult = RazerAPI.RzSBWinRenderStart(handle, translateGestures, Constants.DebugEnabled);
-            //if (hResult == HRESULT.RZSB_ALREADY_STARTED)
-            //{
-            //    _log.Warn("WinRender already started, attempting to force render stop and try again...");
-            //    StopRender(false, true);
-            //    _log.Info("Attempting to start WinRender again...");
-            //    hResult = RazerAPI.RzSBWinRenderStart(handle, translateGestures, Constants.DebugEnabled);
-            //}
+            ClearForm();
 
-            //if (HRESULT.RZSB_FAILED(hResult))
-            //    RazerManager.NativeCallFailure("RzSBWinRenderStart", hResult);
+            CurrentForm = form;
 
-            CurrentHandle = handle;
+            CurrentForm.Paint += DrawForm;
 
-            _log.Debug("<< SetHandle()");
+            _log.Debug("<< SetForm()");
         }
 
-        public void SetKeyboardEnabledControls(IEnumerable<KeyboardControl> keyboardControls, bool resetList = true)
+        public void ClearForm()
         {
-            _log.Debug(">> SetKeyboardEnabledControls([handles])");
+            _log.Debug(">> ClearForm()");
 
-            //_log.Debug("Getting keyboard controls array");
-            //var kbControlArray = keyboardControls as KeyboardControl[] ?? keyboardControls.ToArray();
+            if (CurrentForm != null)
+            {
+                CurrentForm.Paint -= DrawForm;
+                CurrentForm.Close();
+                CurrentForm.Dispose();
+                CurrentForm = null;
+            }
 
-            _log.Debug("<< SetKeyboardEnabledControls()");
+            _log.Debug("<< ClearForm()");
         }
 
         public void SetImage(string image)
         {
             _log.DebugFormat(">> SetImage({0})", image);
-            StopRender();
 
             image = IO.GetAbsolutePath(image);
 
@@ -130,25 +130,6 @@ namespace Sharparam.SwitchBladeSteam.Razer
             CurrentImage = image;
 
             _log.Debug("<< SetImage()");
-        }
-
-        public void StopRender(bool erase = true, bool force = false)
-        {
-            _log.DebugFormat(">> StopRender({0})", erase ? "true" : "false");
-            if (CurrentHandle == IntPtr.Zero && !force)
-            {
-                _log.Debug("CurrentHandle is null and force was not specified, aborting.");
-                _log.Debug("<< StopRender()");
-                return;
-            }
-            
-            //var hResult = RazerAPI.RzSBWinRenderStop(erase);
-            //if (HRESULT.RZSB_FAILED(hResult))
-            //    RazerManager.NativeCallFailure("RzSBWinRenderStop", hResult);
-
-            CurrentHandle = IntPtr.Zero;
-
-            _log.Debug("<< StopRender()");
         }
 
         public void ClearImage()
@@ -166,7 +147,7 @@ namespace Sharparam.SwitchBladeSteam.Razer
 
         public void StopAll()
         {
-            StopRender();
+            ClearForm();
             ClearImage();
         }
 
@@ -319,10 +300,47 @@ namespace Sharparam.SwitchBladeSteam.Razer
             // Do not log gesture events, it gets VERY SPAMMY
 
             //_log.DebugFormat(">> HandleTouchpadGesture({0}, {1}, {2}, {3}, {4})", gesture, dwParameters, wXPos, wYPos, wZPos);
-            var result = HRESULT.RZSB_OK;
             OnGesture(gestureType, dwParameters, wXPos, wYPos, wZPos);
             //_log.Debug("<< HandleTouchpadGesture()");
-            return result;
+            return HRESULT.RZSB_OK;
+        }
+
+        private void DrawForm(object sender, PaintEventArgs e)
+        {
+            // TODO: Finish this function
+
+            var source = new Bitmap(CurrentForm.Width, CurrentForm.Height);
+            CurrentForm.DrawToBitmap(source, CurrentForm.ClientRectangle);
+            
+            var dest = new Bitmap(source.Width, source.Height, PixelFormat.Format16bppRgb565);
+            using (Graphics g = Graphics.FromImage(dest))
+            {
+                g.DrawImageUnscaled(source, 0, 0);
+            }
+
+            var rect = new Rectangle(0, 0, dest.Width, dest.Height);
+            var bitmapData = dest.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb565);
+            var data = new byte[dest.Width * dest.Height * 2];
+            Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
+            dest.UnlockBits(bitmapData);
+            
+            var flipped = new byte[data.Length];
+            for (int i = 0, j = data.Length - dest.Width; i < data.Length; i += dest.Width, j -= dest.Width)
+                for (int k = 0; k < dest.Width; ++k)
+                    flipped[i + k] = data[j + k];
+
+            var bufferData = new RazerAPI.BufferParams
+            {
+                DataSize = (uint)data.Length,
+                PixelType = RazerAPI.PixelType.RGB565
+            };
+
+            var hResult = RazerAPI.RzSBRenderBuffer(RazerAPI.TargetDisplay.Widget, ref bufferData);
+            if (HRESULT.RZSB_FAILED(hResult))
+                RazerManager.NativeCallFailure("RzSBRenderBuffer", hResult);
+
+            dest.Dispose();
+            source.Dispose();
         }
     }
 }

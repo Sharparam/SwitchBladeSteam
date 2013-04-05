@@ -1,4 +1,4 @@
-﻿/* ITouchpad.cs
+﻿/* TouchpadForm.cs
  *
  * Copyright © 2013 by Adam Hellberg
  * 
@@ -27,35 +27,18 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using System;
-using System.Collections.Generic;
-using Sharparam.SwitchBladeSteam.Native;
-using Sharparam.SwitchBladeSteam.Razer.Events;
-using Sharparam.SwitchBladeSteam.Razer.Structs;
+using System.Windows.Forms;
+using Sharparam.SwitchBladeSteam.Razer;
 
-namespace Sharparam.SwitchBladeSteam.Razer
+namespace Sharparam.SwitchBladeSteam
 {
-    public interface ITouchpad
+    public class TouchpadForm : Form
     {
-        event GestureEventHandler Gesture;
+        protected readonly RazerManager Manager;
 
-        IntPtr CurrentHandle { get; }
-        string CurrentImage { get; }
-
-        void SetHandle(IntPtr handle, bool translateGestures = true);
-        void SetImage(string image);
-        void ClearImage();
-        void SetKeyboardEnabledControls(IEnumerable<KeyboardControl> controls, bool reset);
-        void StopAll();
-        void StopRender(bool erase, bool force);
-
-        void SetGesture(RazerAPI.GestureType gestureType, bool enabled);
-        void EnableGesture(RazerAPI.GestureType gestureType);
-        void DisableGesture(RazerAPI.GestureType gestureType);
-
-        void SetOSGesture(RazerAPI.GestureType gestureType, bool enabled);
-        void EnableOSGesture(RazerAPI.GestureType gestureType);
-        void DisableOSGesture(RazerAPI.GestureType gestureType);
-
+        public TouchpadForm(RazerManager manager)
+        {
+            Manager = manager;
+        }
     }
 }
