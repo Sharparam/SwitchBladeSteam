@@ -45,279 +45,262 @@
  * └────────┴─────────┴──────────────────────┘
  */
 
+// 2013-04-05: Major update to reflect changes in the new SDK.
+
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace F16Gaming.SwitchBladeSteam.Native
+namespace Sharparam.SwitchBladeSteam.Native
 {
-	public static class RazerAPI
-	{
-		// Native functions from SwitchBladeSDK32.dll, all functions are __cdecl calls
+    public static class RazerAPI
+    {
+        // Native functions from SwitchBladeSDK32.dll, all functions are __cdecl calls
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBStart();
+        #region File Constants
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBStop();
-		
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBQueryCapabilities(out SBSDKQUERYCAPABILITIES pSBSDKCap);
+        public const string DllName = "RzSwitchbladeSDK2.dll";
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBRenderBuffer([In] RZTARGET_DISPLAY dwTarget, [In] ref RZSB_BUFFERPARAMS bufferParams);
+        #endregion File Constants
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBSetImageDynamicKey(
-			[In] RZDYNAMICKEY dk,
-			[In] RZDKSTATE state,
-			[In] [MarshalAs(UnmanagedType.LPWStr)] string lpszImageFilename);
+        #region Functions
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBSetImageTouchpad([In] [MarshalAs(UnmanagedType.LPWStr)] string lpszImageFilename);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBStart();
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBAppEventSetCallback([In] AppEventCallbackDelegate pFn);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern void RzSBStop();
+        
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBQueryCapabilities(out Capabilities pSBSDKCap);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBDynamicKeySetCallback([In] DynamicKeyCallbackFunctionDelegate pFn);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBRenderBuffer([In] TargetDisplay dwTarget, [In] ref BufferParams bufferParams);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBGestureSetCallback([In] TouchpadGestureCallbackFunctionDelegate pFn);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBSetImageDynamicKey(
+            [In] DynamicKeyType dk,
+            [In] DynamicKeyState state,
+            [In] [MarshalAsAttribute(UnmanagedType.LPWStr)] string filename);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBGestureEnable([In] RZGESTURE gesture, [In] bool bEnable);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBSetImageTouchpad([In] [MarshalAsAttribute(UnmanagedType.LPWStr)] string filename);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBGestureSetNotification([In] RZGESTURE gesture, [In] bool bEnable);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBEnableGesture([In] GestureType gestureType, [In] bool bEnable);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBGestureSetOSNotification([In] RZGESTURE gesture, [In] bool bEnable);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBEnableOSGesture([In] GestureType gestureType, [In] bool bEnable);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderSetDisabledImage([In] [MarshalAs(UnmanagedType.LPWStr)] string pszImageFilename);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBCaptureKeyboard(bool bEnable);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderAddKeyInputCtrls(
-			[In] RZSB_KEYEVTCTRLS[] pKeyboardEvtCtrls,
-			[In] int nCtrlCount,
-			[In] bool bResetList);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBAppEventSetCallback([In] AppEventCallbackDelegate callback);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderStart([In] IntPtr hwnd, [In] bool bTranslateGestures, [In] bool bVisibleOnDesktop);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBDynamicKeySetCallback([In] DynamicKeyCallbackFunctionDelegate callback);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderStop([In] bool bEraseOnStop);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBGestureSetCallback([In] TouchpadGestureCallbackFunctionDelegate callback);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderGetStats(out uint pdwCount, out uint pdwMaxTime, out uint pdwLastTime, out uint pdwAverageTime);
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+        public static extern HRESULT RzSBKeyboardCaptureSetCallback([In] KeyboardCallbackFunctionDelegate callback);
 
-		[DllImport("SwitchBladeSDK32.dll", CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-		public static extern HRESULT RzSBWinRenderResetStats();
+        #endregion Functions
 
-		// Delegates
+        #region Delegates
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT DynamicKeyCallbackFunctionDelegate(RZDYNAMICKEY dynamicKey, RZDKSTATE dynamicKeyState);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate HRESULT DynamicKeyCallbackFunctionDelegate(DynamicKeyType dynamicKeyType, DynamicKeyState dynamicKeyState);
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT AppEventCallbackDelegate(RZSDKAPPEVENTTYPE appEventType, uint dwAppMode, uint dwProcessID);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate HRESULT AppEventCallbackDelegate(AppEventType appEventType, uint dwAppMode, uint dwProcessID);
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT TouchpadGestureCallbackFunctionDelegate(RZGESTURE gesture, uint dwParameters, ushort wXPos, ushort wYPos, ushort wZPos);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate HRESULT TouchpadGestureCallbackFunctionDelegate(GestureType gestureType, uint dwParameters, ushort wXPos, ushort wYPos, ushort wZPos);
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		public delegate HRESULT KeyboardCallbackFunctionDelegate(uint uMsg, uint wParam, int lParam);
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate HRESULT KeyboardCallbackFunctionDelegate(uint uMsg, UIntPtr wParam, IntPtr lParam);
 
-		// Structs
+        #endregion
 
-		[StructLayout(LayoutKind.Sequential)]
-		public struct Point
-		{
-			public int x;
-			public int y;
-		}
+        #region Structs
 
-		[StructLayout(LayoutKind.Explicit)]
-		public struct SBSDKQUERYCAPABILITIES
-		{
-			[FieldOffset(0)]
-			public uint qc_version;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Point
+        {
+            public int X;
+            public int Y;
+        }
 
-			[FieldOffset(4)]
-			public uint qc_BEVersion;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Capabilities
+        {
+            public ulong Version;
 
-			[FieldOffset(8)]
-			public SWITCHBLADEHARDWARETYPE qc_HardwareType;
+            public ulong BEVersion;
 
-			[FieldOffset(12)]
-			public uint qc_numSurfaces;
+            public HardwareType HardwareType;
 
-			[FieldOffset(16)]
-			[MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_SUPPORTED_SURFACES)]
-			public Point[] qc_surfacegeometry;
+            public ulong NumSurfaces;
 
-			[FieldOffset(32)]
-			[MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_SUPPORTED_SURFACES)]
-			public uint[] qc_pixelformat;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MaxSupportedSurfaces)]
+            public Point[] Surfacegeometry;
 
-			[FieldOffset(40)]
-			public byte qc_numDynamicKeys;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MaxSupportedSurfaces)]
+            public uint[] Pixelformat;
 
-			[FieldOffset(41)]
-			public Point qc_DynamicKeyArrangement;
+            public byte NumDynamicKeys;
 
-			[FieldOffset(49)]
-			public Point qc_keyDynamicKeySize;
-		}
+            public Point DynamicKeyArrangement;
 
-		[StructLayout(LayoutKind.Explicit)]
-		public struct RZSB_BUFFERPARAMS
-		{
-			[FieldOffset(0)]
-			public PIXEL_TYPE PixelType;
+            public Point DynamicKeySize;
+        }
 
-			[FieldOffset(4)]
-			public uint DataSize;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BufferParams
+        {
+            public PixelType PixelType;
+            public uint DataSize;
+            public IntPtr PtrData;
+        }
 
-			[FieldOffset(8)]
-			public IntPtr pData;
-		}
+        #endregion Structs
 
-		[StructLayout(LayoutKind.Explicit)]
-		public struct RZSB_KEYEVTCTRLS
-		{
-			[FieldOffset(0)]
-			public IntPtr hwndTarget;
+        #region Enumerations
 
-			[FieldOffset(4)]
-			public bool bReleaseOnEnter;
-		}
+        public enum DynamicKeyState
+        {
+            None = 0,
+            Up,
+            Down,
+            Hold,
+            Invalid
+        }
 
-		// Enums
+        public enum Direction
+        {
+            None = 0,
+            Left,
+            Right,
+            Up,
+            Down,
+            Invalid
+        }
 
-		public enum RZDKSTATE
-		{
-			INVALID = 0,
-			DISABLED,
-			UP,
-			DOWN,
-			UNDEFINED
-		}
+        public enum DynamicKeyType
+        {
+            None = 0,
+            DK1,
+            DK2,
+            DK3,
+            DK4,
+            DK5,
+            DK6,
+            DK7,
+            DK8,
+            DK9,
+            DK10,
+            Invalid,
+            Count = 10
+        }
 
-		public enum RZDYNAMICKEY
-		{
-			INVALID = 0,
-			DK1,
-			DK2,
-			DK3,
-			DK4,
-			DK5,
-			DK6,
-			DK7,
-			DK8,
-			DK9,
-			DK10,
-			UNDEFINED
-		}
+        public enum TargetDisplay
+        {
+            Widget = ((1 << 16) | (0)),
+            DK1    = ((1 << 16) | (1)),
+            DK2    = ((1 << 16) | (2)),
+            DK3    = ((1 << 16) | (3)),
+            DK4    = ((1 << 16) | (4)),
+            DK5    = ((1 << 16) | (5)),
+            DK6    = ((1 << 16) | (6)),
+            DK7    = ((1 << 16) | (7)),
+            DK8    = ((1 << 16) | (8)),
+            DK9    = ((1 << 16) | (9)),
+            DK10   = ((1 << 16) | (10))
+        }
 
-		public enum RZTARGET_DISPLAY
-		{
-			WIDGET = 65536,
-			DK_1 = 65537,
-			DK_2 = 65538,
-			DK_3 = 65539,
-			DK_4 = 65540,
-			DK_5 = 65541,
-			DK_6 = 65542,
-			DK_7 = 65543,
-			DK_8 = 65544,
-			DK_9 = 65545,
-			DK_10 = 65546
-		}
+        public enum PixelType
+        {
+            RGB565 = 0
+        }
 
-		public enum PIXEL_TYPE
-		{
-			RGB565 = 0
-		}
+        public enum AppEventType
+        {
+            None = 0,
+            Activated,
+            Deactivated,
+            Close,
+            Exit,
+            Invalid
+        }
 
-		public enum RZSDKAPPEVENTTYPE
-		{
-			INVALID = 0,
-			APPMODE = INVALID + 1,
-			UNDEFINED = INVALID + 2
-		}
+        public enum AppEventMode
+        {
+            Applet = 0x02,
+            Normal = 0x04
+        }
 
-		public enum RZSDKAPPEVENTMODE
-		{
-			APPLET = 0x02,
-			NORMAL = 0x04
-		}
+        [Flags]
+        public enum GestureType : uint
+        {
+            None    = 0x00000000,
+            Press   = 0x00000001,
+            Tap     = 0x00000002,
+            Flick   = 0x00000004,
+            Zoom    = 0x00000008,
+            Rotate  = 0x00000010,
+            Move    = 0x00000020,
+            Hold    = 0x00000040,
+            Release = 0x00000080,
+            Scroll  = 0x00000100,
+            All     = 0xFFFF
+        }
 
-		[Flags]
-		public enum RZGESTURE : uint
-		{
-			INVALID = 0x00000000,
-			NONE = 0x00000001,
-			PRESS = 0x00000002,
-			TAP = 0x00000004,
-			FLICK = 0x00000008,
-			ZOOM = 0x00000010,
-			ROTATE = 0x00000020,
-			ALL = 0x0000003e,
-			UNDEFINED = 0xffffffc0
-		}
+        public enum HardwareType
+        {
+            Invalid = 0,
+            Switchblade,
+            Undefined
+        }
 
-		public enum SWITCHBLADEHARDWARETYPE
-		{
-			INVALID = 0,
-			SWITCHBLADE,
-			UNDEFINED
-		}
+        #endregion Enumerations
 
-		// Constants
+        #region Constants
 
-		/*
-		 * definitions for the Dynamic Key display region of the Switchblade
-		 */
-		public const int DYNAMIC_KEYS_PER_ROW = 5;
-		public const int DYNAMIC_KEYS_ROWS = 2;
-		public const int DYNAMIC_KEYS_COUNT = DYNAMIC_KEYS_PER_ROW * DYNAMIC_KEYS_ROWS;
-		public const int DYNAMIC_KEY_X_SIZE = 115;
-		public const int DYNAMIC_KEY_Y_SIZE = 115;
-		public const int DK_SIZE_IMAGEDATA = DYNAMIC_KEY_X_SIZE * DYNAMIC_KEY_Y_SIZE * sizeof(ushort);
+        /*
+         * definitions for the Dynamic Key display region of the Switchblade
+         */
+        public const int DynamicKeysPerRow = 5;
+        public const int DynamicKeysRows = 2;
+        public const int DynamicKeysCount = DynamicKeysPerRow * DynamicKeysRows;
+        public const int DynamicKeyWidth = 115;
+        public const int DynamicKeyHeight = 115;
+        public const int DynamicKeyImageDataSize = DynamicKeyWidth * DynamicKeyHeight * sizeof(ushort);
 
-		/*
-		 * definitions for the Touchpad display region of the Switchblade
-		 */
-		public const int TOUCHPAD_X_SIZE = 800;
-		public const int TOUCHPAD_Y_SIZE = 480;
-		public const int TOUCHPAD_SIZE_IMAGEDATA = TOUCHPAD_X_SIZE * TOUCHPAD_Y_SIZE * sizeof(ushort);
+        /*
+         * definitions for the Touchpad display region of the Switchblade
+         */
+        public const int TouchpadWidth = 800;
+        public const int TouchpadHeight = 480;
+        public const int TouchpadImageDataSize = TouchpadWidth * TouchpadHeight * sizeof(ushort);
 
-		public const int SWITCHBLADE_DISPLAY_COLOR_DEPTH = 16;
+        public const int DisplayColorDepth = 16;
 
-		public const int MAX_STRING_LENGTH = 260;
+        public const int MaxStringLength = 260;
 
-		public const int MAX_SUPPORTED_SURFACES = 2;
+        public const int MaxSupportedSurfaces = 2;
 
-		public const int PIXEL_FORMAT_INVALID = 0;
-		public const int PIXEL_FORMAT_RGB_565 = 1;
+        public const int PixelFormatInvalid = 0;
+        public const int PixelFormatRgb565 = 1;
 
-		// "Macros"
+        #endregion Constants
 
-		public static bool ValidDynamicKey(int a) { return (int) RZDYNAMICKEY.INVALID < a && a < (int) RZDYNAMICKEY.UNDEFINED; }
-		public static bool ValidDynamicKeyState(int a) { return (int) RZDKSTATE.INVALID < a && a < (int) RZDKSTATE.UNDEFINED; }
-		public static bool ValidGesture(uint a) { return (a & (uint) RZGESTURE.ALL) != 0; }
-		public static bool SingleGesture(uint a) { return 0 == ((a - a) & a); }
-		public static int TARGET_MASK(int x) { return (1 << 16) | x; }
+        #region Macros
 
-		// Is this needed?
-		public static void DebugCheckFault()
-		{
-#if DEBUG
-			if (Debugger.IsAttached)
-				Debugger.Break();
-#endif
-		}
-	}
+        public static bool ValidGesture(uint a) { return (a & (uint) GestureType.All) != 0; }
+        public static bool SingleGesture(uint a) { return 0 == ((a - a) & a); }
+
+        #endregion Macros
+    }
 }
