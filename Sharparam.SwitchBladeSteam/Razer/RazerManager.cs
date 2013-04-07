@@ -27,6 +27,7 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
+using System;
 using System.IO;
 using Sharparam.SwitchBladeSteam.Helpers;
 using Sharparam.SwitchBladeSteam.Native;
@@ -39,7 +40,7 @@ namespace Sharparam.SwitchBladeSteam.Razer
 {
     public delegate void VoidDelegate();
 
-    public class RazerManager
+    public class RazerManager : IDisposable
     {
         public event AppEventEventHandler AppEvent;
         public event DynamicKeyEventHandler DynamicKeyEvent;
@@ -110,6 +111,22 @@ namespace Sharparam.SwitchBladeSteam.Razer
             _dkCallbacks = new VoidDelegate[RazerAPI.DynamicKeysCount];
 
             _log.Debug("<< RazerManager()");
+        }
+
+        public void Dispose()
+        {
+            _log.Debug(">> Dispose()");
+            _log.Debug("RazerManager is disposing...");
+
+            if (_touchpad != null)
+            {
+                _touchpad.Dispose();
+                _touchpad = null;
+            }
+
+            _log.Debug("Dispose: Calling Stop()");
+            Stop();
+            _log.Debug("<< Dispose()");
         }
 
         private void OnAppEvent(RazerAPI.AppEventType type, RazerAPI.AppEventMode mode, uint processId)

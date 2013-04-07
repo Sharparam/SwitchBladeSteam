@@ -45,7 +45,7 @@ using LogManager = Sharparam.SwitchBladeSteam.Logging.LogManager;
 
 namespace Sharparam.SwitchBladeSteam.Razer
 {
-    public class Touchpad
+    public class Touchpad : IDisposable
     {
         public event GestureEventHandler Gesture;
 
@@ -56,6 +56,10 @@ namespace Sharparam.SwitchBladeSteam.Razer
 
         private bool _allGestureEnabled;
         private bool _allOSGestureEnabled;
+
+        private Bitmap _formBitmap;
+        private Bitmap _razerBitmap;
+        private Graphics _razerBmpGraphics;
 
         private static RazerAPI.TouchpadGestureCallbackFunctionDelegate _gestureCallback;
 
@@ -79,7 +83,33 @@ namespace Sharparam.SwitchBladeSteam.Razer
             var hResult = RazerAPI.RzSBGestureSetCallback(_gestureCallback);
             if (HRESULT.RZSB_FAILED(hResult))
                 RazerManager.NativeCallFailure("RzSBGestureSetCallback", hResult);
+            _log.Debug("Initializing bitmap objects...");
+            _formBitmap = new Bitmap(RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight);
+            _razerBitmap = new Bitmap(RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight, PixelFormat.Format16bppRgb565);
+            _log.Debug("Obtaining graphics object for razer bitmap...");
+            _razerBmpGraphics = Graphics.FromImage(_razerBitmap);
             _log.Debug("<< Touchpad()");
+        }
+
+        public void Dispose()
+        {
+            if (_razerBmpGraphics != null)
+            {
+                _razerBmpGraphics.Dispose();
+                _razerBmpGraphics = null;
+            }
+            
+            if (_razerBitmap != null)
+            {
+                _razerBitmap.Dispose();
+                _razerBitmap = null;
+            }
+
+            if (_formBitmap != null)
+            {
+                _formBitmap.Dispose();
+                _formBitmap = null;
+            }
         }
         
         private void OnGesture(RazerAPI.GestureType gestureType, uint parameter, ushort x, ushort y, ushort z)
@@ -305,42 +335,40 @@ namespace Sharparam.SwitchBladeSteam.Razer
             return HRESULT.RZSB_OK;
         }
 
+        // Big thanks to ben_a_adams at the Razer Developer forum
+        // for sharing his drawing code.
         private void DrawForm(object sender, PaintEventArgs e)
         {
-            // TODO: Finish this function
+            // TODO: Test this function
 
-            var source = new Bitmap(CurrentForm.Width, CurrentForm.Height);
-            CurrentForm.DrawToBitmap(source, CurrentForm.ClientRectangle);
-            
-            var dest = new Bitmap(source.Width, source.Height, PixelFormat.Format16bppRgb565);
-            using (Graphics g = Graphics.FromImage(dest))
+            if (CurrentForm == null || CurrentForm.IsDisposed)
+                return;
+
+            CurrentForm.DrawToBitmap(_formBitmap, CurrentForm.ClientRectangle);
+            _razerBmpGraphics.DrawImageUnscaled(_formBitmap, 0, 0);
+
+            var bitmapData = _razerBitmap.LockBits(new Rectangle(0, 0, RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight),
+                                                   ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb565);
+
+            var buffer = new RazerAPI.BufferParams
             {
-                g.DrawImageUnscaled(source, 0, 0);
-            }
-
-            var rect = new Rectangle(0, 0, dest.Width, dest.Height);
-            var bitmapData = dest.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb565);
-            var data = new byte[dest.Width * dest.Height * 2];
-            Marshal.Copy(bitmapData.Scan0, data, 0, data.Length);
-            dest.UnlockBits(bitmapData);
-            
-            var flipped = new byte[data.Length];
-            for (int i = 0, j = data.Length - dest.Width; i < data.Length; i += dest.Width, j -= dest.Width)
-                for (int k = 0; k < dest.Width; ++k)
-                    flipped[i + k] = data[j + k];
-
-            var bufferData = new RazerAPI.BufferParams
-            {
-                DataSize = (uint)data.Length,
-                PixelType = RazerAPI.PixelType.RGB565
+                PixelType = RazerAPI.PixelType.RGB565,
+                DataSize = RazerAPI.TouchpadWidth * RazerAPI.TouchpadHeight * sizeof (short),
+                PtrData = bitmapData.Scan0
             };
 
-            var hResult = RazerAPI.RzSBRenderBuffer(RazerAPI.TargetDisplay.Widget, ref bufferData);
+            var ptrToImageStruct = Marshal.AllocHGlobal(Marshal.SizeOf(buffer));
+            Marshal.StructureToPtr(buffer, ptrToImageStruct, true);
+
+            var hResult = RazerAPI.RzSBRenderBuffer(RazerAPI.TargetDisplay.Widget, ptrToImageStruct);
+
+            // Free resources before handling return
+
+            Marshal.FreeHGlobal(ptrToImageStruct);
+            _razerBitmap.UnlockBits(bitmapData);
+
             if (HRESULT.RZSB_FAILED(hResult))
                 RazerManager.NativeCallFailure("RzSBRenderBuffer", hResult);
-
-            dest.Dispose();
-            source.Dispose();
         }
     }
 }

@@ -297,7 +297,7 @@ namespace Sharparam.SwitchBladeSteam.App
                 _activeForm.Close();
         }
 
-        private static void ClearCurrentForm(bool erase = false)
+        private static void ClearCurrentForm()
         {
             _log.Debug(">> ClearCurrentForm()");
 
@@ -452,7 +452,7 @@ namespace Sharparam.SwitchBladeSteam.App
         private static void QuitKeyPressed(object sender, EventArgs e)
         {
             _log.Debug(">> QuitKeyPressed()");
-            ClearCurrentForm(true);
+            ClearCurrentForm();
             _log.Debug("<< QuitKeyPressed()");
         }
 
@@ -515,7 +515,7 @@ namespace Sharparam.SwitchBladeSteam.App
         public static void DebugQuitButton()
         {
             _log.Debug(">> DebugQuitButton()");
-            ClearCurrentForm(true);
+            ClearCurrentForm();
             _log.Debug("<< DebugQuitButton()");
         }
 #endif

@@ -74,7 +74,7 @@ namespace Sharparam.SwitchBladeSteam.Native
         public static extern HRESULT RzSBQueryCapabilities(out Capabilities pSBSDKCap);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-        public static extern HRESULT RzSBRenderBuffer([In] TargetDisplay dwTarget, [In] ref BufferParams bufferParams);
+        public static extern HRESULT RzSBRenderBuffer([In] TargetDisplay dwTarget, [In] /*ref BufferParams*/ IntPtr bufferParams);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
         public static extern HRESULT RzSBSetImageDynamicKey(
