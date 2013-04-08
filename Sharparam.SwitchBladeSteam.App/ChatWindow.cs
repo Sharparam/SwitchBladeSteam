@@ -41,12 +41,13 @@ using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.App
 {
-    public partial class ChatWindow : TouchpadForm , IKeyboardEnabledForm
+    public partial class ChatWindow : Form , IKeyboardEnabledForm
     {
         private readonly log4net.ILog _log;
+        private readonly RazerManager _manager;
         private Friend _friend;
 
-        public ChatWindow(RazerManager manager, CSteamID friendId) : base(manager)
+        public ChatWindow(RazerManager manager, CSteamID friendId)
         {
             if (Program.SteamFriends == null)
                 throw new Exception("ChatWindow does not work without steam features enabled");
@@ -55,6 +56,8 @@ namespace Sharparam.SwitchBladeSteam.App
             _log.DebugFormat(">> ChatWindow({0})", friendId.Render());
 
             InitializeComponent();
+
+            _manager = manager;
 
             _log.Debug("Setting friend variable");
             _friend = Program.SteamFriends.GetFriendBySteamId(friendId);
@@ -175,7 +178,7 @@ namespace Sharparam.SwitchBladeSteam.App
             {
                 _log.Info("Friend null or offline, closing chat window");
                 _friend = null;
-                Program.QueueForm(new FriendsWindow(Manager));
+                Program.QueueForm(new FriendsWindow(_manager));
                 Close();
                 return;
             }

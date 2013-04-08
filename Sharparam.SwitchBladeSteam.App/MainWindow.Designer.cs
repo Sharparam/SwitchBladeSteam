@@ -30,6 +30,7 @@
 		{
             this.DebugExitButton = new System.Windows.Forms.Button();
             this.ErrorLabel = new System.Windows.Forms.Label();
+            this.RenderButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // DebugExitButton
@@ -55,6 +56,17 @@
             this.ErrorLabel.TabIndex = 1;
             this.ErrorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // RenderButton
+            // 
+            this.RenderButton.ForeColor = System.Drawing.Color.Black;
+            this.RenderButton.Location = new System.Drawing.Point(285, 256);
+            this.RenderButton.Name = "RenderButton";
+            this.RenderButton.Size = new System.Drawing.Size(289, 65);
+            this.RenderButton.TabIndex = 2;
+            this.RenderButton.Text = "PRESS TO RENDER";
+            this.RenderButton.UseVisualStyleBackColor = true;
+            this.RenderButton.Click += new System.EventHandler(this.RenderButtonClick);
+            // 
             // MainWindow
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -63,6 +75,7 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(800, 480);
             this.ControlBox = false;
+            this.Controls.Add(this.RenderButton);
             this.Controls.Add(this.ErrorLabel);
             this.Controls.Add(this.DebugExitButton);
             this.DoubleBuffered = true;
@@ -81,6 +94,7 @@
 
 		private System.Windows.Forms.Button DebugExitButton;
         private System.Windows.Forms.Label ErrorLabel;
+        private System.Windows.Forms.Button RenderButton;
 
 	}
 }

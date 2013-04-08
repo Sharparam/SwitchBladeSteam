@@ -98,9 +98,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SteamManager.cs" />
-    <Compile Include="TouchpadForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <EmbeddedResource Include="ChatWindow.resx">
       <DependentUpon>ChatWindow.cs</DependentUpon>
     </EmbeddedResource>

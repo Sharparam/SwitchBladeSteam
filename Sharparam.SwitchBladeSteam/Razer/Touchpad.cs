@@ -57,10 +57,6 @@ namespace Sharparam.SwitchBladeSteam.Razer
         private bool _allGestureEnabled;
         private bool _allOSGestureEnabled;
 
-        private Bitmap _formBitmap;
-        private Bitmap _razerBitmap;
-        private Graphics _razerBmpGraphics;
-
         private static RazerAPI.TouchpadGestureCallbackFunctionDelegate _gestureCallback;
 
         /// <summary>
@@ -83,33 +79,12 @@ namespace Sharparam.SwitchBladeSteam.Razer
             var hResult = RazerAPI.RzSBGestureSetCallback(_gestureCallback);
             if (HRESULT.RZSB_FAILED(hResult))
                 RazerManager.NativeCallFailure("RzSBGestureSetCallback", hResult);
-            _log.Debug("Initializing bitmap objects...");
-            _formBitmap = new Bitmap(RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight);
-            _razerBitmap = new Bitmap(RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight, PixelFormat.Format16bppRgb565);
-            _log.Debug("Obtaining graphics object for razer bitmap...");
-            _razerBmpGraphics = Graphics.FromImage(_razerBitmap);
             _log.Debug("<< Touchpad()");
         }
 
         public void Dispose()
         {
-            if (_razerBmpGraphics != null)
-            {
-                _razerBmpGraphics.Dispose();
-                _razerBmpGraphics = null;
-            }
             
-            if (_razerBitmap != null)
-            {
-                _razerBitmap.Dispose();
-                _razerBitmap = null;
-            }
-
-            if (_formBitmap != null)
-            {
-                _formBitmap.Dispose();
-                _formBitmap = null;
-            }
         }
         
         private void OnGesture(RazerAPI.GestureType gestureType, uint parameter, ushort x, ushort y, ushort z)
@@ -127,7 +102,7 @@ namespace Sharparam.SwitchBladeSteam.Razer
 
             CurrentForm = form;
 
-            CurrentForm.Paint += DrawForm;
+            //CurrentForm.Paint += DrawForm;
 
             _log.Debug("<< SetForm()");
         }
@@ -138,10 +113,7 @@ namespace Sharparam.SwitchBladeSteam.Razer
 
             if (CurrentForm != null)
             {
-                CurrentForm.Paint -= DrawForm;
-                CurrentForm.Close();
-                CurrentForm.Dispose();
-                CurrentForm = null;
+                //CurrentForm.Paint -= DrawForm;
             }
 
             _log.Debug("<< ClearForm()");
@@ -325,6 +297,44 @@ namespace Sharparam.SwitchBladeSteam.Razer
             _log.Debug("<< DisableOSGesture()");
         }
 
+        public void DrawForm(Form form)
+        {
+            if (form == null || form.IsDisposed)
+                return;
+
+            var source = new Bitmap(RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight);
+            var dest = new Bitmap(source.Width, source.Height, PixelFormat.Format16bppRgb565);
+
+            using (var g = Graphics.FromImage(dest))
+                g.DrawImageUnscaled(source, 0, 0);
+
+            var data = dest.LockBits(new Rectangle(0, 0, dest.Width, dest.Height),
+                                     ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb565);
+
+            var buffer = new RazerAPI.BufferParams
+            {
+                PixelType = RazerAPI.PixelType.RGB565,
+                DataSize = (uint) (dest.Width * dest.Height * sizeof (short)),
+                PtrData = data.Scan0
+            };
+
+            var ptrToImageStruct = Marshal.AllocHGlobal(Marshal.SizeOf(buffer));
+            Marshal.StructureToPtr(buffer, ptrToImageStruct, true);
+
+            var hResult = RazerAPI.RzSBRenderBuffer(RazerAPI.TargetDisplay.Widget, ptrToImageStruct);
+
+            // Free resources before handling return
+
+            Marshal.FreeHGlobal(ptrToImageStruct);
+            dest.UnlockBits(data);
+
+            dest.Dispose();
+            source.Dispose();
+
+            if (HRESULT.RZSB_FAILED(hResult))
+                RazerManager.NativeCallFailure("RzSBRenderBuffer", hResult);
+        }
+
         private HRESULT HandleTouchpadGesture(RazerAPI.GestureType gestureType, uint dwParameters, ushort wXPos, ushort wYPos, ushort wZPos)
         {
             // Do not log gesture events, it gets VERY SPAMMY
@@ -337,38 +347,9 @@ namespace Sharparam.SwitchBladeSteam.Razer
 
         // Big thanks to ben_a_adams at the Razer Developer forum
         // for sharing his drawing code.
-        private void DrawForm(object sender, PaintEventArgs e)
+        private void FormPaintHandler(object sender, PaintEventArgs e)
         {
-            // TODO: Test this function
-
-            if (CurrentForm == null || CurrentForm.IsDisposed)
-                return;
-
-            CurrentForm.DrawToBitmap(_formBitmap, CurrentForm.ClientRectangle);
-            _razerBmpGraphics.DrawImageUnscaled(_formBitmap, 0, 0);
-
-            var bitmapData = _razerBitmap.LockBits(new Rectangle(0, 0, RazerAPI.TouchpadWidth, RazerAPI.TouchpadHeight),
-                                                   ImageLockMode.ReadOnly, PixelFormat.Format16bppRgb565);
-
-            var buffer = new RazerAPI.BufferParams
-            {
-                PixelType = RazerAPI.PixelType.RGB565,
-                DataSize = RazerAPI.TouchpadWidth * RazerAPI.TouchpadHeight * sizeof (short),
-                PtrData = bitmapData.Scan0
-            };
-
-            var ptrToImageStruct = Marshal.AllocHGlobal(Marshal.SizeOf(buffer));
-            Marshal.StructureToPtr(buffer, ptrToImageStruct, true);
-
-            var hResult = RazerAPI.RzSBRenderBuffer(RazerAPI.TargetDisplay.Widget, ptrToImageStruct);
-
-            // Free resources before handling return
-
-            Marshal.FreeHGlobal(ptrToImageStruct);
-            _razerBitmap.UnlockBits(bitmapData);
-
-            if (HRESULT.RZSB_FAILED(hResult))
-                RazerManager.NativeCallFailure("RzSBRenderBuffer", hResult);
+            DrawForm(CurrentForm);
         }
     }
 }

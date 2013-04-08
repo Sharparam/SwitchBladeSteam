@@ -33,11 +33,15 @@ using Sharparam.SwitchBladeSteam.Razer;
 
 namespace Sharparam.SwitchBladeSteam.App
 {
-    public partial class MainWindow : TouchpadForm
+    public partial class MainWindow : Form
     {
-        public MainWindow(RazerManager manager) : base(manager)
+        private RazerManager _manager;
+
+        public MainWindow(RazerManager manager)
         {
             InitializeComponent();
+
+            _manager = manager;
 
             DebugExitButton.Visible = Program.DebugMode;
         }
@@ -50,6 +54,11 @@ namespace Sharparam.SwitchBladeSteam.App
         private void DebugExitButtonClick(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void RenderButtonClick(object sender, EventArgs e)
+        {
+            _manager.GetTouchpad().DrawForm(this);
         }
     }
 }

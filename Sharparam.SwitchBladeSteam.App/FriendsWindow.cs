@@ -40,9 +40,11 @@ using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.App
 {
-    public partial class FriendsWindow : TouchpadForm, IDynamicKeyEnabledForm
+    public partial class FriendsWindow : Form, IDynamicKeyEnabledForm
     {
         private readonly log4net.ILog _log;
+
+        private readonly RazerManager _manager;
 
         private readonly List<DynamicKeySettings> _dynamicKeys = new List<DynamicKeySettings>();
 
@@ -53,12 +55,14 @@ namespace Sharparam.SwitchBladeSteam.App
 
         public IEnumerable<DynamicKeySettings> DynamicKeys { get { return _dynamicKeys; } } 
 
-        public FriendsWindow(RazerManager manager) : base(manager)
+        public FriendsWindow(RazerManager manager)
         {
             _log = LogManager.GetLogger(this);
             _log.Debug(">> FriendsWindow()");
 
             InitializeComponent();
+
+            _manager = manager;
 
             if (Program.SteamFriends != null)
             {
@@ -148,7 +152,7 @@ namespace Sharparam.SwitchBladeSteam.App
         {
             _log.DebugFormat(">> StartChat({0})", id.Render());
             _log.Debug("Queueing the chatwindow form");
-            Program.QueueForm(new ChatWindow(Manager, id));
+            Program.QueueForm(new ChatWindow(_manager, id));
             Close();
             _log.Debug("<< StartChat()");
         }
