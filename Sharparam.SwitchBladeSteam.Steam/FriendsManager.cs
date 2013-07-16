@@ -30,7 +30,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Sharparam.SwitchBladeSteam.Logging;
+using Sharparam.SharpBlade.Logging;
 using Sharparam.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
@@ -38,7 +38,7 @@ namespace Sharparam.SwitchBladeSteam.Steam
 {
     public class FriendsManager
     {
-        private readonly log4net.ILog _log;
+        private readonly ILog _log;
 
         public event FriendsUpdatedEventHandler FriendsUpdated;
 

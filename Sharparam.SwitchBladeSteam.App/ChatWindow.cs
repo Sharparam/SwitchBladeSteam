@@ -31,10 +31,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Sharparam.SwitchBladeSteam.Logging;
-using Sharparam.SwitchBladeSteam.Native;
-using Sharparam.SwitchBladeSteam.Razer;
-using Sharparam.SwitchBladeSteam.Razer.Events;
+using Sharparam.SharpBlade.Logging;
+using Sharparam.SharpBlade.Native;
+using Sharparam.SharpBlade.Razer;
+using Sharparam.SharpBlade.Razer.Events;
 using Sharparam.SwitchBladeSteam.Steam;
 using Sharparam.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
@@ -43,7 +43,7 @@ namespace Sharparam.SwitchBladeSteam.App
 {
     public partial class ChatWindow : Form , IKeyboardEnabledForm
     {
-        private readonly log4net.ILog _log;
+        private readonly ILog _log;
         private readonly RazerManager _manager;
         private Friend _friend;
 

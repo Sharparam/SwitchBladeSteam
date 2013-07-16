@@ -32,17 +32,18 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Sharparam.SwitchBladeSteam.Helpers;
-using Sharparam.SwitchBladeSteam.Logging;
-using Sharparam.SwitchBladeSteam.Native;
-using Sharparam.SwitchBladeSteam.Razer;
+using Sharparam.SharpBlade;
+using Sharparam.SharpBlade.Helpers;
+using Sharparam.SharpBlade.Logging;
+using Sharparam.SharpBlade.Native;
+using Sharparam.SharpBlade.Razer;
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.App
 {
     public partial class FriendsWindow : Form, IDynamicKeyEnabledForm
     {
-        private readonly log4net.ILog _log;
+        private readonly ILog _log;
 
         private readonly RazerManager _manager;
 

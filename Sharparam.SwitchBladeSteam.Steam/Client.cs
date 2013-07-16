@@ -27,7 +27,7 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using Sharparam.SwitchBladeSteam.Logging;
+using Sharparam.SharpBlade.Logging;
 using Sharparam.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
@@ -38,7 +38,7 @@ namespace Sharparam.SwitchBladeSteam.Steam
         // Events
         public event ChatMessageReceivedEventHandler ChatMessageReceived;
 
-        private readonly log4net.ILog _log;
+        private readonly ILog _log;
 
         private bool _isDisposed;
 

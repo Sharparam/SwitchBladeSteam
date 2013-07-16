@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using Sharparam.SwitchBladeSteam.Logging;
+using Sharparam.SharpBlade.Logging;
 using Sharparam.SwitchBladeSteam.Steam.Events;
 using Steam4NET;
 
@@ -41,7 +41,7 @@ namespace Sharparam.SwitchBladeSteam.Steam
     {
         public event ChatMessageReceivedEventHandler ChatMessageReceived;
 
-        private readonly log4net.ILog _log;
+        private readonly ILog _log;
 
         private readonly SteamFriends _steamFriends;
         private readonly CSteamID _steamId;

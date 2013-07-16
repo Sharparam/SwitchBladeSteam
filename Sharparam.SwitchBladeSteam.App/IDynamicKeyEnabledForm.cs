@@ -28,6 +28,7 @@
  */
 
 using System.Collections.Generic;
+using Sharparam.SharpBlade;
 
 namespace Sharparam.SwitchBladeSteam.App
 {

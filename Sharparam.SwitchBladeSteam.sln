@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SwitchBladeSteam", "Sharparam.SwitchBladeSteam\Sharparam.SwitchBladeSteam.csproj", "{2C390908-D634-4450-9804-71D4929DD392}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SwitchBladeSteam.Steam", "Sharparam.SwitchBladeSteam.Steam\Sharparam.SwitchBladeSteam.Steam.csproj", "{AFE60A20-6E47-41E4-92F8-80B7EAABF03C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SwitchBladeSteam.Console", "Sharparam.SwitchBladeSteam.Console\Sharparam.SwitchBladeSteam.Console.csproj", "{F42106ED-5812-4398-B7E2-391FA5273944}"
@@ -10,6 +8,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steam4NET", "Steam4NET2\Steam4NET.csproj", "{1A204257-FE82-4BBE-9ED4-40694821C31F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SwitchBladeSteam.App", "Sharparam.SwitchBladeSteam.App\Sharparam.SwitchBladeSteam.App.csproj", "{2C411DDE-EA1E-4A15-9720-5776C9E94FDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SharpBlade", "Sharparam.SharpBlade\Sharparam.SharpBlade\Sharparam.SharpBlade.csproj", "{2C390908-D634-4450-9804-71D4929DD392}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2C390908-D634-4450-9804-71D4929DD392}.Debug (Razer Enabled)|Any CPU.ActiveCfg = Debug (Razer Enabled)|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Debug (Razer Enabled)|Any CPU.Build.0 = Debug (Razer Enabled)|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Release (Razer Enabled)|Any CPU.ActiveCfg = Release (Razer Enabled)|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Release (Razer Enabled)|Any CPU.Build.0 = Release (Razer Enabled)|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C390908-D634-4450-9804-71D4929DD392}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFE60A20-6E47-41E4-92F8-80B7EAABF03C}.Debug (Razer Enabled)|Any CPU.ActiveCfg = Debug (Razer Enabled)|Any CPU
 		{AFE60A20-6E47-41E4-92F8-80B7EAABF03C}.Debug (Razer Enabled)|Any CPU.Build.0 = Debug (Razer Enabled)|Any CPU
 		{AFE60A20-6E47-41E4-92F8-80B7EAABF03C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -59,6 +51,14 @@ Global
 		{2C411DDE-EA1E-4A15-9720-5776C9E94FDB}.Release (Razer Enabled)|Any CPU.Build.0 = Release (Razer Enabled)|Any CPU
 		{2C411DDE-EA1E-4A15-9720-5776C9E94FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C411DDE-EA1E-4A15-9720-5776C9E94FDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Debug (Razer Enabled)|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Debug (Razer Enabled)|Any CPU.Build.0 = Debug|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Release (Razer Enabled)|Any CPU.ActiveCfg = Release|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Release (Razer Enabled)|Any CPU.Build.0 = Release|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C390908-D634-4450-9804-71D4929DD392}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -29,7 +29,7 @@
 
 using System;
 using System.Windows.Forms;
-using Sharparam.SwitchBladeSteam.Razer;
+using Sharparam.SharpBlade.Razer;
 
 namespace Sharparam.SwitchBladeSteam.App
 {

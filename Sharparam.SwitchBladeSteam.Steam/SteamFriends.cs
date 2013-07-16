@@ -29,9 +29,8 @@
 
 using System.Drawing;
 using System.Text;
+using Sharparam.SharpBlade.Logging;
 using Steam4NET;
-using log4net;
-using LogManager = Sharparam.SwitchBladeSteam.Logging.LogManager;
 
 namespace Sharparam.SwitchBladeSteam.Steam
 {

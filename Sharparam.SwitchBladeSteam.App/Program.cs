@@ -36,15 +36,17 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using Sharparam.SwitchBladeSteam.Helpers;
-using Sharparam.SwitchBladeSteam.Native;
-using Sharparam.SwitchBladeSteam.Razer;
-using Sharparam.SwitchBladeSteam.Razer.Events;
-using Sharparam.SwitchBladeSteam.Razer.Exceptions;
+using Sharparam.SharpBlade;
+using Sharparam.SharpBlade.Helpers;
+using Sharparam.SharpBlade.Logging;
+using Sharparam.SharpBlade.Native;
+using Sharparam.SharpBlade.Razer;
+using Sharparam.SharpBlade.Razer.Events;
+using Sharparam.SharpBlade.Razer.Exceptions;
 using Sharparam.SwitchBladeSteam.Steam;
 using Steam4NET;
-using log4net;
-using LogManager = Sharparam.SwitchBladeSteam.Logging.LogManager;
+
+using LogManager = Sharparam.SharpBlade.Logging.LogManager;
 
 namespace Sharparam.SwitchBladeSteam.App
 {

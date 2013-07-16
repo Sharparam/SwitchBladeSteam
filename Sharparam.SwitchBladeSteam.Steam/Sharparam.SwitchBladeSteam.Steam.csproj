@@ -83,9 +83,9 @@
     <Folder Include="Tools\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sharparam.SwitchBladeSteam\Sharparam.SwitchBladeSteam.csproj">
+    <ProjectReference Include="..\Sharparam.SharpBlade\Sharparam.SharpBlade\Sharparam.SharpBlade.csproj">
       <Project>{2c390908-d634-4450-9804-71d4929dd392}</Project>
-      <Name>Sharparam.SwitchBladeSteam</Name>
+      <Name>Sharparam.SharpBlade</Name>
     </ProjectReference>
     <ProjectReference Include="..\Steam4NET2\Steam4NET.csproj">
       <Project>{1a204257-fe82-4bbe-9ed4-40694821c31f}</Project>
@@ -95,7 +95,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UseGlobalSettings="False" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.None.Increment.TimeStamp" BuildVersion_UseGlobalSettings="False" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
