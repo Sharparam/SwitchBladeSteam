@@ -17,6 +17,11 @@ If you want to join the development team, please contact [Sharparam](https://git
 
 All authors and contributors are listed in the **AUTHORS** file.
 
+When cloning this/a fork of this repo, make sure to update the submodules with the following command (executed from root of repo):  
+`git submodule update --init`  
+Or if you are only updating the submodules, and this is not the initial clone:  
+`git submodule update`
+
 License
 -------
 
