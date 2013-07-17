@@ -91,6 +91,7 @@ namespace Steam4NET
         /// Creates an interface from steamclient.
         /// </summary>
         /// <typeparam name="TClass">The interface type. ex: ISteamClient009</typeparam>
+        /// <param name="version">The interface version.</param>
         /// <returns>An instance of an interface object, or null if an error occurred.</returns>
         public static TClass CreateInterface<TClass>() where TClass : InteropHelp.INativeWrapper, new()
         {
@@ -113,6 +114,7 @@ namespace Steam4NET
         /// Creates an interface from steam.
         /// </summary>
         /// <typeparam name="TClass">The interface type. ex: ISteam006</typeparam>
+        /// <param name="version">The interface version.</param>
         /// <returns>An instance of an interface object, or null if an error occurred.</returns>
         public static TClass CreateSteamInterface<TClass>() where TClass : InteropHelp.INativeWrapper, new()
         {

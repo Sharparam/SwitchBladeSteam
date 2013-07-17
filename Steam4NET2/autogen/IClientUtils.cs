@@ -42,7 +42,10 @@ namespace Steam4NET
 		public IntPtr GetEnteredGamepadTextInput30;
 		public IntPtr GamepadTextInputClosed31;
 		public IntPtr SetSpew32;
-		private IntPtr DTorIClientUtils33;
+		public IntPtr BDownloadsDisabled33;
+		public IntPtr SetFocusedWindow34;
+		public IntPtr GetSteamUILanguage35;
+		private IntPtr DTorIClientUtils36;
 	};
 	
 	[InteropHelp.InterfaceVersion("CLIENTUTILS_INTERFACE_VERSION001")]
@@ -254,6 +257,25 @@ namespace Steam4NET
 		public void SetSpew( ESpewGroup eSpewGroup, Int32 iSpewLevel, Int32 iLogLevel ) 
 		{
 			this.GetFunction<NativeSetSpewEII>( this.Functions.SetSpew32 )( this.ObjectAddress, eSpewGroup, iSpewLevel, iLogLevel ); 
+		}
+		
+		[return: MarshalAs(UnmanagedType.I1)]
+		[UnmanagedFunctionPointer(CallingConvention.ThisCall)] private delegate bool NativeBDownloadsDisabled( IntPtr thisptr );
+		public bool BDownloadsDisabled(  ) 
+		{
+			return this.GetFunction<NativeBDownloadsDisabled>( this.Functions.BDownloadsDisabled33 )( this.ObjectAddress ); 
+		}
+		
+		[UnmanagedFunctionPointer(CallingConvention.ThisCall)] private delegate void NativeSetFocusedWindowEU( IntPtr thisptr, EWindowType eWindowType, UInt32 uUnk );
+		public void SetFocusedWindow( EWindowType eWindowType, UInt32 uUnk ) 
+		{
+			this.GetFunction<NativeSetFocusedWindowEU>( this.Functions.SetFocusedWindow34 )( this.ObjectAddress, eWindowType, uUnk ); 
+		}
+		
+		[UnmanagedFunctionPointer(CallingConvention.ThisCall)] private delegate string NativeGetSteamUILanguage( IntPtr thisptr );
+		public string GetSteamUILanguage(  ) 
+		{
+			return InteropHelp.DecodeANSIReturn( this.GetFunction<NativeGetSteamUILanguage>( this.Functions.GetSteamUILanguage35 )( this.ObjectAddress ) ); 
 		}
 		
 	};

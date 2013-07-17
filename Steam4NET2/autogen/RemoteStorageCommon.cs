@@ -23,7 +23,9 @@ namespace Steam4NET
 		k_ERemoteStorageFileRootSteamCloudDocuments = 11,
 		k_ERemoteStorageFileRootWinAppDataLocalLow = 12,
 		k_ERemoteStorageFileRootMacCaches = 13,
-		k_ERemoteStorageFileRootMax = 14,
+		k_ERemoteStorageFileRootLinuxHome = 14,
+		k_ERemoteStorageFileRootLinuxXdgDataHome = 15,
+		k_ERemoteStorageFileRootMax = 16,
 	};
 	
 	public enum ERemoteStorageSyncState : int
@@ -59,7 +61,7 @@ namespace Steam4NET
 		k_ERemoteStoragePlatformWindows = 1,
 		k_ERemoteStoragePlatformOSX = 2,
 		k_ERemoteStoragePlatformPS3 = 4,
-		k_ERemoteStoragePlatformReserved1 = 8,
+		k_ERemoteStoragePlatformLinux = 8,
 		k_ERemoteStoragePlatformReserved2 = 16,
 		k_ERemoteStoragePlatformAll = -1,
 	};
@@ -83,6 +85,19 @@ namespace Steam4NET
 	
 	public enum EWorkshopFileType : int
 	{
+		k_EWorkshopFileTypeCommunity = 0,
+		k_EWorkshopFileTypeMicrotransaction = 1,
+		k_EWorkshopFileTypeCollection = 2,
+		k_EWorkshopFileTypeArt = 3,
+		k_EWorkshopFileTypeVideo = 4,
+		k_EWorkshopFileTypeScreenshot = 5,
+	};
+	
+	public enum EWorkshopVote : int
+	{
+		k_EWorkshopVoteUnvoted = 0,
+		k_EWorkshopVoteFor = 1,
+		k_EWorkshopVoteAgainst = 2,
 	};
 	
 	public enum EWorkshopVideoProvider : int
@@ -97,13 +112,21 @@ namespace Steam4NET
 	
 	public enum EWorkshopEnumerationType : int
 	{
-		k_EWorkshopEnumerationTypeTopRated = 0,
-		k_EWorkshopEnumerationTypeMostRecent = 1,
+		k_EWorkshopEnumerationTypeRankedByVote = 0,
+		k_EWorkshopEnumerationTypeRecent = 1,
 		k_EWorkshopEnumerationTypeTrending = 2,
-		k_EWorkshopEnumerationTypeFavoritedByFriends = 3,
+		k_EWorkshopEnumerationTypeFavoritesOfFriends = 3,
 		k_EWorkshopEnumerationTypeVotedByFriends = 4,
-		k_EWorkshopEnumerationTypeCreatedByFriends = 5,
-		k_EWorkshopEnumerationTypeCreatedByFollowed = 6,
+		k_EWorkshopEnumerationTypeContentByFriends = 5,
+		k_EWorkshopEnumerationTypeRecentFromFollowedUsers = 6,
+	};
+	
+	public enum EPublishedFileInfoMatchingFileType : int
+	{
+	};
+	
+	public enum EUGCReadAction : int
+	{
 	};
 	
 	[StructLayout(LayoutKind.Sequential,Pack=8)]
@@ -385,9 +408,9 @@ namespace Steam4NET
 		public const int k_iCallback = 1320;
 		public EResult m_eResult;
 		public UInt64 m_unPublishedFileId;
-		public Int32 m_cVotesFor;
-		public Int32 m_cVotesAgainst;
-		public Int32 m_cReports;
+		public Int32 m_nVotesFor;
+		public Int32 m_nVotesAgainst;
+		public Int32 m_nReports;
 		public float m_fScore;
 	};
 	
