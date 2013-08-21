@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SwitchBladeSteam.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SharpBlade", "Sharparam.SharpBlade\Sharparam.SharpBlade\Sharparam.SharpBlade.csproj", "{2C390908-D634-4450-9804-71D4929DD392}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SteamLib", "SteamLib\Sharparam.SteamLib\Sharparam.SteamLib.csproj", "{7A29757A-2A04-4089-9B78-ACDF896ABD0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharparam.SteamLib", "Sharparam.SteamLib\Sharparam.SteamLib\Sharparam.SteamLib.csproj", "{7A29757A-2A04-4089-9B78-ACDF896ABD0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steam4NET", "SteamLib\Steam4NET2\Steam4NET.csproj", "{1A204257-FE82-4BBE-9ED4-40694821C31F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steam4NET", "Sharparam.SteamLib\Steam4NET2\Steam4NET.csproj", "{1A204257-FE82-4BBE-9ED4-40694821C31F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
