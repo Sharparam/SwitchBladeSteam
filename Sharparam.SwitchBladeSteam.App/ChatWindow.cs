@@ -35,8 +35,8 @@ using Sharparam.SharpBlade.Logging;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SharpBlade.Razer.Events;
-using Sharparam.SwitchBladeSteam.Steam;
-using Sharparam.SwitchBladeSteam.Steam.Events;
+using Sharparam.SteamLib;
+using Sharparam.SteamLib.Events;
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.App

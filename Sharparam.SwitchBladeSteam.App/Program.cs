@@ -43,7 +43,7 @@ using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SharpBlade.Razer.Events;
 using Sharparam.SharpBlade.Razer.Exceptions;
-using Sharparam.SwitchBladeSteam.Steam;
+using Sharparam.SteamLib;
 using Steam4NET;
 
 using LogManager = Sharparam.SharpBlade.Logging.LogManager;

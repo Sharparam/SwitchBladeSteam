@@ -29,7 +29,7 @@
 
 using System;
 using System.Linq;
-using Sharparam.SwitchBladeSteam.Steam;
+using Sharparam.SteamLib;
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.Console
