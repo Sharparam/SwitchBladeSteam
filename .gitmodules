@@ -1,3 +1,6 @@
 [submodule "Sharparam.SharpBlade"]
 	path = Sharparam.SharpBlade
 	url = git@github.com:Sharparam/SharpBlade.git
+[submodule "SteamLib"]
+	path = SteamLib
+	url = git@github.com:Sharparam/SteamLib.git
