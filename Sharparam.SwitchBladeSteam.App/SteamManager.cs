@@ -27,7 +27,7 @@
  * "Razer" is a trademark of Razer USA Ltd.
  */
 
-using Sharparam.SwitchBladeSteam.Steam;
+using Sharparam.SteamLib;
 
 namespace Sharparam.SwitchBladeSteam.App
 {
