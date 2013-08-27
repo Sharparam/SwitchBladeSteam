@@ -43,7 +43,9 @@ namespace Sharparam.SwitchBladeSteam.App
 {
     public partial class ChatWindow : Form , IKeyboardEnabledForm
     {
-        private readonly ILog _log;
+        private delegate void VoidDelegate();
+
+        private readonly log4net.ILog _log;
         private readonly RazerManager _manager;
         private Friend _friend;
 

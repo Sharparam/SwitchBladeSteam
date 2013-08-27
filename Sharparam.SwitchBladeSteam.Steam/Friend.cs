@@ -41,7 +41,7 @@ namespace Sharparam.SwitchBladeSteam.Steam
     {
         public event ChatMessageReceivedEventHandler ChatMessageReceived;
 
-        private readonly ILog _log;
+        private readonly log4net.ILog _log;
 
         private readonly SteamFriends _steamFriends;
         private readonly CSteamID _steamId;

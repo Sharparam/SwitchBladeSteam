@@ -59,7 +59,9 @@ namespace Sharparam.SwitchBladeSteam.App
 
     public static class Program
     {
-        private static ILog _log;
+        private delegate void VoidDelegate();
+
+        private static log4net.ILog _log;
 
         private static Form _activeForm;
         private static Form _nextForm;
@@ -183,7 +185,7 @@ namespace Sharparam.SwitchBladeSteam.App
                     + "\n\nDo you want to call RzSBStop? You will need to restart this application regardless of choice.",
                     "Unsafe Application Shutdown", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == DialogResult.Yes)
-                    RazerManager.Stop();
+                    _razerManager.Stop();
 
                 RazerManager.DeleteControlFile();
 
@@ -376,7 +378,7 @@ namespace Sharparam.SwitchBladeSteam.App
             }
 
             _log.Info("Stopping Razer interface");
-            RazerManager.Stop();
+            _razerManager.Stop();
 #endif
 
             _log.Info("### APPLICATION EXIT ###");

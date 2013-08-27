@@ -38,7 +38,7 @@ namespace Sharparam.SwitchBladeSteam.Steam
 {
     public class FriendsManager
     {
-        private readonly ILog _log;
+        private readonly log4net.ILog _log;
 
         public event FriendsUpdatedEventHandler FriendsUpdated;
 

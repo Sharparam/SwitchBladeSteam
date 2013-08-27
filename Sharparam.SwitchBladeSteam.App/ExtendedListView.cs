@@ -47,7 +47,7 @@ namespace Sharparam.SwitchBladeSteam.App
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
-            if (m.Msg == WinAPI.WM_HSCROLL || m.Msg == WinAPI.WM_VSCROLL)
+            if (m.Msg == (int) WinAPI.MessageType.HSCROLL || m.Msg == (int) WinAPI.MessageType.VSCROLL)
                 OnScroll();
         }
     }
