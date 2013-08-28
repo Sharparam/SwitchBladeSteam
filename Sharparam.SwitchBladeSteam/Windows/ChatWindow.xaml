@@ -1,0 +1,11 @@
+﻿<Window x:Class="Sharparam.SwitchBladeSteam.Windows.ChatWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ChatWindow" Height="480" Width="800" ResizeMode="NoResize" WindowStyle="None" Background="Black" Foreground="White">
+    <Grid>
+        <Label Content="Chatting with $(NAME) ($(NICK))" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="800" Foreground="White" FontSize="18" HorizontalContentAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Margin="0,33,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="416" Width="800"/>
+        <TextBox HorizontalAlignment="Left" Height="31" Margin="0,449,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="800" Background="{x:Null}" Foreground="White" BorderThickness="0,1,0,0" FontSize="16"/>
+
+    </Grid>
+</Window>

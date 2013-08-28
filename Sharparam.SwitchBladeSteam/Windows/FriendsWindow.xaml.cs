@@ -14,25 +14,13 @@ using System.Windows.Shapes;
 namespace Sharparam.SwitchBladeSteam.Windows
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for FriendsWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class FriendsWindow : Window
     {
-        public MainWindow()
+        public FriendsWindow()
         {
             InitializeComponent();
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            Application.Current.MainWindow = new FriendsWindow();
-            Close();
-            Application.Current.MainWindow.Show();
         }
     }
 }
