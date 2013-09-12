@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Sharparam.SteamLib;
@@ -17,7 +18,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private const string TitleFormat = "Chatting with {0}";
         private const string MessageFormat = "{0}: {1}";
 
-        private Friend _friend;
+        private readonly Friend _friend;
 
         public ChatWindow(Friend friend)
         {
@@ -25,29 +26,29 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             _friend = friend;
 
-            TitleLabel.Content = String.Format(TitleFormat, _friend.GetName());
+            TitleLabel.Content = String.Format(TitleFormat, _friend.Name);
 
-            if (_friend.ChatHistory.Count > 0)
-                foreach (var message in _friend.ChatHistory)
+            if (_friend.ChatMessageHistory.Any())
+                foreach (var message in _friend.ChatMessageHistory)
                 {
                     HistoryBox.Items.Add(String.Format(
                         MessageFormat,
-                        Provider.Steam.FriendsManager.GetFriendBySteamId(message.Sender).GetName(),
-                        Provider.Steam.FriendsManager.GetFriendBySteamId(message.Receiver).GetName()));
+                        Provider.Steam.Friends.GetFriendById(message.Sender).Name,
+                        Provider.Steam.Friends.GetFriendById(message.Receiver).Name));
                 }
 
-            _friend.ChatMessageReceived += FriendOnChatMessageReceived;
+            _friend.ChatMessage += FriendOnChatMessage;
         }
 
-        private void FriendOnChatMessageReceived(object sender, ChatMessageEventArgs args)
+        private void FriendOnChatMessage(object sender, MessageEventArgs args)
         {
             var message = args.Message;
             HistoryBox.Dispatcher.Invoke(DispatcherPriority.Send, (VoidDelegate) (() => HistoryBox.Items.Add(String.Format(
                 MessageFormat,
-                message.Sender == Provider.Steam.Me
-                    ? Provider.Steam.GetMyName()
-                    : Provider.Steam.FriendsManager.GetFriendBySteamId(message.Sender).GetName(),
-                message.Message.Replace('\n', ' ')))));
+                message.Sender == Provider.Steam.LocalUser
+                    ? Provider.Steam.LocalUser.Name
+                    : Provider.Steam.Friends.GetFriendById(message.Sender).Name,
+                message.Content.Replace('\n', ' ')))));
         }
 
         private void InputBoxKeyDown(object sender, KeyEventArgs e)
