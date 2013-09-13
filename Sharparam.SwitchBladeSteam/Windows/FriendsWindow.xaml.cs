@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
-using Sharparam.SwitchBladeSteam.Lib;
+using Sharparam.SteamLib;
 
 namespace Sharparam.SwitchBladeSteam.Windows
 {
@@ -13,9 +12,6 @@ namespace Sharparam.SwitchBladeSteam.Windows
         public FriendsWindow()
         {
             InitializeComponent();
-
-            foreach (var friend in Provider.Steam.Friends.GetOnlineFriends().OrderBy(f => f.Name))
-                FriendsListBox.Items.Add(friend.Name);
         }
 
         private void FriendsListBoxKeyDown(object sender, KeyEventArgs e)
@@ -23,7 +19,13 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (e.Key != Key.Return || (e.Key == Key.Enter && FriendsListBox.SelectedItem == null))
                 return;
 
-            var friend = Provider.Steam.Friends.GetFriendByName((string) FriendsListBox.SelectedItem, false);
+            var item = FriendsListBox.SelectedItem;
+
+            var friend = item as Friend;
+
+            if (friend == null)
+                return;
+
             Application.Current.MainWindow = new ChatWindow(friend);
             Close();
             Application.Current.MainWindow.Show();

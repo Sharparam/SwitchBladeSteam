@@ -1,9 +1,26 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewModels="clr-namespace:Sharparam.SwitchBladeSteam.ViewModels"
+        xmlns:steam="clr-namespace:Sharparam.SteamLib;assembly=Sharparam.SteamLib"
         x:Class="Sharparam.SwitchBladeSteam.Windows.FriendsWindow"
         Title="FriendsWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type steam:Friend}">
+            <StackPanel>
+                <TextBlock Text="{Binding Path=Name}"/>
+                <TextBlock Text="{Binding Path=StateText}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
-        <ListBox x:Name="FriendsListBox" HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" KeyDown="FriendsListBoxKeyDown"/>
+        <ListBox x:Name="FriendsListBox"
+                 HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White"
+                 KeyDown="FriendsListBoxKeyDown"
+                 ItemsSource="{Binding Friends}">
+            <ListBox.DataContext>
+                <viewModels:FriendsViewModel/>
+            </ListBox.DataContext>
+        </ListBox>
     </Grid>
 </Window>
