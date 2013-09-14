@@ -4,7 +4,9 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Sharparam.SteamLib;
 using Sharparam.SteamLib.Events;
+using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
+using Sharparam.SwitchBladeSteam.ViewModels;
 
 namespace Sharparam.SwitchBladeSteam.Windows
 {
@@ -15,7 +17,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
     {
         private delegate void VoidDelegate();
 
-        private const string TitleFormat = "Chatting with {0}";
+        private const string TitleFormat = "Chatting with {0} ({1})";
         private const string MessageFormat = "{0}: {1}";
 
         private readonly Friend _friend;
@@ -26,7 +28,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             _friend = friend;
 
-            TitleLabel.Content = String.Format(TitleFormat, _friend.Name);
+            TitleLabel.Content = String.Format(TitleFormat, _friend.Name, _friend.Nickname);
 
             if (_friend.ChatMessageHistory.Any())
                 foreach (var message in _friend.ChatMessageHistory)
@@ -34,7 +36,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
                     HistoryBox.Items.Add(String.Format(
                         MessageFormat,
                         Provider.Steam.Friends.GetFriendById(message.Sender).Name,
-                        Provider.Steam.Friends.GetFriendById(message.Receiver).Name));
+                        message.Content));
                 }
 
             _friend.ChatMessage += FriendOnChatMessage;
@@ -43,7 +45,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void FriendOnChatMessage(object sender, MessageEventArgs args)
         {
             var message = args.Message;
-            HistoryBox.Dispatcher.Invoke(DispatcherPriority.Send, (VoidDelegate) (() => HistoryBox.Items.Add(String.Format(
+            HistoryBox.Dispatcher.Invoke(DispatcherPriority.Send, (VoidDelegate)(() => HistoryBox.Items.Add(String.Format(
                 MessageFormat,
                 message.Sender == Provider.Steam.LocalUser
                     ? Provider.Steam.LocalUser.Name

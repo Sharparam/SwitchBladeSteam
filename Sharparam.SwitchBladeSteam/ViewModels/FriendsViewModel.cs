@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using Sharparam.SteamLib;
+using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
 
 namespace Sharparam.SwitchBladeSteam.ViewModels
 {
     public class FriendsViewModel
     {
-        public FriendsList Friends { get; private set; }
+        public FriendsWrapper Friends { get; private set; }
 
         public FriendsViewModel()
         {
@@ -15,7 +15,7 @@ namespace Sharparam.SwitchBladeSteam.ViewModels
             if (DesignerProperties.GetIsInDesignMode(dep))
                 return;
 
-            Friends = Provider.Steam.Friends;
+            Friends = new FriendsWrapper(Provider.Steam.Friends);
         }
     }
 }

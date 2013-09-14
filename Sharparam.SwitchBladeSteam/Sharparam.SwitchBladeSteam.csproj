@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -57,8 +58,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Compatibility\FriendsWrapper.cs" />
+    <Compile Include="Compatibility\FriendWrapper.cs" />
+    <Compile Include="Compatibility\MessagesWrapper.cs" />
+    <Compile Include="Compatibility\MessageWrapper.cs" />
+    <Compile Include="Controls\BitmapImage.cs" />
+    <Compile Include="Lib\Helper.cs" />
     <Compile Include="Lib\Provider.cs" />
     <Compile Include="ViewModels\FriendsViewModel.cs" />
+    <Compile Include="ViewModels\FriendViewModel.cs" />
+    <Compile Include="ViewModels\MessagesViewModel.cs" />
     <Compile Include="Windows\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
