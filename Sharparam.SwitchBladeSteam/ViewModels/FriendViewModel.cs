@@ -28,5 +28,10 @@ namespace Sharparam.SwitchBladeSteam.ViewModels
             _cache.Add(friend, viewModel);
             return viewModel;
         }
+
+        public static void ClearCache()
+        {
+            _cache.Clear();
+        }
     }
 }

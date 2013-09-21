@@ -6,6 +6,7 @@ using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
+using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.Windows
 {
@@ -31,6 +32,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
                                     @"Resources\Images\dk_up.png", @"Resources\Images\dk_up_down.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => MoveSelectionDown(),
                                     @"Resources\Images\dk_down.png", @"Resources\Images\dk_down_down.png", true);
+
+            // These keys are only enabled once
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK6,
+                                    (s, e) => { Provider.Steam.LocalUser.State = EPersonaState.k_EPersonaStateOnline; },
+                                    @"Resources\Images\dk_appear_online.png",
+                                    @"Resources\Images\dk_appear_online_down.png");
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK9,
+                                    (s, e) => { Provider.Steam.LocalUser.State = EPersonaState.k_EPersonaStateOffline; },
+                                    @"Resources\Images\dk_appear_offline.png",
+                                    @"Resources\Images\dk_appear_offline_down.png");
         }
 
         private void FriendsListBoxKeyDown(object sender, KeyEventArgs e)
