@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -13,6 +15,7 @@ using Sharparam.SteamLib.Events;
 using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
 using Sharparam.SwitchBladeSteam.ViewModels;
+using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.Windows
 {
@@ -34,6 +37,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private readonly Friend _friend;
 
+        private ScrollViewer _historyBoxScroller;
+
         public ChatWindow(Friend friend)
         {
             InitializeComponent();
@@ -42,19 +47,21 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             TitleLabel.Content = String.Format(TitleFormat, _friend.Name, _friend.Nickname);
 
-            if (_friend.ChatMessageHistory.Any())
-                foreach (var message in _friend.ChatMessageHistory)
-                {
-                    var sender = message.Sender;
-                    var name = sender == Provider.Steam.LocalUser
-                                   ? Provider.Steam.LocalUser.Name
-                                   : Provider.Steam.Friends.GetFriendById(sender).Name;
-                    var content = message.Content;
-                    var formatted = String.Format(MessageFormat, name, content);
-                    HistoryBox.Items.Add(formatted);
-                }
+            //if (_friend.ChatMessageHistory.Any())
+            //    foreach (var message in _friend.ChatMessageHistory)
+            //    {
+            //        var sender = message.Sender;
+            //        var name = sender == Provider.Steam.LocalUser
+            //                       ? Provider.Steam.LocalUser.Name
+            //                       : Provider.Steam.Friends.GetFriendById(sender).Name;
+            //        var content = message.Content;
+            //        var formatted = String.Format(MessageFormat, name, content);
+            //        HistoryBox.Items.Add(formatted);
+            //    }
 
-            _friend.ChatMessage += FriendOnChatMessage;
+            var viewModel = FriendViewModel.GetViewModel(_friend);
+            DataContext = viewModel;
+            ((INotifyCollectionChanged) viewModel.Messages.Messages).CollectionChanged += MessagesCollectionChanged;
 
             _razer = Provider.Razer;
             _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
@@ -64,6 +71,69 @@ namespace Sharparam.SwitchBladeSteam.Windows
             // Set up dynamic keys
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, FriendsKeyPressed, @"Resources\Images\dk_friends.png",
                                     @"Resources\Images\dk_friends_down.png", true);
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK10, (s, e) => ScrollHistoryBoxUp(),
+                                    @"Resources\Images\dk_up.png", @"Resources\Images\dk_up_down.png", true);
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => ScrollHistoryBoxDown(),
+                                    @"Resources\Images\dk_down.png", @"Resources\Images\dk_down_down.png", true);
+        }
+
+        private void ScrollHistoryBoxToEnd()
+        {
+            try
+            {
+                if (_historyBoxScroller.Dispatcher.CheckAccess())
+                    _historyBoxScroller.ScrollToEnd();
+                else
+                    _historyBoxScroller.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action) (ScrollHistoryBoxToEnd));
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+        }
+
+        private void ScrollHistoryBoxUp()
+        {
+            try
+            {
+                if (_historyBoxScroller.Dispatcher.CheckAccess())
+                    _historyBoxScroller.LineUp();
+                else
+                    _historyBoxScroller.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(ScrollHistoryBoxUp));
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+        }
+
+        private void ScrollHistoryBoxDown()
+        {
+            try
+            {
+                if (_historyBoxScroller.Dispatcher.CheckAccess())
+                    _historyBoxScroller.LineDown();
+                else
+                    _historyBoxScroller.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(ScrollHistoryBoxDown));
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+        }
+
+        private void WindowLoaded(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Getting scroller...");
+            _historyBoxScroller = Helper.GetDescendantByType<ScrollViewer>(HistoryBox);
+            Console.WriteLine("Scroller: " + _historyBoxScroller.GetType());
+            if (HistoryBox.SelectedIndex > -1)
+                HistoryBox.SelectedIndex = -1;
+        }
+
+        private void MessagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            ScrollHistoryBoxToEnd();
         }
 
         private void FriendsKeyPressed(object sender, EventArgs eventArgs)
@@ -83,17 +153,6 @@ namespace Sharparam.SwitchBladeSteam.Windows
             InputBox.Clear();
             InputBox.Background = ActiveColor;
             _razer.StartWPFControlKeyboardCapture(InputBox, false);
-        }
-
-        private void FriendOnChatMessage(object sender, MessageEventArgs args)
-        {
-            var message = args.Message;
-            HistoryBox.Dispatcher.Invoke(DispatcherPriority.Send, (VoidDelegate)(() => HistoryBox.Items.Add(String.Format(
-                MessageFormat,
-                message.Sender == Provider.Steam.LocalUser
-                    ? Provider.Steam.LocalUser.Name
-                    : Provider.Steam.Friends.GetFriendById(message.Sender).Name,
-                message.Content.Replace('\n', ' ')))));
         }
 
         private void InputBoxKeyDown(object sender, KeyEventArgs e)

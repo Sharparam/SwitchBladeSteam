@@ -1,6 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows;
+using System.Windows.Threading;
 using Sharparam.SteamLib;
 using Steam4NET;
 
@@ -37,7 +40,9 @@ namespace Sharparam.SwitchBladeSteam.Compatibility
                                             let msg = (Message) newItem
                                             where msg.Type == EChatEntryType.k_EChatEntryTypeChatMsg
                                             select newItem)
-                        _wrapper.Add(new MessageWrapper((Message) newItem));
+                        Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+                                                              (Action)
+                                                              (() => _wrapper.Add(new MessageWrapper((Message) newItem))));
                     break;
                 default:
                     UpdateWrapper();

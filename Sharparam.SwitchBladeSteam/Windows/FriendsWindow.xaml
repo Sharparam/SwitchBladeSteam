@@ -14,9 +14,9 @@
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="Name"/>
             </CollectionViewSource.SortDescriptions>
-            <CollectionViewSource.GroupDescriptions>
+            <!--<CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="State"/>
-            </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource.GroupDescriptions>-->
         </CollectionViewSource>
         <DataTemplate DataType="{x:Type compatibility:FriendWrapper}">
             <StackPanel Orientation="Horizontal">

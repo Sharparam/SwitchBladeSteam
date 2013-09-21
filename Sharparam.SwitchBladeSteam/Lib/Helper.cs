@@ -46,5 +46,31 @@ namespace Sharparam.SwitchBladeSteam.Lib
             }
             return result;
         }
+
+        // By punker76 on StackOverflow <http://stackoverflow.com/a/10293595>
+        public static T GetDescendantByType<T>(Visual element) where T : class
+        {
+            if (element == null)
+                return null;
+
+            if (element.GetType() == typeof (T))
+                return element as T;
+
+            T foundElement = null;
+
+            var frameworkElement = element as FrameworkElement;
+            if (frameworkElement != null)
+                frameworkElement.ApplyTemplate();
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(element); i++)
+            {
+                var visual = VisualTreeHelper.GetChild(element, i) as Visual;
+                foundElement = GetDescendantByType<T>(visual);
+                if (foundElement != null)
+                    break;
+            }
+
+            return foundElement;
+        }
     }
 }
