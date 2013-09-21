@@ -13,8 +13,8 @@
         </DataTemplate>
     </Window.Resources>
     <Grid>
-        <Label x:Name="TitleLabel" Content="Chatting with $(NAME) ($(NICK))" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="800" Foreground="White" FontSize="18" HorizontalContentAlignment="Center" FontFamily="Segoe UI Light"/>
-        <ListBox x:Name="HistoryBox" HorizontalAlignment="Left" Height="416" Margin="0,33,0,0" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Segoe UI Light" FontSize="24"/>
-        <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="31" Margin="0,449,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="800" Background="{x:Null}" Foreground="White" BorderThickness="0,1,0,0" FontSize="16" KeyDown="InputBoxKeyDown"/>
+        <Label x:Name="TitleLabel" Content="$(NAME) ($(NICK))" HorizontalAlignment="Left" VerticalAlignment="Top" Height="33" Width="800" Foreground="White" FontSize="18" HorizontalContentAlignment="Center" FontFamily="Segoe UI Light"/>
+        <ListBox x:Name="HistoryBox" HorizontalAlignment="Left" Height="388" Margin="0,33,0,0" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" FontFamily="Segoe UI Light" FontSize="24"/>
+        <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="59" Margin="0,421,0,0" Text="Tap screen to type a message..." VerticalAlignment="Top" Width="800" Background="{x:Null}" Foreground="White" BorderThickness="0,1,0,0" FontSize="38" KeyDown="InputBoxKeyDown" VerticalContentAlignment="Center"/>
     </Grid>
 </Window>
