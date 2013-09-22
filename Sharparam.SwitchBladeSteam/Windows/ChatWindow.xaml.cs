@@ -149,6 +149,9 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private void FriendsKeyPressed(object sender, EventArgs eventArgs)
         {
+            if (_razer.KeyboardCapture)
+                _razer.SetKeyboardCapture(false);
+
             _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Tap);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
