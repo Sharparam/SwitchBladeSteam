@@ -24,11 +24,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// </summary>
     public partial class ChatWindow
     {
-        private delegate void VoidDelegate();
-
         private const string DefaultInputMessage = "Tap screen to type a message...";
         private const string TitleFormat = "{0} ({1})";
-        private const string MessageFormat = "{0}: {1}";
 
         private static readonly SolidColorBrush IdleColor = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
         private static readonly SolidColorBrush ActiveColor = new SolidColorBrush(Color.FromRgb(51, 153, 0));
@@ -47,17 +44,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             TitleLabel.Content = String.Format(TitleFormat, _friend.Name, _friend.Nickname);
 
-            //if (_friend.ChatMessageHistory.Any())
-            //    foreach (var message in _friend.ChatMessageHistory)
-            //    {
-            //        var sender = message.Sender;
-            //        var name = sender == Provider.Steam.LocalUser
-            //                       ? Provider.Steam.LocalUser.Name
-            //                       : Provider.Steam.Friends.GetFriendById(sender).Name;
-            //        var content = message.Content;
-            //        var formatted = String.Format(MessageFormat, name, content);
-            //        HistoryBox.Items.Add(formatted);
-            //    }
+            _friend.TypingMessageReceived += FriendOnTypingMessageReceived;
+            _friend.ChatMessageReceived += FriendOnChatMessageReceived;
 
             var viewModel = FriendViewModel.GetViewModel(_friend);
             DataContext = viewModel;
@@ -75,6 +63,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
                                     @"Resources\Images\dk_up.png", @"Resources\Images\dk_up_down.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => ScrollHistoryBoxDown(),
                                     @"Resources\Images\dk_down.png", @"Resources\Images\dk_down_down.png", true);
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK4, (s, e) => ScrollHistoryBoxToEnd(),
+                                    @"Resources\Images\dk_bottom.png", @"Resources\Images\dk_bottom_down.png", true);
+        }
+
+        private void SetTitle(string content)
+        {
+            if (TitleLabel.Dispatcher.CheckAccess())
+                TitleLabel.Content = content;
+            else
+                TitleLabel.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action) (() => SetTitle(content)));
         }
 
         private void ScrollHistoryBoxToEnd()
@@ -131,6 +129,20 @@ namespace Sharparam.SwitchBladeSteam.Windows
                 HistoryBox.SelectedIndex = -1;
         }
 
+        private void FriendOnTypingMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        {
+            if (TitleLabel.Dispatcher.CheckAccess())
+                SetTitle(TitleLabel.Content + " is typing...");
+            else
+                TitleLabel.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                                                  (Action) (() => SetTitle(TitleLabel.Content + " is typing...")));
+        }
+
+        private void FriendOnChatMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        {
+            SetTitle(String.Format(TitleFormat, _friend.Name, _friend.Nickname));
+        }
+
         private void MessagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             ScrollHistoryBoxToEnd();
@@ -140,6 +152,9 @@ namespace Sharparam.SwitchBladeSteam.Windows
         {
             _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Tap);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK4);
             Application.Current.MainWindow = new FriendsWindow();
             Close();
             Application.Current.MainWindow.Show();
@@ -169,7 +184,10 @@ namespace Sharparam.SwitchBladeSteam.Windows
             }
 
             if (e.Key != Key.Return)
+            {
+                _friend.SendMessage(msg, EChatEntryType.k_EChatEntryTypeTyping);
                 return;
+            }
 
             if (!String.IsNullOrEmpty(msg))
             {
