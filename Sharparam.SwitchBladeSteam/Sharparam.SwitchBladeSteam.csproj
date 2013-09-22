@@ -120,6 +120,9 @@
     <Content Include="Resources\Images\dk_back_down.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\dk_bottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\dk_chat.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
