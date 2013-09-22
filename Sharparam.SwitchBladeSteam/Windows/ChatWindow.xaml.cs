@@ -123,9 +123,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             Helper.ExtendWindowStyleWithTool(this);
-            Console.WriteLine("Getting scroller...");
             _historyBoxScroller = Helper.GetDescendantByType<ScrollViewer>(HistoryBox);
-            Console.WriteLine("Scroller: " + _historyBoxScroller.GetType());
             if (HistoryBox.SelectedIndex > -1)
                 HistoryBox.SelectedIndex = -1;
         }
