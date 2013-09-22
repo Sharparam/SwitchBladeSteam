@@ -5,7 +5,7 @@
         xmlns:compatibility="clr-namespace:Sharparam.SwitchBladeSteam.Compatibility"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         x:Class="Sharparam.SwitchBladeSteam.Windows.FriendsWindow"
-        Title="FriendsWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="FriendsWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="Window_Loaded">
     <Window.DataContext>
         <vm:FriendsViewModel/>
     </Window.DataContext>
@@ -22,8 +22,8 @@
             <StackPanel Orientation="Horizontal">
                 <Image Width="64" Height="64" Source="{Binding Path=MediumAvatar}"/>
                 <StackPanel Margin="10,0,0,0">
-                    <TextBlock Text="{Binding Path=Friend.Name}" FontFamily="Segoe UI Light" FontSize="16"/>
-                    <TextBlock Text="{Binding Path=Friend.StateText}" FontFamily="Segoe UI Light" FontSize="16"/>
+                    <TextBlock Text="{Binding Path=Friend.Name}" FontFamily="Segoe UI Light" FontSize="26"/>
+                    <TextBlock Text="{Binding Path=Friend.StateText}" FontFamily="Segoe UI Light" FontSize="20"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
@@ -31,7 +31,6 @@
     <Grid>
         <ListBox x:Name="FriendsListBox"
                  HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White"
-                 KeyDown="FriendsListBoxKeyDown"
                  ItemsSource="{Binding Source={StaticResource Friends}}" HorizontalContentAlignment="Stretch">
         </ListBox>
     </Grid>

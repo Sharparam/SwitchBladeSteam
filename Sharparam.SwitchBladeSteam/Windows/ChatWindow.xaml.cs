@@ -28,7 +28,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private const string TitleFormat = "{0} ({1})";
 
         private static readonly SolidColorBrush IdleColor = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-        private static readonly SolidColorBrush ActiveColor = new SolidColorBrush(Color.FromRgb(51, 153, 0));
+        private static readonly SolidColorBrush ActiveColor = new SolidColorBrush(Color.FromArgb(100, 51, 153, 0));
 
         private readonly RazerManager _razer;
 
@@ -122,6 +122,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            Helper.ExtendWindowStyleWithTool(this);
             Console.WriteLine("Getting scroller...");
             _historyBoxScroller = Helper.GetDescendantByType<ScrollViewer>(HistoryBox);
             Console.WriteLine("Scroller: " + _historyBoxScroller.GetType());
@@ -192,7 +193,6 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (!String.IsNullOrEmpty(msg))
             {
                 _friend.SendMessage(msg);
-                InputBox.Text = DefaultInputMessage;
                 InputBox.CaretIndex = InputBox.Text.Length;
                 var rect = InputBox.GetRectFromCharacterIndex(InputBox.CaretIndex);
                 InputBox.ScrollToHorizontalOffset(rect.Right);
@@ -200,6 +200,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             InputBox.Background = IdleColor;
             _razer.SetKeyboardCapture(false);
+            InputBox.Text = DefaultInputMessage;
         }
     }
 }

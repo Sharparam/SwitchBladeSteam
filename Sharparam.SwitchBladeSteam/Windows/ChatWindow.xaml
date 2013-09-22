@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:compatibility="clr-namespace:Sharparam.SwitchBladeSteam.Compatibility"
-        Title="ChatWindow" Height="480" Width="800" ResizeMode="NoResize" WindowStyle="None" Background="Black" Foreground="White" WindowStartupLocation="CenterScreen" Loaded="WindowLoaded">
+        Title="ChatWindow" Height="480" Width="800" ResizeMode="NoResize" WindowStyle="None" Background="Black" Foreground="White" WindowStartupLocation="Manual" Loaded="WindowLoaded" Left="-99999" Top="-99999" ShowActivated="False">
     <Window.Resources>
         <Style x:Key="NameStyle" TargetType="{x:Type TextBlock}">
             <Style.Triggers>

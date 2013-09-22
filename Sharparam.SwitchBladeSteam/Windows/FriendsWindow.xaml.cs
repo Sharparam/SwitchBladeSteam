@@ -44,10 +44,9 @@ namespace Sharparam.SwitchBladeSteam.Windows
                                     @"Resources\Images\dk_appear_offline_down.png");
         }
 
-        private void FriendsListBoxKeyDown(object sender, KeyEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.Return && (e.Key != Key.Enter || FriendsListBox.SelectedItem != null))
-                StartChatWithSelected();
+            Helper.ExtendWindowStyleWithTool(this);
         }
 
         private void StartChatWithSelected()
