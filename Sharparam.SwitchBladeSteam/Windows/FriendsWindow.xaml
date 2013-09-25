@@ -6,9 +6,6 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         x:Class="Sharparam.SwitchBladeSteam.Windows.FriendsWindow"
         Title="FriendsWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="Window_Loaded">
-    <Window.DataContext>
-        <vm:FriendsViewModel/>
-    </Window.DataContext>
     <Window.Resources>
         <CollectionViewSource x:Key="Friends" Source="{Binding Friends}" Filter="Friends_OnFilter">
             <CollectionViewSource.SortDescriptions>
@@ -20,18 +17,20 @@
         </CollectionViewSource>
         <DataTemplate DataType="{x:Type compatibility:FriendWrapper}">
             <StackPanel Orientation="Horizontal">
-                <Image Width="64" Height="64" Source="{Binding Path=MediumAvatar}"/>
+                <Image Width="64" Height="64" Source="{Binding MediumAvatar}"/>
                 <StackPanel Margin="10,0,0,0">
-                    <TextBlock Text="{Binding Path=Friend.Name}" FontFamily="Segoe UI Light" FontSize="26"/>
-                    <TextBlock Text="{Binding Path=Friend.StateText}" FontFamily="Segoe UI Light" FontSize="20"/>
+                    <TextBlock Text="{Binding Friend.Name}" FontFamily="Segoe UI Light" FontSize="26"/>
+                    <TextBlock Text="{Binding Friend.StateText}" FontFamily="Segoe UI Light" FontSize="20"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
     </Window.Resources>
-    <Grid>
-        <ListBox x:Name="FriendsListBox"
-                 HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White"
-                 ItemsSource="{Binding Source={StaticResource Friends}}" HorizontalContentAlignment="Stretch">
-        </ListBox>
-    </Grid>
+    <Window.DataContext>
+        <vm:FriendsViewModel/>
+    </Window.DataContext>
+	<Grid>
+		<ListBox x:Name="FriendsListBox"
+			HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White"
+			ItemsSource="{Binding Source={StaticResource Friends}}" HorizontalContentAlignment="Stretch"/>
+	</Grid>
 </Window>

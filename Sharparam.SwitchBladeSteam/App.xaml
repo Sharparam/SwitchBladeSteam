@@ -1,9 +1,116 @@
-﻿<Application x:Class="Sharparam.SwitchBladeSteam.App"
+﻿<Application
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Sharparam.SwitchBladeSteam.App"
              StartupUri="Windows\FriendsWindow.xaml"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-         
+    	<SolidColorBrush x:Key="DarkScrollBarColor" Color="#FF424242"/>
+        
+        <Style x:Key="DarkScrollBarPageButtonStyle" TargetType="{x:Type RepeatButton}">
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Border Background="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="DarkVerticalScrollBarThumbStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Margin" Value="0, 0, 0, 0"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkScrollBarColor}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Rectangle Width="16" Stroke="{StaticResource DarkScrollBarColor}" Fill="{StaticResource DarkScrollBarColor}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkHorizontalScrollBarThumbStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Margin" Value="0, 0, 0, 0"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DarkScrollBarColor}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Rectangle Height="16" Stroke="{StaticResource DarkScrollBarColor}" Fill="{StaticResource DarkScrollBarColor}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="DarkVerticalScrollBar" TargetType="{x:Type ScrollBar}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition MaxHeight="0"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition MaxHeight="0"/>
+                </Grid.RowDefinitions>
+                <Grid.Background>Transparent</Grid.Background>
+                <RepeatButton Grid.Row="0" Height="0" Command="ScrollBar.LineUpCommand"/>
+                <Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="True">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource DarkScrollBarPageButtonStyle}"/>
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb Style="{StaticResource DarkVerticalScrollBarThumbStyle}"/>
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource DarkScrollBarPageButtonStyle}"/>
+                    </Track.IncreaseRepeatButton>
+                </Track>
+                <RepeatButton Grid.Row="2" Height="0" Command="ScrollBar.LineDownCommand"/>
+            </Grid>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="DarkHorizontalScrollBar" TargetType="{x:Type ScrollBar}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MaxWidth="0"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition MaxWidth="0"/>
+                </Grid.ColumnDefinitions>
+                <Grid.Background>Transparent</Grid.Background>
+                <RepeatButton Grid.Column="0" Width="0" Command="ScrollBar.LineLeftCommand"/>
+                <Track Name="PART_Track" Grid.Column="1" IsDirectionReversed="False" >
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource DarkScrollBarPageButtonStyle}"/>
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb Style="{StaticResource DarkHorizontalScrollBarThumbStyle}"/>
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource DarkScrollBarPageButtonStyle}"/>
+                    </Track.IncreaseRepeatButton>
+                </Track>
+                <RepeatButton Grid.Column="2" Width="0" Command="ScrollBar.LineRightCommand"/>
+            </Grid>
+        </ControlTemplate>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Margin" Value="0, 0, 0, 0"/>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="Width" Value="18"/>
+                    <Setter Property="Height" Value="Auto" />
+                    <Setter Property="Template" Value="{StaticResource DarkVerticalScrollBar}" />
+                </Trigger>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="Height" Value="18" />
+                    <Setter Property="Template" Value="{StaticResource DarkHorizontalScrollBar}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Application.Resources>
 </Application>
