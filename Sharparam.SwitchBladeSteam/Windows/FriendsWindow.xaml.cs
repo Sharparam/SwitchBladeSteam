@@ -22,7 +22,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private int _pressYPos;
         private int _lastYPos;
-        private int _deltaMove;
+        private int _deltaYPos;
 
         public FriendsWindow()
         {
@@ -61,16 +61,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
                 case RazerAPI.GestureType.Press:
                     _pressYPos = gestureEventArgs.Y;
                     _lastYPos = _pressYPos;
-                    _deltaMove = 0;
+                    _deltaYPos = 0;
                     break;
                 case RazerAPI.GestureType.Move:
                     var yPos = gestureEventArgs.Y;
                     var change = yPos - _lastYPos;
-                    _deltaMove += change;
-                    if (Math.Abs(_deltaMove) > ScrollThreshold)
+                    _deltaYPos += change;
+                    if (Math.Abs(_deltaYPos) > ScrollThreshold)
                     {
-                        MoveSelection(_deltaMove);
-                        _deltaMove = 0;
+                        MoveSelection(-_deltaYPos);
+                        _deltaYPos = 0;
                     }
                     _lastYPos = yPos;
                     break;
@@ -91,6 +91,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (friend == null)
                 return;
 
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);

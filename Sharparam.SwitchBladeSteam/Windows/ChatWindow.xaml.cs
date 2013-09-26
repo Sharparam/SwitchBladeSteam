@@ -26,6 +26,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
     {
         private const string DefaultInputMessage = "Tap screen to type a message...";
         private const string TitleFormat = "{0} ({1})";
+        private const int ScrollThreshold = 10;
 
         private static readonly SolidColorBrush IdleColor = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
         private static readonly SolidColorBrush ActiveColor = new SolidColorBrush(Color.FromArgb(100, 51, 153, 0));
@@ -35,6 +36,10 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private readonly Friend _friend;
 
         private ScrollViewer _historyBoxScroller;
+
+        private int _pressYPos;
+        private int _lastYPos;
+        private int _deltaYPos;
 
         public ChatWindow(Friend friend)
         {
@@ -53,7 +58,9 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             _razer = Provider.Razer;
             _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+            _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Press);
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Tap);
+            _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Move);
             _razer.Touchpad.Gesture += TouchpadOnGesture;
 
             // Set up dynamic keys
@@ -152,11 +159,14 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (_razer.KeyboardCapture)
                 _razer.SetKeyboardCapture(false);
 
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
             _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Tap);
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK4);
+            _razer.Touchpad.Gesture -= TouchpadOnGesture;
             Application.Current.MainWindow = new FriendsWindow();
             Close();
             Application.Current.MainWindow.Show();
@@ -164,12 +174,33 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private void TouchpadOnGesture(object sender, GestureEventArgs args)
         {
-            if (args.GestureType != RazerAPI.GestureType.Tap)
-                return;
-            
-            InputBox.Clear();
-            InputBox.Background = ActiveColor;
-            _razer.StartWPFControlKeyboardCapture(InputBox, false);
+            switch (args.GestureType)
+            {
+                case RazerAPI.GestureType.Press:
+                    _pressYPos = args.Y;
+                    _lastYPos = _pressYPos;
+                    _deltaYPos = 0;
+                    break;
+                case RazerAPI.GestureType.Move:
+                    var yPos = args.Y;
+                    var change = yPos - _lastYPos;
+                    _deltaYPos += change;
+                    if (Math.Abs(_deltaYPos) > ScrollThreshold)
+                    {
+                        if (_deltaYPos < 0) // Moved finger up
+                            ScrollHistoryBoxDown();
+                        else // Moved finger down
+                            ScrollHistoryBoxUp();
+                        _deltaYPos = 0;
+                    }
+                    _lastYPos = yPos;
+                    break;
+                case RazerAPI.GestureType.Tap:
+                    InputBox.Clear();
+                    InputBox.Background = ActiveColor;
+                    _razer.StartWPFControlKeyboardCapture(InputBox, false);
+                    break;
+            }
         }
 
         private void InputBoxKeyDown(object sender, KeyEventArgs e)
