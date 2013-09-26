@@ -4,6 +4,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
+using Sharparam.SharpBlade.Razer.Events;
 using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
 using Steam4NET;
@@ -15,14 +16,19 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// </summary>
     public partial class FriendsWindow
     {
-        private RazerManager _razer;
+        private const int ScrollThreshold = 15;
+
+        private readonly RazerManager _razer;
+
+        private int _pressYPos;
+        private int _lastYPos;
+        private int _deltaMove;
 
         public FriendsWindow()
         {
             InitializeComponent();
 
             _razer = Provider.Razer;
-            _razer.Touchpad.DisableOSGesture(RazerAPI.GestureType.All);
             _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
 
             // Set up dynamic keys
@@ -42,6 +48,33 @@ namespace Sharparam.SwitchBladeSteam.Windows
                                     (s, e) => { Provider.Steam.LocalUser.State = EPersonaState.k_EPersonaStateOffline; },
                                     @"Resources\Images\dk_appear_offline.png",
                                     @"Resources\Images\dk_appear_offline_down.png");
+
+            _razer.Touchpad.Gesture += TouchpadOnGesture;
+            _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Press);
+            _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Move);
+        }
+
+        private void TouchpadOnGesture(object sender, GestureEventArgs gestureEventArgs)
+        {
+            switch (gestureEventArgs.GestureType)
+            {
+                case RazerAPI.GestureType.Press:
+                    _pressYPos = gestureEventArgs.Y;
+                    _lastYPos = _pressYPos;
+                    _deltaMove = 0;
+                    break;
+                case RazerAPI.GestureType.Move:
+                    var yPos = gestureEventArgs.Y;
+                    var change = yPos - _lastYPos;
+                    _deltaMove += change;
+                    if (Math.Abs(_deltaMove) > ScrollThreshold)
+                    {
+                        MoveSelection(_deltaMove);
+                        _deltaMove = 0;
+                    }
+                    _lastYPos = yPos;
+                    break;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -61,6 +94,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
             _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
+            _razer.Touchpad.Gesture -= TouchpadOnGesture;
 
             Application.Current.MainWindow = new ChatWindow(friend.Friend);
             Close();
@@ -71,11 +105,11 @@ namespace Sharparam.SwitchBladeSteam.Windows
         {
             if (FriendsListBox.Items.Count <= 1 ||
                 FriendsListBox.SelectedIndex == -1 ||
-                (FriendsListBox.SelectedIndex == 0 && direction == -1) ||
-                (FriendsListBox.SelectedIndex == FriendsListBox.Items.Count - 1 && direction == 1))
+                (FriendsListBox.SelectedIndex == 0 && direction < 0) ||
+                (FriendsListBox.SelectedIndex == FriendsListBox.Items.Count - 1 && direction > 0))
                 return;
 
-            FriendsListBox.SelectedIndex += direction;
+            FriendsListBox.SelectedIndex += (direction == 0 ? 0 : (direction < 0 ? -1 : 1));
             FriendsListBox.ScrollIntoView(FriendsListBox.SelectedItem);
         }
 

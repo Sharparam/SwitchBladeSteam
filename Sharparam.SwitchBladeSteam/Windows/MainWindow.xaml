@@ -5,9 +5,5 @@
     <Window.Background>
         <ImageBrush ImageSource="/Sharparam.SwitchBladeSteam;component/Resources/Images/tp_splash.png"/>
     </Window.Background>
-    <Grid>
-        <Button Content="FRIENDS" HorizontalAlignment="Left" Margin="257,68,0,0" VerticalAlignment="Top" Width="290" Height="89" FontWeight="Bold" FontSize="36" Click="Button_Click_2"/>
-        <Button Content="EXIT" HorizontalAlignment="Left" Margin="56,282,0,0" VerticalAlignment="Top" Width="161" Height="63" FontWeight="Bold" FontSize="24" Click="Button_Click_1"/>
-
-    </Grid>
+    <Grid/>
 </Window>
