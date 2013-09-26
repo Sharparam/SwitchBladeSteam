@@ -26,6 +26,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
     {
         private const string DefaultInputMessage = "Tap screen to type a message...";
         private const string TitleFormat = "{0} ({1})";
+        private const string TitleFormatNoTag = "{0}";
         private const int ScrollThreshold = 10;
 
         private static readonly SolidColorBrush IdleColor = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
@@ -47,7 +48,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             _friend = friend;
 
-            TitleLabel.Content = String.Format(TitleFormat, _friend.Name, _friend.Nickname);
+            TitleLabel.Content = String.Format(String.IsNullOrEmpty(_friend.Nickname) ? TitleFormatNoTag : TitleFormat, _friend.Name, _friend.Nickname);
 
             _friend.TypingMessageReceived += FriendOnTypingMessageReceived;
             _friend.ChatMessageReceived += FriendOnChatMessageReceived;
