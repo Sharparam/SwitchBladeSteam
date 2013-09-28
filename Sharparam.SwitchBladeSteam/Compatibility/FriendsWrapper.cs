@@ -10,9 +10,9 @@ namespace Sharparam.SwitchBladeSteam.Compatibility
 
         private bool _updating;
 
-        public readonly FriendsList Friends;
+        public readonly Friends Friends;
 
-        private FriendsWrapper(FriendsList friends, ObservableCollection<FriendWrapper> wrapper) : base(wrapper)
+        private FriendsWrapper(Friends friends, ObservableCollection<FriendWrapper> wrapper) : base(wrapper)
         {
             Friends = friends;
             _wrapper = wrapper;
@@ -20,7 +20,7 @@ namespace Sharparam.SwitchBladeSteam.Compatibility
             UpdateWrapper();
         }
 
-        public FriendsWrapper(FriendsList friends) : this(friends, new ObservableCollection<FriendWrapper>())
+        public FriendsWrapper(Friends friends) : this(friends, new ObservableCollection<FriendWrapper>())
         {
             
         }
