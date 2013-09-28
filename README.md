@@ -1,6 +1,8 @@
 Sharparam.SwitchBladeSteam
 ==========================
 
+[![Build Status](http://ci.sharpblade.net/buildStatus/icon?job=SwitchBladeSteam)](http://ci.sharpblade.net/job/SwitchBladeSteam/)
+
 A Steam client for the SwitchBlade UI
 -------------------------------------
 
