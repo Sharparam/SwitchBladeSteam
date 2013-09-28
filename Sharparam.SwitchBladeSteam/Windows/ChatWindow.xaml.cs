@@ -147,7 +147,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private void FriendOnChatMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
-            SetTitle(String.Format(TitleFormat, _friend.Name, _friend.Nickname));
+            SetTitle(String.Format(String.IsNullOrEmpty(_friend.Nickname) ? TitleFormatNoTag : TitleFormat, _friend.Name, _friend.Nickname));
         }
 
         private void MessagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
