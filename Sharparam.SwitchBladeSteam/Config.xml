@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<application>
+  <name>SwitchBladeSteam</name>
+  <appid>80754CA8-6E32-4A67-B774-746A8F30E4C5</appid>
+  <filename>Sharparam.SwitchBladeSteam.exe</filename>
+  <icon>
+    <img src="Images/dk_icon.png"/>
+  </icon>
+  <version>1.0.0</version>
+  <author>
+    <name>Adam Hellberg, Graham Hough and Brandon Scott</name>
+    <company>SharpBlade Apps</company>
+  </author>
+  <description>Enables usage of Steam friends list and chat.</description>
+</application>
