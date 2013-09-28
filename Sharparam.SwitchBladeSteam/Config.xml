@@ -5,6 +5,8 @@
   <filename>Sharparam.SwitchBladeSteam.exe</filename>
   <icon>
     <img src="Images/dk_icon.png"/>
+    <up>Images/dk_icon.png</up>
+    <down>Images/dk_icon.png</down>
   </icon>
   <version>1.0.0</version>
   <author>
