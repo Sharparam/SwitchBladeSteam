@@ -50,30 +50,24 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         #region Helper Methods
 
-        private bool IsMouseOverTarget(Visual target, GetPositionDelegate getPosition)
-        {
-            if (target == null)
-                return false;
-
-            var bounds = VisualTreeHelper.GetDescendantBounds(target);
-            var mousePos = getPosition((IInputElement) target);
-            return bounds.Contains(mousePos);
-        }
-
-        private ListViewItem GetListViewItem(int index)
+        private ListBoxItem GetListViewItem(int index)
         {
             if (FriendsListBox.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
                 return null;
-            return FriendsListBox.ItemContainerGenerator.ContainerFromIndex(index) as ListViewItem;
+            return FriendsListBox.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
         }
 
-        private int GetCurrentIndex(GetPositionDelegate getPosition)
+        private int GetCurrentIndex(Point position)
         {
             var index = -1;
             for (var i = 0; i < FriendsListBox.Items.Count; i++)
             {
                 var item = GetListViewItem(i);
-                if (IsMouseOverTarget(item, getPosition))
+                if (item == null)
+                    continue;
+
+                var pos = item.TransformToAncestor(this).Transform(new Point(0, 0));
+                if (position.Y >= pos.Y && position.Y <= pos.Y + item.ActualHeight)
                 {
                     index = i;
                     break;
@@ -88,6 +82,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         {
             var xPos = gestureEventArgs.X;
             var yPos = gestureEventArgs.Y;
+            var pos = new Point(xPos, yPos);
 
             switch (gestureEventArgs.GestureType)
             {
@@ -107,7 +102,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
                     _lastYPos = yPos;
                     break;
                 case RazerAPI.GestureType.Tap:
-                    var index = GetCurrentIndex(e => new Point(xPos, yPos));
+                    var index = GetCurrentIndex(pos);
                     if (index < 0 || index >= FriendsListBox.Items.Count)
                         break;
                     FriendsListBox.SelectedIndex = index; // Small hack to utilize existing StartChatWithSelected

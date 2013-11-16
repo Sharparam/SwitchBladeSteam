@@ -6,7 +6,7 @@ namespace Sharparam.SwitchBladeSteam.ViewModels
 {
     public class FriendViewModel
     {
-        private static readonly Dictionary<Friend, FriendViewModel> _cache = new Dictionary<Friend, FriendViewModel>();
+        private static readonly Dictionary<Friend, FriendViewModel> Cache = new Dictionary<Friend, FriendViewModel>();
 
         public Friend Friend { get; private set; }
 
@@ -21,17 +21,17 @@ namespace Sharparam.SwitchBladeSteam.ViewModels
 
         public static FriendViewModel GetViewModel(Friend friend)
         {
-            if (_cache.ContainsKey(friend))
-                return _cache[friend];
+            if (Cache.ContainsKey(friend))
+                return Cache[friend];
 
             var viewModel = new FriendViewModel(friend);
-            _cache.Add(friend, viewModel);
+            Cache.Add(friend, viewModel);
             return viewModel;
         }
 
         public static void ClearCache()
         {
-            _cache.Clear();
+            Cache.Clear();
         }
     }
 }
