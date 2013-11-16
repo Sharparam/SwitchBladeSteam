@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Windows;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
+using Sharparam.SteamLib;
 using Sharparam.SwitchBladeSteam.Lib;
+using Sharparam.SwitchBladeSteam.Windows;
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam
@@ -32,9 +35,20 @@ namespace Sharparam.SwitchBladeSteam
             _offlineKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK9, OnOfflineKeyPressed,
                                                  @"Default\Images\dk_offline.png",
                                                  @"Default\Images\dk_offline_down.png", true);
-            
-            Provider.Steam.LocalUser.StateChanged += LocalUserOnStateChanged;
-            UpdateKeys(Provider.Steam.LocalUser.State, true);
+
+            try
+            {
+                var steam = Provider.Steam;
+                steam.LocalUser.StateChanged += LocalUserOnStateChanged;
+                UpdateKeys(steam.LocalUser.State, true);
+            }
+            catch (SteamException)
+            {
+                razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK6);
+                razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK7);
+                razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK8);
+                razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK9);
+            }
         }
 
         private void OnOnlineKeyPressed(object sender, EventArgs eventArgs)

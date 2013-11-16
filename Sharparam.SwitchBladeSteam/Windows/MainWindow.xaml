@@ -1,0 +1,13 @@
+﻿<Window x:Class="Sharparam.SwitchBladeSteam.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewModels="clr-namespace:Sharparam.SwitchBladeSteam.ViewModels"
+        Title="SteamFailureWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="Window_Loaded">
+    <!--<Window.DataContext>
+        <viewModels:MainWindowMessageViewModel/>
+    </Window.DataContext>-->
+    <Grid>
+        <Label Content="{Binding Message}" HorizontalAlignment="Left" Foreground="White" FontSize="32" FontWeight="Bold" Width="800" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Padding="5,0" Height="174" VerticalAlignment="Top"/>
+        <TextBlock Text="{Binding MessageDetails}" HorizontalAlignment="Left" Margin="10,179,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="291" Width="780" FontSize="24"/>
+    </Grid>
+</Window>

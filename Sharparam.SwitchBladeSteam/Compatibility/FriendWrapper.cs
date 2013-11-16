@@ -1,5 +1,4 @@
 ﻿using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Sharparam.SteamLib;
 using Sharparam.SwitchBladeSteam.Lib;
 using Steam4NET;

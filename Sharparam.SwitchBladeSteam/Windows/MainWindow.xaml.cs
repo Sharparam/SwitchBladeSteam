@@ -1,0 +1,57 @@
+﻿using System;
+using System.Windows;
+using Sharparam.SharpBlade.Razer;
+using Sharparam.SteamLib;
+using Sharparam.SwitchBladeSteam.Lib;
+using Sharparam.SwitchBladeSteam.ViewModels;
+
+namespace Sharparam.SwitchBladeSteam.Windows
+{
+    /// <summary>
+    /// Interaction logic for SteamFailureWindow.xaml
+    /// </summary>
+    public partial class MainWindow
+    {
+        private readonly RazerManager _razer;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            _razer = Provider.Razer;
+            _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+
+            DataContext = new MainWindowMessageViewModel
+            {
+                Message = "Unknown initialization error",
+                MessageDetails = "Unknown error."
+            };
+
+            // Try to init Steam
+            try
+            {
+                var steam = Provider.Steam;
+                if (steam.LocalUser == null)
+                    return;
+                
+                Application.Current.MainWindow = new FriendsWindow();
+                Close();
+                Application.Current.MainWindow.Show();
+            }
+            catch (SteamException ex)
+            {
+                var context = new MainWindowMessageViewModel
+                {
+                    Message = "Steam failed to initialize properly, is Steam running?",
+                    MessageDetails = String.Format("Error detail:\n{0}: {1}", ex.GetType(), ex.Message)
+                };
+                DataContext = context;
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Helper.ExtendWindowStyleWithTool(this);
+        }
+    }
+}
