@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Windows;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SteamLib;
 using Sharparam.SwitchBladeSteam.Lib;
-using Sharparam.SwitchBladeSteam.Windows;
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam
@@ -71,20 +69,56 @@ namespace Sharparam.SwitchBladeSteam
             Provider.Steam.LocalUser.State = EPersonaState.k_EPersonaStateOffline;
         }
 
-        private void ResetKeys()
+        private static bool EqualStates(EPersonaState first, EPersonaState second)
         {
-            _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Resources\Images\dk_online_pressed.png");
-            _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Resources\Images\dk_busy_pressed.png");
-            _awayKey.SetImages(@"Default\Images\dk_away.png", @"Resources\Images\dk_away_pressed.png");
-            _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Resources\Images\dk_offline_pressed.png");
+            if (first == second)
+                return true;
+
+            if ((first == EPersonaState.k_EPersonaStateOnline && second == EPersonaState.k_EPersonaStateLookingToPlay) ||
+                (first == EPersonaState.k_EPersonaStateOnline && second == EPersonaState.k_EPersonaStateLookingToTrade) ||
+                (first == EPersonaState.k_EPersonaStateOnline && second == EPersonaState.k_EPersonaStateMax) ||
+                (first == EPersonaState.k_EPersonaStateLookingToPlay && second == EPersonaState.k_EPersonaStateLookingToTrade) ||
+                (first == EPersonaState.k_EPersonaStateLookingToPlay && second == EPersonaState.k_EPersonaStateMax) ||
+                (first == EPersonaState.k_EPersonaStateLookingToTrade && second == EPersonaState.k_EPersonaStateMax))
+                return true;
+
+            return first == EPersonaState.k_EPersonaStateAway && second == EPersonaState.k_EPersonaStateSnooze;
+        }
+
+        private void ResetKey(EPersonaState state)
+        {
+            switch (state)
+            {
+                case EPersonaState.k_EPersonaStateOnline:
+                case EPersonaState.k_EPersonaStateMax:
+                case EPersonaState.k_EPersonaStateLookingToPlay:
+                case EPersonaState.k_EPersonaStateLookingToTrade:
+                    _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Resources\Images\dk_online_pressed.png");
+                    break;
+                case EPersonaState.k_EPersonaStateBusy:
+                    _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Resources\Images\dk_busy_pressed.png");
+                    break;
+                case EPersonaState.k_EPersonaStateAway:
+                case EPersonaState.k_EPersonaStateSnooze:
+                    _awayKey.SetImages(@"Default\Images\dk_away.png", @"Resources\Images\dk_away_pressed.png");
+                    break;
+                case EPersonaState.k_EPersonaStateOffline:
+                    _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Resources\Images\dk_offline_pressed.png");
+                    break;
+            }
         }
 
         private void UpdateKeys(EPersonaState state, bool ignoreState = false)
         {
-            if (!ignoreState && state == _state)
+            // _state is old state, state is new state
+
+            // Do nothing if the state didn't change
+            if (!ignoreState && (EqualStates(state, _state) || EqualStates(_state, state))) // state == _state
                 return;
 
-            ResetKeys();
+            // Reset the previous key to the default images
+            // EX: _state = online, state = away, reset online key to default image, set away to active image
+            ResetKey(_state);
 
             switch (state)
             {
