@@ -65,13 +65,13 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             // Set up dynamic keys
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, FriendsKeyPressed, @"Default\Images\dk_friends.png",
-                                    @"Default\Images\dk_friends_down.png", true);
+                                    @"Default\Images\dk_friends_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK10, (s, e) => ScrollHistoryBoxUp(),
-                                    @"Default\Images\dk_up.png", @"Default\Images\dk_up_down.png", true);
+                                    @"Default\Images\dk_up.png", @"Default\Images\dk_up_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => ScrollHistoryBoxDown(),
-                                    @"Default\Images\dk_down.png", @"Default\Images\dk_down_down.png", true);
+                                    @"Default\Images\dk_down.png", @"Default\Images\dk_down_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK4, (s, e) => ScrollHistoryBoxToEnd(),
-                                    @"Default\Images\dk_bottom.png", @"Default\Images\dk_bottom_down.png", true);
+                                    @"Default\Images\dk_bottom.png", @"Default\Images\dk_bottom_pressed.png", true);
         }
 
         private void SetTitle(string content)

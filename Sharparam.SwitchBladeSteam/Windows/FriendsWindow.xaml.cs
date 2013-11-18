@@ -36,11 +36,11 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             // Set up dynamic keys
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, (s, e) => StartChatWithSelected(),
-                                    @"Default\Images\dk_chat.png", @"Default\Images\dk_chat_down.png", true);
+                                    @"Default\Images\dk_startchat.png", @"Default\Images\dk_startchat_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK10, (s, e) => MoveSelectionUp(),
-                                    @"Default\Images\dk_up.png", @"Default\Images\dk_up_down.png", true);
+                                    @"Default\Images\dk_up.png", @"Default\Images\dk_up_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => MoveSelectionDown(),
-                                    @"Default\Images\dk_down.png", @"Default\Images\dk_down_down.png", true);
+                                    @"Default\Images\dk_down.png", @"Default\Images\dk_down_pressed.png", true);
 
             _razer.Touchpad.Gesture += TouchpadOnGesture;
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Press);

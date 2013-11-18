@@ -26,15 +26,15 @@ namespace Sharparam.SwitchBladeSteam
             var razer = Provider.Razer;
 
             _onlineKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK6, OnOnlineKeyPressed, @"Default\Images\dk_online.png",
-                                                @"Default\Images\dk_online_down.png", true);
+                                                @"Default\Images\dk_online_pressed.png", true);
             _busyKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK7, OnBusyKeyPressed, @"Default\Images\dk_busy.png",
-                                              @"Deault\Images\dk_busy_down.png", true);
+                                              @"Deault\Images\dk_busy_pressed.png", true);
             _awayKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK8, OnAwayKeyPressed,
                                               @"Default\Images\dk_away.png",
-                                              @"Default\Images\dk_away_down.png", true);
+                                              @"Default\Images\dk_away_pressed.png", true);
             _offlineKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK9, OnOfflineKeyPressed,
                                                  @"Default\Images\dk_offline.png",
-                                                 @"Default\Images\dk_offline_down.png", true);
+                                                 @"Default\Images\dk_offline_pressed.png", true);
 
             try
             {
@@ -73,10 +73,10 @@ namespace Sharparam.SwitchBladeSteam
 
         private void ResetKeys()
         {
-            _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Resources\Images\dk_online_down.png");
-            _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Resources\Images\dk_busy_down.png");
-            _awayKey.SetImages(@"Default\Images\dk_away.png", @"Resources\Images\dk_away_down.png");
-            _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Resources\Images\dk_offline_down.png");
+            _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Resources\Images\dk_online_pressed.png");
+            _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Resources\Images\dk_busy_pressed.png");
+            _awayKey.SetImages(@"Default\Images\dk_away.png", @"Resources\Images\dk_away_pressed.png");
+            _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Resources\Images\dk_offline_pressed.png");
         }
 
         private void UpdateKeys(EPersonaState state, bool ignoreState = false)
