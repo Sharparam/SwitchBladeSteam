@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SteamLib;
@@ -12,6 +13,14 @@ namespace Sharparam.SwitchBladeSteam
     /// </summary>
     public partial class App
     {
+        private static readonly Dictionary<EPersonaState, EPersonaState> StateMap = new Dictionary<EPersonaState, EPersonaState>
+        {
+            {EPersonaState.k_EPersonaStateLookingToPlay, EPersonaState.k_EPersonaStateOnline},
+            {EPersonaState.k_EPersonaStateLookingToTrade, EPersonaState.k_EPersonaStateOnline},
+            {EPersonaState.k_EPersonaStateMax, EPersonaState.k_EPersonaStateOnline},
+            {EPersonaState.k_EPersonaStateSnooze, EPersonaState.k_EPersonaStateAway}
+        };
+
         private readonly DynamicKey _onlineKey;
         private readonly DynamicKey _busyKey;
         private readonly DynamicKey _awayKey;
@@ -71,18 +80,13 @@ namespace Sharparam.SwitchBladeSteam
 
         private static bool EqualStates(EPersonaState first, EPersonaState second)
         {
-            if (first == second)
-                return true;
+            if (StateMap.ContainsKey(first))
+                first = StateMap[first];
 
-            if ((first == EPersonaState.k_EPersonaStateOnline && second == EPersonaState.k_EPersonaStateLookingToPlay) ||
-                (first == EPersonaState.k_EPersonaStateOnline && second == EPersonaState.k_EPersonaStateLookingToTrade) ||
-                (first == EPersonaState.k_EPersonaStateOnline && second == EPersonaState.k_EPersonaStateMax) ||
-                (first == EPersonaState.k_EPersonaStateLookingToPlay && second == EPersonaState.k_EPersonaStateLookingToTrade) ||
-                (first == EPersonaState.k_EPersonaStateLookingToPlay && second == EPersonaState.k_EPersonaStateMax) ||
-                (first == EPersonaState.k_EPersonaStateLookingToTrade && second == EPersonaState.k_EPersonaStateMax))
-                return true;
+            if (StateMap.ContainsKey(second))
+                second = StateMap[second];
 
-            return first == EPersonaState.k_EPersonaStateAway && second == EPersonaState.k_EPersonaStateSnooze;
+            return first == second;
         }
 
         private void ResetKey(EPersonaState state)
