@@ -97,17 +97,17 @@ namespace Sharparam.SwitchBladeSteam
                 case EPersonaState.k_EPersonaStateMax:
                 case EPersonaState.k_EPersonaStateLookingToPlay:
                 case EPersonaState.k_EPersonaStateLookingToTrade:
-                    _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Resources\Images\dk_online_pressed.png");
+                    _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Default\Images\dk_online_pressed.png");
                     break;
                 case EPersonaState.k_EPersonaStateBusy:
-                    _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Resources\Images\dk_busy_pressed.png");
+                    _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Default\Images\dk_busy_pressed.png");
                     break;
                 case EPersonaState.k_EPersonaStateAway:
                 case EPersonaState.k_EPersonaStateSnooze:
-                    _awayKey.SetImages(@"Default\Images\dk_away.png", @"Resources\Images\dk_away_pressed.png");
+                    _awayKey.SetImages(@"Default\Images\dk_away.png", @"Default\Images\dk_away_pressed.png");
                     break;
                 case EPersonaState.k_EPersonaStateOffline:
-                    _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Resources\Images\dk_offline_pressed.png");
+                    _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Default\Images\dk_offline_pressed.png");
                     break;
             }
         }
