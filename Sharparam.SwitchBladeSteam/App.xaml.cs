@@ -122,7 +122,10 @@ namespace Sharparam.SwitchBladeSteam
         private void UpdateKeys(EPersonaState state, bool ignoreState = false)
         {
             if (!_dispatcher.CheckAccess())
+            {
                 _dispatcher.Invoke(DispatcherPriority.Render, (VoidDelegate) (() => UpdateKeys(state, ignoreState)));
+                return;
+            }
 
             // _state is old state, state is new state
 
