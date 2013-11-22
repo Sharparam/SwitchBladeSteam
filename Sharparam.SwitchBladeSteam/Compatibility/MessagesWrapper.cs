@@ -23,6 +23,7 @@ namespace Sharparam.SwitchBladeSteam.Compatibility
             Messages = messages;
             _wrapper = wrapper;
             ((INotifyCollectionChanged) Messages).CollectionChanged += OnMessagesCollectionChanged;
+            UpdateWrapper();
         }
 
         internal MessagesWrapper(ReadOnlyObservableCollection<Message> messages)
