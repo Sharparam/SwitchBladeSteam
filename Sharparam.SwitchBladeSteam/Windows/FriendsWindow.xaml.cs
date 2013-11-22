@@ -4,11 +4,15 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SharpBlade.Razer.Events;
+using Sharparam.SteamLib;
+using Sharparam.SteamLib.Events;
 using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
+using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.Windows
 {
@@ -17,7 +21,10 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// </summary>
     public partial class FriendsWindow
     {
+        private delegate void VoidDelegate();
+
         private const int ScrollThreshold = 15;
+        private const string NewMessageFormat = "New message from {0}";
 
         private readonly RazerManager _razer;
 
@@ -25,11 +32,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private int _lastYPos;
         private int _deltaYPos;
 
-        private delegate Point GetPositionDelegate(IInputElement element);
+        private Friend _lastMessageFriend;
+        private OverlayHelper _overlayHelper;
 
         public FriendsWindow()
         {
             InitializeComponent();
+
+            _overlayHelper = new OverlayHelper(NewMessageOverlay, NewMessageOverlayLabel);
+
+            Provider.Steam.MessageReceived += SteamOnMessageReceived;
 
             _razer = Provider.Razer;
             _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
@@ -78,6 +90,20 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         #endregion Helper Methods
 
+        private void SteamOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        {
+            if (messageEventArgs.Message.Sender == Provider.Steam.LocalUser || messageEventArgs.Message.Type != EChatEntryType.k_EChatEntryTypeChatMsg)
+                return;
+
+            var friend = Provider.Steam.Friends.GetFriendById(messageEventArgs.Message.Sender);
+
+            if (friend == null)
+                return;
+
+            _lastMessageFriend = friend;
+            _overlayHelper.Show(_lastMessageFriend.Name, 5000);
+        }
+
         private void TouchpadOnGesture(object sender, GestureEventArgs gestureEventArgs)
         {
             var xPos = gestureEventArgs.X;
@@ -102,11 +128,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
                     _lastYPos = yPos;
                     break;
                 case RazerAPI.GestureType.Tap:
-                    var index = GetCurrentIndex(pos);
-                    if (index < 0 || index >= FriendsListBox.Items.Count)
-                        break;
-                    FriendsListBox.SelectedIndex = index; // Small hack to utilize existing StartChatWithSelected
-                    StartChatWithSelected();
+                    if (NewMessageOverlay.IsVisible && _overlayHelper.IsPointInsideOverlay(pos, this))
+                        StartChatWithFriend(_lastMessageFriend);
+                    else
+                    {
+                        var index = GetCurrentIndex(pos);
+                        if (index < 0 || index >= FriendsListBox.Items.Count)
+                            break;
+                        FriendsListBox.SelectedIndex = index; // Small hack to utilize existing StartChatWithSelected
+                        StartChatWithSelected();
+                    }
                     break;
             }
         }
@@ -114,6 +145,25 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Helper.ExtendWindowStyleWithTool(this);
+        }
+
+        private void StartChatWithFriend(Friend friend)
+        {
+            if (friend == null)
+                return;
+
+            Provider.Steam.MessageReceived -= SteamOnMessageReceived;
+
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
+            _razer.Touchpad.Gesture -= TouchpadOnGesture;
+
+            Application.Current.MainWindow = new ChatWindow(friend);
+            Close();
+            Application.Current.MainWindow.Show();
         }
 
         private void StartChatWithSelected()
@@ -125,16 +175,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (friend == null)
                 return;
 
-            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
-            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
-            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
-            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
-            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
-            _razer.Touchpad.Gesture -= TouchpadOnGesture;
-
-            Application.Current.MainWindow = new ChatWindow(friend.Friend);
-            Close();
-            Application.Current.MainWindow.Show();
+            StartChatWithFriend(friend.Friend);
         }
 
         private void MoveSelection(int direction)
@@ -157,6 +198,17 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void MoveSelectionDown()
         {
             MoveSelection(1);
+        }
+
+        private void HideOverlay()
+        {
+            if (!NewMessageOverlay.Dispatcher.CheckAccess())
+                NewMessageOverlay.Dispatcher.Invoke(
+                    (VoidDelegate) (() => NewMessageOverlay.Visibility = Visibility.Collapsed));
+            else
+                NewMessageOverlay.Visibility = Visibility.Collapsed;
+            
+            _lastMessageFriend = null;
         }
 
         private void Friends_OnFilter(object sender, FilterEventArgs e)

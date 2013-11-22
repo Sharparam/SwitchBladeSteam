@@ -43,7 +43,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
                 var context = new MainWindowMessageViewModel
                 {
                     Message = "Steam failed to initialize properly, is Steam running?",
-                    MessageDetails = String.Format("Error detail:\n{0}: {1}", ex.GetType(), ex.Message)
+                    MessageDetails = String.Format("Please close app and launch it after Steam has been started.\n\nError detail:\n{0}: {1}", ex.GetType(), ex.Message)
                 };
                 DataContext = context;
             }

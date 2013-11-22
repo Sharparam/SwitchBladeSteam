@@ -35,6 +35,10 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private readonly Friend _friend;
 
+        private readonly OverlayHelper _overlayHelper;
+
+        private Friend _lastMessageFriend;
+
         private ScrollViewer _historyBoxScroller;
 
         private int _pressYPos;
@@ -47,10 +51,14 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             _friend = friend;
 
+            _overlayHelper = new OverlayHelper(NewMessageOverlay, NewMessageOverlayLabel);
+
             TitleLabel.Content = String.Format(TitleFormat, _friend.Name);
 
             _friend.TypingMessageReceived += FriendOnTypingMessageReceived;
             _friend.ChatMessageReceived += FriendOnChatMessageReceived;
+
+            Provider.Steam.MessageReceived += SteamOnMessageReceived;
 
             var viewModel = FriendViewModel.GetViewModel(_friend);
             DataContext = viewModel;
@@ -72,6 +80,23 @@ namespace Sharparam.SwitchBladeSteam.Windows
                                     @"Default\Images\dk_down.png", @"Default\Images\dk_down_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK4, (s, e) => ScrollHistoryBoxToEnd(),
                                     @"Default\Images\dk_bottom.png", @"Default\Images\dk_bottom_pressed.png", true);
+        }
+
+        private void SteamOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        {
+            var id = messageEventArgs.Message.Sender;
+
+            if (messageEventArgs.Message.Type != EChatEntryType.k_EChatEntryTypeChatMsg ||
+                id == Provider.Steam.LocalUser || _friend == id)
+                return;
+
+            var friend = Provider.Steam.Friends.GetFriendById(id);
+
+            if (friend == null)
+                return;
+
+            _lastMessageFriend = friend;
+            _overlayHelper.Show(_lastMessageFriend.Name, 5000);
         }
 
         private void SetTitle(string content)
@@ -159,6 +184,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (_razer.KeyboardCapture)
                 _razer.SetKeyboardCapture(false);
 
+            Provider.Steam.MessageReceived -= SteamOnMessageReceived;
+
             _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
             _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Tap);
             _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
@@ -172,8 +199,29 @@ namespace Sharparam.SwitchBladeSteam.Windows
             Application.Current.MainWindow.Show();
         }
 
+        private void StartChatWithFriend(Friend friend)
+        {
+            if (friend == null)
+                return;
+
+            Provider.Steam.MessageReceived -= SteamOnMessageReceived;
+
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
+            _razer.Touchpad.Gesture -= TouchpadOnGesture;
+
+            Application.Current.MainWindow = new ChatWindow(friend);
+            Close();
+            Application.Current.MainWindow.Show();
+        }
+
         private void TouchpadOnGesture(object sender, GestureEventArgs args)
         {
+            var pos = new Point(args.X, args.Y);
+
             switch (args.GestureType)
             {
                 case RazerAPI.GestureType.Press:
@@ -196,9 +244,14 @@ namespace Sharparam.SwitchBladeSteam.Windows
                     _lastYPos = yPos;
                     break;
                 case RazerAPI.GestureType.Tap:
-                    InputBox.Clear();
-                    InputBox.Background = ActiveColor;
-                    _razer.StartWPFControlKeyboardCapture(InputBox, false);
+                    if (NewMessageOverlay.IsVisible && _overlayHelper.IsPointInsideOverlay(pos, this))
+                        StartChatWithFriend(_lastMessageFriend);
+                    else
+                    {
+                        InputBox.Clear();
+                        InputBox.Background = ActiveColor;
+                        _razer.StartWPFControlKeyboardCapture(InputBox, false);
+                    }
                     break;
             }
         }

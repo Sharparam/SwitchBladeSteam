@@ -29,8 +29,10 @@
         <vm:FriendsViewModel/>
     </Window.DataContext>
 	<Grid>
-		<ListBox x:Name="FriendsListBox"
-			HorizontalAlignment="Left" Height="480" VerticalAlignment="Top" Width="800" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White"
+		<ListBox x:Name="FriendsListBox" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White"
 			ItemsSource="{Binding Source={StaticResource Friends}}" HorizontalContentAlignment="Stretch"/>
+        <Grid x:Name="NewMessageOverlay" Height="80" Background="#FF747474" Margin="25,25,25,0" VerticalAlignment="Top" Visibility="Collapsed">
+            <Label x:Name="NewMessageOverlayLabel" Content="New message from $(NAME)" Margin="10" Foreground="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Segoe UI Semibold" FontSize="32" Background="{x:Null}"/>
+        </Grid>
 	</Grid>
 </Window>

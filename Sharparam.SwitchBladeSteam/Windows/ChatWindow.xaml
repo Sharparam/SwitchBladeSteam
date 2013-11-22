@@ -38,5 +38,8 @@
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ItemsSource="{Binding Source={StaticResource Messages}}"/>
         <TextBox x:Name="InputBox" HorizontalAlignment="Left" Height="47" Margin="0,433,0,0" Text="Tap screen to type a message..." VerticalAlignment="Top" Width="800" Background="{x:Null}" Foreground="White" BorderThickness="0,1,0,0" FontSize="30" KeyDown="InputBoxKeyDown" CaretBrush="White"/>
+        <Grid x:Name="NewMessageOverlay" Height="80" Background="#FF747474" Margin="25,25,25,0" VerticalAlignment="Top" Visibility="Collapsed">
+            <Label x:Name="NewMessageOverlayLabel" Content="New message from $(NAME)" Margin="10" Foreground="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="32" Background="{x:Null}" FontFamily="Segoe UI Semibold"/>
+        </Grid>
     </Grid>
 </Window>
