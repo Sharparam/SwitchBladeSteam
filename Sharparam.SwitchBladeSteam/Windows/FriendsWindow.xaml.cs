@@ -3,8 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Media;
-using System.Windows.Threading;
 using Sharparam.SharpBlade.Native;
 using Sharparam.SharpBlade.Razer;
 using Sharparam.SharpBlade.Razer.Events;
@@ -21,19 +19,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// </summary>
     public partial class FriendsWindow
     {
-        private delegate void VoidDelegate();
-
         private const int ScrollThreshold = 15;
-        private const string NewMessageFormat = "New message from {0}";
 
         private readonly RazerManager _razer;
+        private readonly OverlayHelper _overlayHelper;
 
         private int _pressYPos;
         private int _lastYPos;
         private int _deltaYPos;
 
         private Friend _lastMessageFriend;
-        private OverlayHelper _overlayHelper;
 
         public FriendsWindow()
         {
@@ -142,7 +137,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             Helper.ExtendWindowStyleWithTool(this);
         }
@@ -198,17 +193,6 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void MoveSelectionDown()
         {
             MoveSelection(1);
-        }
-
-        private void HideOverlay()
-        {
-            if (!NewMessageOverlay.Dispatcher.CheckAccess())
-                NewMessageOverlay.Dispatcher.Invoke(
-                    (VoidDelegate) (() => NewMessageOverlay.Visibility = Visibility.Collapsed));
-            else
-                NewMessageOverlay.Visibility = Visibility.Collapsed;
-            
-            _lastMessageFriend = null;
         }
 
         private void Friends_OnFilter(object sender, FilterEventArgs e)
