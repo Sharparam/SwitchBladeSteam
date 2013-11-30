@@ -85,15 +85,14 @@ namespace Sharparam.SwitchBladeSteam
             Provider.Steam.LocalUser.State = EPersonaState.k_EPersonaStateOffline;
         }
 
+        private static EPersonaState NormalizeState(EPersonaState state)
+        {
+            return StateMap.ContainsKey(state) ? StateMap[state] : state;
+        }
+
         private static bool EqualStates(EPersonaState first, EPersonaState second)
         {
-            if (StateMap.ContainsKey(first))
-                first = StateMap[first];
-
-            if (StateMap.ContainsKey(second))
-                second = StateMap[second];
-
-            return first == second;
+            return NormalizeState(first) == NormalizeState(second);
         }
 
         private void ResetKey(EPersonaState state)
@@ -130,7 +129,7 @@ namespace Sharparam.SwitchBladeSteam
             // _state is old state, state is new state
 
             // Do nothing if the state didn't change
-            if (!ignoreState && (EqualStates(state, _state) || EqualStates(_state, state))) // state == _state
+            if (!ignoreState && EqualStates(state, _state)) // state == _state
                 return;
 
             // Reset the previous key to the default images
