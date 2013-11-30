@@ -99,7 +99,7 @@ namespace Sharparam.SwitchBladeSteam.Lib
         // By Franci Penov & Peter Mortensen on StackOverflow <http://stackoverflow.com/a/551847>
         public static IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
         {
-            int error = 0;
+            int error;
             IntPtr result = IntPtr.Zero;
             // Win32 SetWindowLong doesn't clear error on success
             SetLastError(0);

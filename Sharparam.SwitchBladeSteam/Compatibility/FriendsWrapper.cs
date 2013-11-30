@@ -8,13 +8,13 @@ namespace Sharparam.SwitchBladeSteam.Compatibility
     {
         private readonly ObservableCollection<FriendWrapper> _wrapper;
 
-        private bool _updating;
+        private readonly Friends _friends;
 
-        public readonly Friends Friends;
+        private bool _updating;
 
         private FriendsWrapper(Friends friends, ObservableCollection<FriendWrapper> wrapper) : base(wrapper)
         {
-            Friends = friends;
+            _friends = friends;
             _wrapper = wrapper;
             ((INotifyCollectionChanged) friends).CollectionChanged += OnFriendsListChanged;
             UpdateWrapper();
@@ -39,7 +39,7 @@ namespace Sharparam.SwitchBladeSteam.Compatibility
 
             _wrapper.Clear();
 
-            foreach (var friend in Friends)
+            foreach (var friend in _friends)
                 _wrapper.Add(new FriendWrapper(friend));
 
             _updating = false;

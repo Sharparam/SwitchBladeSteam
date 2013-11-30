@@ -49,7 +49,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             Helper.ExtendWindowStyleWithTool(this);
         }

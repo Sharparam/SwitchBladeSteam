@@ -5,7 +5,7 @@
         xmlns:compatibility="clr-namespace:Sharparam.SwitchBladeSteam.Compatibility"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         x:Class="Sharparam.SwitchBladeSteam.Windows.FriendsWindow"
-        Title="FriendsWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="Window_Loaded">
+        Title="FriendsWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="WindowLoaded">
     <Window.Resources>
         <CollectionViewSource x:Key="Friends" Source="{Binding Friends}" Filter="Friends_OnFilter">
             <CollectionViewSource.SortDescriptions>

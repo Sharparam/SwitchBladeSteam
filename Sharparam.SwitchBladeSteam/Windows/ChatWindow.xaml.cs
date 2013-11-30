@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -12,7 +10,6 @@ using Sharparam.SharpBlade.Razer;
 using Sharparam.SharpBlade.Razer.Events;
 using Sharparam.SteamLib;
 using Sharparam.SteamLib.Events;
-using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
 using Sharparam.SwitchBladeSteam.ViewModels;
 using Steam4NET;
@@ -158,6 +155,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
             _historyBoxScroller = Helper.GetDescendantByType<ScrollViewer>(HistoryBox);
             if (HistoryBox.SelectedIndex > -1)
                 HistoryBox.SelectedIndex = -1;
+
+            ScrollHistoryBoxToEnd();
         }
 
         private void FriendOnTypingMessageReceived(object sender, MessageEventArgs messageEventArgs)
