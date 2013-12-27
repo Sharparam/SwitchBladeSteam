@@ -21,7 +21,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// </summary>
     public partial class ChatWindow
     {
-        private const string DefaultInputMessage = "Tap screen to type a message...";
+        private const string DefaultInputMessage = "Tap to type a message...";
         private const string TitleFormat = "{0}";
         private const int ScrollThreshold = 10;
 
@@ -245,18 +245,22 @@ namespace Sharparam.SwitchBladeSteam.Windows
                 case RazerAPI.GestureType.Tap:
                     if (NewMessageOverlay.IsVisible && _overlayHelper.IsPointInsideOverlay(pos, this))
                         StartChatWithFriend(_lastMessageFriend);
-                    else
-                    {
-                        InputBox.Clear();
-                        InputBox.Background = ActiveColor;
-                        _razer.StartWPFControlKeyboardCapture(InputBox, false);
-                    }
+                    else if (pos.Y < 433 && _razer.KeyboardCapture)
+                        StopKeyboardCapture();
+                    else if (pos.Y >= 433 && !_razer.KeyboardCapture)
+                        StartKeyboardCapture();
                     break;
             }
         }
 
         private void InputBoxKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Escape)
+            {
+                StopKeyboardCapture();
+                return;
+            }
+
             var msg = InputBox.Text;
 
             if (!String.IsNullOrEmpty(msg))
@@ -274,17 +278,30 @@ namespace Sharparam.SwitchBladeSteam.Windows
                 return;
             }
 
-            if (!String.IsNullOrEmpty(msg))
-            {
-                _friend.SendMessage(msg);
-                InputBox.CaretIndex = InputBox.Text.Length;
-                var rect = InputBox.GetRectFromCharacterIndex(InputBox.CaretIndex);
-                InputBox.ScrollToHorizontalOffset(rect.Right);
-            }
+            if (String.IsNullOrEmpty(msg))
+                return;
+            
+            _friend.SendMessage(msg);
 
+            InputBox.Text = String.Empty;
+            InputBox.CaretIndex = InputBox.Text.Length;
+            InputBox.ScrollToHorizontalOffset(InputBox.GetRectFromCharacterIndex(InputBox.CaretIndex).Right);
+        }
+
+        private void StartKeyboardCapture()
+        {
+            InputBox.Clear();
+            InputBox.Background = ActiveColor;
+            _razer.StartWPFControlKeyboardCapture(InputBox, false);
+        }
+
+        private void StopKeyboardCapture()
+        {
             InputBox.Background = IdleColor;
             _razer.SetKeyboardCapture(false);
             InputBox.Text = DefaultInputMessage;
+            InputBox.CaretIndex = InputBox.Text.Length;
+            InputBox.ScrollToHorizontalOffset(InputBox.GetRectFromCharacterIndex(InputBox.CaretIndex).Right);
         }
     }
 }
