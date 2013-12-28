@@ -24,6 +24,48 @@ namespace Sharparam.SwitchBladeSteam
             {EPersonaState.k_EPersonaStateSnooze, EPersonaState.k_EPersonaStateAway}
         };
 
+        private static readonly Dictionary<EPersonaState, string[]> ImageMap = new Dictionary<EPersonaState, string[]>
+        {
+            {
+                EPersonaState.k_EPersonaStateOnline,
+                new[]
+                {
+                    @"Default\Images\dk_online_alt.png",
+                    @"Default\Images\dk_online_pressed_alt.png",
+                    @"Default\Images\dk_online_active_alt.png"
+                }
+            },
+            {
+                EPersonaState.k_EPersonaStateBusy,
+                new[]
+                {
+                    @"Default\Images\dk_busy_alt.png",
+                    @"Default\Images\dk_busy_pressed_alt.png",
+                    @"Default\Images\dk_busy_active_alt.png"
+                }
+            },
+            {
+                EPersonaState.k_EPersonaStateAway,
+                new[]
+                {
+                    @"Default\Images\dk_away_alt.png",
+                    @"Default\Images\dk_away_pressed_alt.png",
+                    @"Default\Images\dk_away_active_alt.png"
+                }
+            },
+            {
+                EPersonaState.k_EPersonaStateOffline,
+                new[]
+                {
+                    @"Default\Images\dk_offline_alt.png",
+                    @"Default\Images\dk_offline_pressed_alt.png",
+                    @"Default\Images\dk_offline_active_alt.png"
+                }
+            }
+        };
+
+        private readonly Dictionary<EPersonaState, DynamicKey> _dynamicKeys; 
+
         private readonly Dispatcher _dispatcher;
 
         private readonly DynamicKey _onlineKey;
@@ -39,16 +81,35 @@ namespace Sharparam.SwitchBladeSteam
 
             var razer = Provider.Razer;
 
-            _onlineKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK6, OnOnlineKeyPressed, @"Default\Images\dk_online.png",
-                                                @"Default\Images\dk_online_pressed.png", true);
-            _busyKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK7, OnBusyKeyPressed, @"Default\Images\dk_busy.png",
-                                              @"Deault\Images\dk_busy_pressed.png", true);
-            _awayKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK8, OnAwayKeyPressed,
-                                              @"Default\Images\dk_away.png",
-                                              @"Default\Images\dk_away_pressed.png", true);
-            _offlineKey = razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK9, OnOfflineKeyPressed,
-                                                 @"Default\Images\dk_offline.png",
-                                                 @"Default\Images\dk_offline_pressed.png", true);
+            _dynamicKeys = new Dictionary<EPersonaState, DynamicKey>();
+
+            _dynamicKeys[EPersonaState.k_EPersonaStateOnline] = razer.EnableDynamicKey(
+                RazerAPI.DynamicKeyType.DK6,
+                OnOnlineKeyPressed,
+                ImageMap[EPersonaState.k_EPersonaStateOnline][0],
+                ImageMap[EPersonaState.k_EPersonaStateOnline][1],
+                true);
+
+            _dynamicKeys[EPersonaState.k_EPersonaStateBusy] = razer.EnableDynamicKey(
+                RazerAPI.DynamicKeyType.DK7,
+                OnBusyKeyPressed,
+                ImageMap[EPersonaState.k_EPersonaStateBusy][0],
+                ImageMap[EPersonaState.k_EPersonaStateBusy][1],
+                true);
+
+            _dynamicKeys[EPersonaState.k_EPersonaStateAway] = razer.EnableDynamicKey(
+                RazerAPI.DynamicKeyType.DK8,
+                OnAwayKeyPressed,
+                ImageMap[EPersonaState.k_EPersonaStateAway][0],
+                ImageMap[EPersonaState.k_EPersonaStateAway][1],
+                true);
+
+            _dynamicKeys[EPersonaState.k_EPersonaStateOffline] = razer.EnableDynamicKey(
+                RazerAPI.DynamicKeyType.DK9,
+                OnOfflineKeyPressed,
+                ImageMap[EPersonaState.k_EPersonaStateOffline][0],
+                ImageMap[EPersonaState.k_EPersonaStateOffline][1],
+                true);
 
             try
             {
@@ -97,25 +158,9 @@ namespace Sharparam.SwitchBladeSteam
 
         private void ResetKey(EPersonaState state)
         {
-            switch (state)
-            {
-                case EPersonaState.k_EPersonaStateOnline:
-                case EPersonaState.k_EPersonaStateMax:
-                case EPersonaState.k_EPersonaStateLookingToPlay:
-                case EPersonaState.k_EPersonaStateLookingToTrade:
-                    _onlineKey.SetImages(@"Default\Images\dk_online.png", @"Default\Images\dk_online_pressed.png");
-                    break;
-                case EPersonaState.k_EPersonaStateBusy:
-                    _busyKey.SetImages(@"Default\Images\dk_busy.png", @"Default\Images\dk_busy_pressed.png");
-                    break;
-                case EPersonaState.k_EPersonaStateAway:
-                case EPersonaState.k_EPersonaStateSnooze:
-                    _awayKey.SetImages(@"Default\Images\dk_away.png", @"Default\Images\dk_away_pressed.png");
-                    break;
-                case EPersonaState.k_EPersonaStateOffline:
-                    _offlineKey.SetImages(@"Default\Images\dk_offline.png", @"Default\Images\dk_offline_pressed.png");
-                    break;
-            }
+            state = NormalizeState(state);
+
+            _dynamicKeys[state].SetImages(ImageMap[state][0], ImageMap[state][1]);
         }
 
         private void UpdateKeys(EPersonaState state, bool ignoreState = false)
@@ -136,25 +181,9 @@ namespace Sharparam.SwitchBladeSteam
             // EX: _state = online, state = away, reset online key to default image, set away to active image
             ResetKey(_state);
 
-            switch (state)
-            {
-                case EPersonaState.k_EPersonaStateOnline:
-                case EPersonaState.k_EPersonaStateMax:
-                case EPersonaState.k_EPersonaStateLookingToPlay:
-                case EPersonaState.k_EPersonaStateLookingToTrade:
-                    _onlineKey.SetImage(@"Default\Images\dk_online_active.png");
-                    break;
-                case EPersonaState.k_EPersonaStateBusy:
-                    _busyKey.SetImage(@"Default\Images\dk_busy_active.png");
-                    break;
-                case EPersonaState.k_EPersonaStateAway:
-                case EPersonaState.k_EPersonaStateSnooze:
-                    _awayKey.SetImage(@"Default\Images\dk_away_active.png");
-                    break;
-                case EPersonaState.k_EPersonaStateOffline:
-                    _offlineKey.SetImage(@"Default\Images\dk_offline_active.png");
-                    break;
-            }
+            var normalizedState = NormalizeState(state);
+
+            _dynamicKeys[normalizedState].SetImage(ImageMap[normalizedState][2]);
 
             _state = state;
         }
