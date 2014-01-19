@@ -1,7 +1,5 @@
-Sharparam.SwitchBladeSteam
-==========================
-
-[![Build Status](http://ci.sharpblade.net/buildStatus/icon?job=SwitchBladeSteam)](http://ci.sharpblade.net/job/SwitchBladeSteam/)
+Sharparam.SwitchBladeSteam [![TC Status][tcimage]][tcproject]
+=============================================================
 
 A Steam client for the SwitchBlade UI
 -------------------------------------
@@ -49,3 +47,6 @@ SwitchBlade UI SDK is provided by Razer and [can be obtained from their website]
 Steam4NET2 (provided) [can be obtained from OpenSteamWork's website](http://www.opensteamworks.org).
 
 log4net (provided) [can be obtained from Apache's website](http://logging.apache.org/log4net/).
+
+[tcimage]: http://tc.sharpblade.net/app/rest/builds/buildType:%28id:switchbladesteam_mainbuild%29/statusIcon
+[tcproject]: http://tc.sharpblade.net/viewType.html?buildTypeId=switchbladesteam_mainbuild&guest=1
