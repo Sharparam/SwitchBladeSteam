@@ -11,7 +11,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// <summary>
     /// Interaction logic for SteamFailureWindow.xaml
     /// </summary>
-    public partial class MainWindow
+    public partial class MainWindow : ISwitchbladeWindow
     {
         private readonly RazerManager _razer;
 
@@ -20,7 +20,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
             InitializeComponent();
 
             _razer = Provider.Razer;
-            _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+            ActivateApp();
+            Provider.CurrentWindow = this;
 
             DataContext = new MainWindowMessageViewModel
             {
@@ -53,6 +54,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             Helper.ExtendWindowStyleWithTool(this);
+        }
+
+        public void ActivateApp()
+        {
+            _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+        }
+
+        public void DeactivateApp()
+        {
+            Application.Current.Shutdown(1);
         }
     }
 }

@@ -28,6 +28,8 @@
 //  </copyright>
 // ---------------------------------------------------------------------------------------
 
+using Sharparam.SwitchBladeSteam.Windows;
+
 using SharpBlade.Native;
 using SharpBlade.Razer;
 using SharpBlade.Razer.Events;
@@ -41,9 +43,13 @@ namespace Sharparam.SwitchBladeSteam.Lib
 
     public static class Provider
     {
+        internal static ISwitchbladeWindow CurrentWindow;
+
         private static RazerManager _razer;
 
         private static Steam _steam;
+
+        private static RazerAPI.AppEventType _lastEventType;
 
         public static RazerManager Razer
         {
@@ -71,10 +77,24 @@ namespace Sharparam.SwitchBladeSteam.Lib
 
         private static void OnAppEvent(object sender, AppEventEventArgs e)
         {
+            if (e.Type == _lastEventType)
+                return;
+
             switch (e.Type)
             {
-                case RazerAPI.AppEventType.Close:
+                case RazerAPI.AppEventType.Activated:
+                    if (CurrentWindow == null)
+                        Application.Current.Shutdown();
+                    else
+                        CurrentWindow.ActivateApp();
+                    break;
                 case RazerAPI.AppEventType.Deactivated:
+                    if (CurrentWindow == null)
+                        Application.Current.Shutdown();
+                    else
+                        CurrentWindow.DeactivateApp();
+                    break;
+                case RazerAPI.AppEventType.Close:
                 case RazerAPI.AppEventType.Exit:
                     FriendViewModel.ClearCache();
                     if (_steam != null)
@@ -82,6 +102,8 @@ namespace Sharparam.SwitchBladeSteam.Lib
                     Application.Current.Shutdown();
                     break;
             }
+
+            _lastEventType = e.Type;
         }
     }
 }

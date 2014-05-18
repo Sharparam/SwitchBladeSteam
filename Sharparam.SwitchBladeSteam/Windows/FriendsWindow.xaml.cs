@@ -19,12 +19,14 @@ namespace Sharparam.SwitchBladeSteam.Windows
     /// <summary>
     /// Interaction logic for FriendsWindow.xaml
     /// </summary>
-    public partial class FriendsWindow
+    public partial class FriendsWindow : ISwitchbladeWindow
     {
         private const int ScrollThreshold = 15;
 
         private readonly RazerManager _razer;
         private readonly OverlayHelper _overlayHelper;
+
+        private bool _activated;
 
         private int _pressYPos;
         private int _lastYPos;
@@ -41,6 +43,15 @@ namespace Sharparam.SwitchBladeSteam.Windows
             Provider.Steam.MessageReceived += SteamOnMessageReceived;
 
             _razer = Provider.Razer;
+            ActivateApp();
+            Provider.CurrentWindow = this;
+        }
+
+        public void ActivateApp()
+        {
+            if (_activated)
+                return;
+
             _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
 
             // Set up dynamic keys
@@ -55,6 +66,24 @@ namespace Sharparam.SwitchBladeSteam.Windows
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Press);
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Move);
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Tap);
+
+            _activated = true;
+        }
+
+        public void DeactivateApp()
+        {
+            if (!_activated)
+                return;
+
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
+            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
+            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
+            _razer.Touchpad.Gesture -= TouchpadOnGesture;
+            _razer.Touchpad.Clear();
+
+            _activated = false;
         }
 
         #region Helper Methods
@@ -151,12 +180,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
             Provider.Steam.MessageReceived -= SteamOnMessageReceived;
 
-            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Press);
-            _razer.Touchpad.DisableGesture(RazerAPI.GestureType.Move);
-            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK1);
-            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK10);
-            _razer.DisableDynamicKey(RazerAPI.DynamicKeyType.DK5);
-            _razer.Touchpad.Gesture -= TouchpadOnGesture;
+            DeactivateApp();
 
             Application.Current.MainWindow = new ChatWindow(friend);
             Close();
