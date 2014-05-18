@@ -3,13 +3,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using Sharparam.SharpBlade.Native;
-using Sharparam.SharpBlade.Razer;
-using Sharparam.SharpBlade.Razer.Events;
 using Sharparam.SteamLib;
 using Sharparam.SteamLib.Events;
 using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
+
+using SharpBlade.Native;
+using SharpBlade.Razer;
+using SharpBlade.Razer.Events;
+
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam.Windows

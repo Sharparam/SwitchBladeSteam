@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Threading;
-using Sharparam.SharpBlade.Native;
-using Sharparam.SharpBlade.Razer;
 using Sharparam.SteamLib;
 using Sharparam.SwitchBladeSteam.Lib;
+
+using SharpBlade.Native;
+using SharpBlade.Razer;
+
 using Steam4NET;
 
 namespace Sharparam.SwitchBladeSteam

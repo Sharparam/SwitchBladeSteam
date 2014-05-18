@@ -28,13 +28,14 @@
 //  </copyright>
 // ---------------------------------------------------------------------------------------
 
+using SharpBlade.Native;
+using SharpBlade.Razer;
+using SharpBlade.Razer.Events;
+
 namespace Sharparam.SwitchBladeSteam.Lib
 {
     using System.Windows;
 
-    using Sharparam.SharpBlade.Native;
-    using Sharparam.SharpBlade.Razer;
-    using Sharparam.SharpBlade.Razer.Events;
     using Sharparam.SteamLib;
     using Sharparam.SwitchBladeSteam.ViewModels;
 

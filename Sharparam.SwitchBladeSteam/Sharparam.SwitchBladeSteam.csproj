@@ -247,10 +247,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sharparam.SharpBlade\Sharparam.SharpBlade\Sharparam.SharpBlade.csproj">
-      <Project>{2c390908-d634-4450-9804-71d4929dd392}</Project>
-      <Name>Sharparam.SharpBlade</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sharparam.SteamLib\Sharparam.SteamLib\Sharparam.SteamLib.csproj">
       <Project>{7a29757a-2a04-4089-9b78-acdf896abd0d}</Project>
       <Name>Sharparam.SteamLib</Name>
@@ -258,6 +254,10 @@
     <ProjectReference Include="..\Sharparam.SteamLib\Steam4NET2\Steam4NET.csproj">
       <Project>{1a204257-fe82-4bbe-9ed4-40694821c31f}</Project>
       <Name>Steam4NET</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SharpBlade\SharpBlade\SharpBlade.csproj">
+      <Project>{2c390908-d634-4450-9804-71d4929dd392}</Project>
+      <Name>SharpBlade</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

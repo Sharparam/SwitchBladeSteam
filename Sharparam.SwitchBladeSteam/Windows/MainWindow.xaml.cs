@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Windows;
-using Sharparam.SharpBlade.Razer;
 using Sharparam.SteamLib;
 using Sharparam.SwitchBladeSteam.Lib;
 using Sharparam.SwitchBladeSteam.ViewModels;
+
+using SharpBlade.Razer;
 
 namespace Sharparam.SwitchBladeSteam.Windows
 {
