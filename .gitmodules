@@ -1,6 +1,6 @@
-[submodule "Sharparam.SharpBlade"]
-	path = Sharparam.SharpBlade
-	url = https://github.com/Sharparam/SharpBlade.git
 [submodule "Sharparam.SteamLib"]
 	path = Sharparam.SteamLib
 	url = https://github.com/Sharparam/SteamLib.git
+[submodule "SharpBlade"]
+	path = SharpBlade
+	url = git://github.com/SharpBlade/SharpBlade.git
