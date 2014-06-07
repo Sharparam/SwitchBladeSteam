@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -252,8 +254,8 @@
       <Project>{7a29757a-2a04-4089-9b78-acdf896abd0d}</Project>
       <Name>Sharparam.SteamLib</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sharparam.SteamLib\Steam4NET2\Steam4NET.csproj">
-      <Project>{1a204257-fe82-4bbe-9ed4-40694821c31f}</Project>
+    <ProjectReference Include="..\Sharparam.SteamLib\Steam4NET\Steam4NET\Steam4NET.csproj">
+      <Project>{092ead98-f052-4f72-8c29-8ed93a5936af}</Project>
       <Name>Steam4NET</Name>
     </ProjectReference>
     <ProjectReference Include="..\SharpBlade\SharpBlade\SharpBlade.csproj">
@@ -288,5 +290,12 @@
     </PropertyGroup>
     <!--Publish copies the untransformed App.config to deployment directory so overwrite it-->
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
+  </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
 </Project>
