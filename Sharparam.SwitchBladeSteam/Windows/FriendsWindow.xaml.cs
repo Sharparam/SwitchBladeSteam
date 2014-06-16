@@ -206,7 +206,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         {
             DeactivateApp();
 
-            Application.Current.MainWindow = new GameWindow();
+            Application.Current.MainWindow = new GamesWindow();
             Close();
             Application.Current.MainWindow.Show();
         }

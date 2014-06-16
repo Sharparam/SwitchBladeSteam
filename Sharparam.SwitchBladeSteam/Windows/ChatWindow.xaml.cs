@@ -229,7 +229,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         private void GamesKeyPressed(object sender, EventArgs eventArgs)
         {
             DeactivateApp();
-            Application.Current.MainWindow = new GameWindow();
+            Application.Current.MainWindow = new GamesWindow();
             Close();
             Application.Current.MainWindow.Show();
         }

@@ -1,4 +1,4 @@
-﻿<Window x:Class="Sharparam.SwitchBladeSteam.Windows.GameWindow"
+﻿<Window x:Class="Sharparam.SwitchBladeSteam.Windows.GamesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Sharparam.SwitchBladeSteam.ViewModels"
@@ -6,7 +6,7 @@
         xmlns:compatibility="clr-namespace:Sharparam.SwitchBladeSteam.Compatibility"
         xmlns:sl="clr-namespace:Sharparam.SteamLib;assembly=Sharparam.SteamLib"
         xmlns:converters="clr-namespace:Sharparam.SwitchBladeSteam.Converters"
-        Title="GameWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="WindowLoaded">
+        Title="GamesWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="WindowLoaded">
     <Window.Resources>
         <converters:BitmapConverter x:Key="BitmapConverter"/>
         <CollectionViewSource x:Key="Apps" Source="{Binding Apps}" Filter="Apps_OnFilter">

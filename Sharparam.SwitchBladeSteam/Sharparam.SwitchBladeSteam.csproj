@@ -80,8 +80,8 @@
     <Compile Include="Windows\FriendsWindow.xaml.cs">
       <DependentUpon>FriendsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\GameWindow.xaml.cs">
-      <DependentUpon>GameWindow.xaml</DependentUpon>
+    <Compile Include="Windows\GamesWindow.xaml.cs">
+      <DependentUpon>GamesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ISwitchbladeWindow.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
@@ -263,7 +263,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\GameWindow.xaml">
+    <Page Include="Windows\GamesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

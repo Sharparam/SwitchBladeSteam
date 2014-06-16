@@ -17,9 +17,9 @@ using Steam4NET;
 namespace Sharparam.SwitchBladeSteam.Windows
 {
     /// <summary>
-    /// Interaction logic for GameWindow.xaml
+    /// Interaction logic for GamesWindow.xaml
     /// </summary>
-    public partial class GameWindow : ISwitchbladeWindow
+    public partial class GamesWindow : ISwitchbladeWindow
     {
         private const int ScrollThreshold = 15;
 
@@ -35,7 +35,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private Friend _lastMessageFriend;
 
-        public GameWindow()
+        public GamesWindow()
         {
             InitializeComponent();
 
