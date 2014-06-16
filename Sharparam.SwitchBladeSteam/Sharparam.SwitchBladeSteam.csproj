@@ -66,6 +66,7 @@
     <Compile Include="Compatibility\MessagesWrapper.cs" />
     <Compile Include="Compatibility\MessageWrapper.cs" />
     <Compile Include="Controls\BitmapImage.cs" />
+    <Compile Include="Converters\BitmapConverter.cs" />
     <Compile Include="Lib\Helper.cs" />
     <Compile Include="Lib\OverlayHelper.cs" />
     <Compile Include="Lib\Provider.cs" />

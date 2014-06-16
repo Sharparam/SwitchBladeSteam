@@ -84,6 +84,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
             // Set up dynamic keys
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, FriendsKeyPressed, @"Default\Images\dk_friends.png",
                                     @"Default\Images\dk_friends_pressed.png", true);
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK2, GamesKeyPressed, @"Default\Images\dk_games.png",
+                                    @"Default\Images\dk_games_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK10, (s, e) => ScrollHistoryBoxUp(),
                                     @"Default\Images\dk_up.png", @"Default\Images\dk_up_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => ScrollHistoryBoxDown(),
@@ -98,6 +100,8 @@ namespace Sharparam.SwitchBladeSteam.Windows
         {
             if (!_activated)
                 return;
+
+            Provider.Steam.MessageReceived -= SteamOnMessageReceived;
 
             if (_razer.KeyboardCapture)
                 _razer.SetKeyboardCapture(false);
@@ -216,9 +220,16 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private void FriendsKeyPressed(object sender, EventArgs eventArgs)
         {
-            Provider.Steam.MessageReceived -= SteamOnMessageReceived;
             DeactivateApp();
             Application.Current.MainWindow = new FriendsWindow();
+            Close();
+            Application.Current.MainWindow.Show();
+        }
+
+        private void GamesKeyPressed(object sender, EventArgs eventArgs)
+        {
+            DeactivateApp();
+            Application.Current.MainWindow = new GameWindow();
             Close();
             Application.Current.MainWindow.Show();
         }

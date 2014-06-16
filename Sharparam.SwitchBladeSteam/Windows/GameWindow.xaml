@@ -5,8 +5,10 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:compatibility="clr-namespace:Sharparam.SwitchBladeSteam.Compatibility"
         xmlns:sl="clr-namespace:Sharparam.SteamLib;assembly=Sharparam.SteamLib"
+        xmlns:converters="clr-namespace:Sharparam.SwitchBladeSteam.Converters"
         Title="GameWindow" Height="480" Width="800" Background="Black" Foreground="White" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="Manual" Left="-99999" Top="-99999" ShowActivated="False" ShowInTaskbar="False" Loaded="WindowLoaded">
     <Window.Resources>
+        <converters:BitmapConverter x:Key="BitmapConverter"/>
         <CollectionViewSource x:Key="Apps" Source="{Binding Apps}" Filter="Apps_OnFilter">
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="Name"/>
@@ -14,7 +16,8 @@
         </CollectionViewSource>
         <DataTemplate DataType="{x:Type sl:App}">
             <StackPanel Orientation="Horizontal">
-                <StackPanel Margin="0,0,0,0">
+                <Image Width="32" Height="32" Source="{Binding IconBitmap, Converter={StaticResource BitmapConverter}}"/>
+                <StackPanel Margin="10,0,0,0">
                     <TextBlock Text="{Binding Name}" FontFamily="Segoe UI Light" FontSize="26"/>
                 </StackPanel>
             </StackPanel>
