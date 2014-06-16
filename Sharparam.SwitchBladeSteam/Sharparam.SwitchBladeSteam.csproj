@@ -60,6 +60,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Compatibility\AppWrapper.cs" />
     <Compile Include="Compatibility\FriendsWrapper.cs" />
     <Compile Include="Compatibility\FriendWrapper.cs" />
     <Compile Include="Compatibility\MessagesWrapper.cs" />
@@ -70,12 +71,16 @@
     <Compile Include="Lib\Provider.cs" />
     <Compile Include="ViewModels\FriendsViewModel.cs" />
     <Compile Include="ViewModels\FriendViewModel.cs" />
+    <Compile Include="ViewModels\GamesViewModel.cs" />
     <Compile Include="ViewModels\MainWindowMessageViewModel.cs" />
     <Compile Include="Windows\ChatWindow.xaml.cs">
       <DependentUpon>ChatWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\FriendsWindow.xaml.cs">
       <DependentUpon>FriendsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\GameWindow.xaml.cs">
+      <DependentUpon>GameWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ISwitchbladeWindow.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
@@ -118,123 +123,135 @@
     <Content Include="Config.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Default\Images\dk_away.png">
+    <None Include="Default\Images\dk_away.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_away_active.png">
+    </None>
+    <None Include="Default\Images\dk_away_active.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_away_active_alt.png">
+    </None>
+    <None Include="Default\Images\dk_away_active_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_away_alt.png">
+    </None>
+    <None Include="Default\Images\dk_away_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_away_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_away_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_away_pressed_alt.png">
+    </None>
+    <None Include="Default\Images\dk_away_pressed_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_bottom.png">
+    </None>
+    <None Include="Default\Images\dk_bottom.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_bottom_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_bottom_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_busy.png">
+    </None>
+    <None Include="Default\Images\dk_busy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_busy_active.png">
+    </None>
+    <None Include="Default\Images\dk_busy_active.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_busy_active_alt.png">
+    </None>
+    <None Include="Default\Images\dk_busy_active_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_busy_alt.png">
+    </None>
+    <None Include="Default\Images\dk_busy_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_busy_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_busy_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_busy_pressed_alt.png">
+    </None>
+    <None Include="Default\Images\dk_busy_pressed_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_disabled.png">
+    </None>
+    <None Include="Default\Images\dk_disabled.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_down.png">
+    </None>
+    <None Include="Default\Images\dk_down.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_down_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_down_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_friends.png">
+    </None>
+    <None Include="Default\Images\dk_friends.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_friends_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_friends_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_icon.png">
+    </None>
+    <None Include="Default\Images\dk_games.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_offline.png">
+    </None>
+    <None Include="Default\Images\dk_games_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_offline_active.png">
+    </None>
+    <None Include="Default\Images\dk_icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_offline_active_alt.png">
+    </None>
+    <None Include="Default\Images\dk_launch.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_offline_alt.png">
+    </None>
+    <None Include="Default\Images\dk_launch_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_offline_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_offline.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_offline_pressed_alt.png">
+    </None>
+    <None Include="Default\Images\dk_offline_active.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_online.png">
+    </None>
+    <None Include="Default\Images\dk_offline_active_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_online_active.png">
+    </None>
+    <None Include="Default\Images\dk_offline_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_online_active_alt.png">
+    </None>
+    <None Include="Default\Images\dk_offline_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_online_alt.png">
+    </None>
+    <None Include="Default\Images\dk_offline_pressed_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_online_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_online.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_online_pressed_alt.png">
+    </None>
+    <None Include="Default\Images\dk_online_active.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_startchat.png">
+    </None>
+    <None Include="Default\Images\dk_online_active_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_startchat_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_online_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_up.png">
+    </None>
+    <None Include="Default\Images\dk_online_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\dk_up_pressed.png">
+    </None>
+    <None Include="Default\Images\dk_online_pressed_alt.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\tp_aero.png">
+    </None>
+    <None Include="Default\Images\dk_startchat.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\tp_blank.png">
+    </None>
+    <None Include="Default\Images\dk_startchat_pressed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Default\Images\tp_splash.png">
+    </None>
+    <None Include="Default\Images\dk_up.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="Default\Images\dk_up_pressed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Default\Images\tp_aero.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Default\Images\tp_blank.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Default\Images\tp_splash.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Windows\ChatWindow.xaml">
@@ -242,6 +259,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\FriendsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\GameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

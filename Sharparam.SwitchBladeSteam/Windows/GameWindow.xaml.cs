@@ -3,9 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+
 using Sharparam.SteamLib;
 using Sharparam.SteamLib.Events;
-using Sharparam.SwitchBladeSteam.Compatibility;
 using Sharparam.SwitchBladeSteam.Lib;
 
 using SharpBlade.Native;
@@ -17,13 +17,14 @@ using Steam4NET;
 namespace Sharparam.SwitchBladeSteam.Windows
 {
     /// <summary>
-    /// Interaction logic for FriendsWindow.xaml
+    /// Interaction logic for GameWindow.xaml
     /// </summary>
-    public partial class FriendsWindow : ISwitchbladeWindow
+    public partial class GameWindow : ISwitchbladeWindow
     {
         private const int ScrollThreshold = 15;
 
         private readonly RazerManager _razer;
+
         private readonly OverlayHelper _overlayHelper;
 
         private bool _activated;
@@ -34,7 +35,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private Friend _lastMessageFriend;
 
-        public FriendsWindow()
+        public GameWindow()
         {
             InitializeComponent();
 
@@ -47,6 +48,11 @@ namespace Sharparam.SwitchBladeSteam.Windows
             Provider.CurrentWindow = this;
         }
 
+        private void WindowLoaded(object sender, RoutedEventArgs e)
+        {
+            Helper.ExtendWindowStyleWithTool(this);
+        }
+
         public void ActivateApp()
         {
             if (_activated)
@@ -55,10 +61,10 @@ namespace Sharparam.SwitchBladeSteam.Windows
             _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
 
             // Set up dynamic keys
-            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, (s, e) => StartChatWithSelected(),
-                                    @"Default\Images\dk_startchat.png", @"Default\Images\dk_startchat_pressed.png", true);
-            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK2, (s, e) => OpenGames(),
-                                    @"Default\Images\dk_games.png", @"Default\Images\dk_games_pressed.png", true);
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, (s, e) => LaunchSelected(),
+                                    @"Default\Images\dk_launch.png", @"Default\Images\dk_launch_pressed.png", true);
+            _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK2, (s, e) => OpenFriends(),
+                                    @"Default\Images\dk_friends.png", @"Default\Images\dk_friends_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK10, (s, e) => MoveSelectionUp(),
                                     @"Default\Images\dk_up.png", @"Default\Images\dk_up_pressed.png", true);
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK5, (s, e) => MoveSelectionDown(),
@@ -95,15 +101,15 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         private ListBoxItem GetListViewItem(int index)
         {
-            if (FriendsListBox.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
+            if (GamesListBox.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
                 return null;
-            return FriendsListBox.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
+            return GamesListBox.ItemContainerGenerator.ContainerFromIndex(index) as ListBoxItem;
         }
 
         private int GetCurrentIndex(Point position)
         {
             var index = -1;
-            for (var i = 0; i < FriendsListBox.Items.Count; i++)
+            for (var i = 0; i < GamesListBox.Items.Count; i++)
             {
                 var item = GetListViewItem(i);
                 if (item == null)
@@ -164,18 +170,13 @@ namespace Sharparam.SwitchBladeSteam.Windows
                     else
                     {
                         var index = GetCurrentIndex(pos);
-                        if (index < 0 || index >= FriendsListBox.Items.Count)
+                        if (index < 0 || index >= GamesListBox.Items.Count)
                             break;
-                        FriendsListBox.SelectedIndex = index; // Small hack to utilize existing StartChatWithSelected
-                        StartChatWithSelected();
+                        GamesListBox.SelectedIndex = index; // Small hack to utilize existing StartChatWithSelected
+                        LaunchSelected();
                     }
                     break;
             }
-        }
-
-        private void WindowLoaded(object sender, RoutedEventArgs e)
-        {
-            Helper.ExtendWindowStyleWithTool(this);
         }
 
         private void StartChatWithFriend(Friend friend)
@@ -190,37 +191,37 @@ namespace Sharparam.SwitchBladeSteam.Windows
             Application.Current.MainWindow.Show();
         }
 
-        private void StartChatWithSelected()
+        private void LaunchSelected()
         {
-            var item = FriendsListBox.SelectedItem;
+            var item = GamesListBox.SelectedItem;
 
-            var friend = item as FriendWrapper;
+            var app = item as SteamLib.App;
 
-            if (friend == null)
+            if (app == null)
                 return;
 
-            StartChatWithFriend(friend.Friend);
+            app.Launch();
         }
 
-        private void OpenGames()
+        private void OpenFriends()
         {
             DeactivateApp();
 
-            Application.Current.MainWindow = new GameWindow();
+            Application.Current.MainWindow = new FriendsWindow();
             Close();
             Application.Current.MainWindow.Show();
         }
 
         private void MoveSelection(int direction)
         {
-            if (FriendsListBox.Items.Count <= 1 ||
-                FriendsListBox.SelectedIndex == -1 ||
-                (FriendsListBox.SelectedIndex == 0 && direction < 0) ||
-                (FriendsListBox.SelectedIndex == FriendsListBox.Items.Count - 1 && direction > 0))
+            if (GamesListBox.Items.Count <= 1 ||
+                GamesListBox.SelectedIndex == -1 ||
+                (GamesListBox.SelectedIndex == 0 && direction < 0) ||
+                (GamesListBox.SelectedIndex == GamesListBox.Items.Count - 1 && direction > 0))
                 return;
 
-            FriendsListBox.SelectedIndex += (direction == 0 ? 0 : (direction < 0 ? -1 : 1));
-            FriendsListBox.ScrollIntoView(FriendsListBox.SelectedItem);
+            GamesListBox.SelectedIndex += (direction == 0 ? 0 : (direction < 0 ? -1 : 1));
+            GamesListBox.ScrollIntoView(GamesListBox.SelectedItem);
         }
 
         private void MoveSelectionUp()
@@ -233,10 +234,10 @@ namespace Sharparam.SwitchBladeSteam.Windows
             MoveSelection(1);
         }
 
-        private void Friends_OnFilter(object sender, FilterEventArgs e)
+        private void Apps_OnFilter(object sender, FilterEventArgs e)
         {
-            var f = e.Item as FriendWrapper;
-            e.Accepted = f != null && f.Friend.Online;
+            var a = e.Item as SteamLib.App;
+            e.Accepted = a != null && a.IsGame && a.Playable;
         }
     }
 }
