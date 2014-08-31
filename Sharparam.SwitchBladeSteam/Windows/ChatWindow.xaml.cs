@@ -75,7 +75,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (_activated)
                 return;
 
-            _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+            _razer.Touchpad.SetWindow(this, RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Press);
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Tap);
             _razer.Touchpad.EnableGesture(RazerAPI.GestureType.Move);
@@ -323,7 +323,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
         {
             InputBox.Clear();
             InputBox.Background = ActiveColor;
-            _razer.StartWPFControlKeyboardCapture(InputBox, false);
+            _razer.StartWpfControlKeyboardCapture(InputBox, false);
         }
 
         private void StopKeyboardCapture()

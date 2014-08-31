@@ -77,10 +77,10 @@ namespace Sharparam.SwitchBladeSteam.Lib
 
         private static void OnAppEvent(object sender, AppEventEventArgs e)
         {
-            if (e.Type == _lastEventType)
+            if (e.EventType == _lastEventType)
                 return;
 
-            switch (e.Type)
+            switch (e.EventType)
             {
                 case RazerAPI.AppEventType.Activated:
                     if (CurrentWindow == null)
@@ -103,7 +103,7 @@ namespace Sharparam.SwitchBladeSteam.Lib
                     break;
             }
 
-            _lastEventType = e.Type;
+            _lastEventType = e.EventType;
         }
     }
 }

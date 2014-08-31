@@ -52,7 +52,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
             if (_activated)
                 return;
 
-            _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+            _razer.Touchpad.SetWindow(this, RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
 
             // Set up dynamic keys
             _razer.EnableDynamicKey(RazerAPI.DynamicKeyType.DK1, (s, e) => StartChatWithSelected(),

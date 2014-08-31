@@ -58,7 +58,7 @@ namespace Sharparam.SwitchBladeSteam.Windows
 
         public void ActivateApp()
         {
-            _razer.Touchpad.SetWindow(this, Touchpad.RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
+            _razer.Touchpad.SetWindow(this, RenderMethod.Polling, new TimeSpan(0, 0, 0, 0, 42));
         }
 
         public void DeactivateApp()
